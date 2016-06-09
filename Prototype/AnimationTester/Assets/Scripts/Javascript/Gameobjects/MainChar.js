@@ -133,9 +133,9 @@
 *	Add NameOfYourGameObject.Start() in your scene.
 */
 
-function AnimateSprite() 
+function MainChar() 
 {
-	this.name = "AnimateSprite";
+	this.name = "MainChar";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
@@ -146,7 +146,7 @@ function AnimateSprite()
 	this.Parent = null;
 	
 	this.Transform = {};
-	this.Transform.RelativePosition = new Vector(3*(canvas.width/4),canvas.height/4);
+	this.Transform.RelativePosition = new Vector(canvas.width/3,canvas.height/4);
 	this.Transform.Position = this.Transform.RelativePosition;
 	this.Transform.Size = new Vector(16,16);
 	this.Transform.RelativeScale = new Vector(10,10);
@@ -243,8 +243,6 @@ function AnimateSprite()
 			}
 			ctx.restore();
 		}
-					
-
 	};
 
 
@@ -277,8 +275,21 @@ function AnimateSprite()
 			if (this.ColliderIsSameSizeAsTransform) {
 				this.Physics.Collider = this.Transform;
 			}
-			this.SetSpriteSheet( Images["sprite"],new Vector(64,64) );
 
+			/*
+																Images["ImagesPath -> Name"]
+																new Vector(1,2);
+																	1 = width sprite
+																	2 = height sprite
+			*/
+			this.SetSpriteSheet( Images["sprite"],new Vector(64,64) );
+			/*
+																Temps entre 2 frames
+																Change la valeur, test !
+			*/
+			this.Renderer.Animation.totalAnimationLength = .5;
+
+			this.Renderer.Animation.animated = true;
 			this.started = true;
 			Print('System:GameObject ' + this.name + " Started !");
 		}
@@ -315,34 +326,16 @@ function AnimateSprite()
 			}
 			
 			this.Update();
-		}
-			
+		}		
 	};
 	this.Update = function() 
 	{
-		
-		if (Input.KeysDown[37] || Input.KeysDown[38] || Input.KeysDown[39] || Input.KeysDown[40]) {
- 				this.Renderer.Animation.animated = true;
- 				if (Input.KeysDown[37]) {
- 					//this.Transform.scale.sub(new Vector(0.1,0.1));
- 					this.Renderer.Animation.Current = this.Renderer.Animation.Animations[1];
- 				}
- 				if (Input.KeysDown[38]) {
- 					//this.Transform.scale.sub(new Vector(0.1,0.1));
- 					this.Renderer.Animation.Current = this.Renderer.Animation.Animations[3];
- 				}
- 				if (Input.KeysDown[39]) {
- 					//this.Transform.scale.add(new Vector(0.1,0.1));
- 					this.Renderer.Animation.Current = this.Renderer.Animation.Animations[2];
- 				}
- 				if (Input.KeysDown[40]) {
- 					//this.Transform.scale.sub(new Vector(0.1,0.1));
- 					this.Renderer.Animation.Current = this.Renderer.Animation.Animations[0];
- 				}
- 			} else {
- 				this.Renderer.Animation.animated = false;
- 			}
-		
+		this.Renderer.Animation.Current = this.Renderer.Animation.Animations[0];
+
+		if( Input.KeysDown[32] == true ){
+			this.Renderer.Animation.Current = this.Renderer.Animation.Animations[1];
+		}
+
 		this.Renderer.Draw();
 
 		this.PostUpdate();	
@@ -354,10 +347,10 @@ function AnimateSprite()
 	};
 	this.GUI = function() 
 	{
-		ctx.fillStyle = "black";
+		ctx.fillStyle = "white";
 		ctx.textAlign = "center";
-		ctx.font = "15px arial";
-		ctx.fillText("use the arrow Keys to animate the sprite",3*(canvas.width/4),(canvas.height/4)-100);
+		ctx.font = "30px arial";
+		ctx.fillText("espace pour jump animation",canvas.width/3,(canvas.height/4)-100);
 		ctx.textAlign = "normal";	
 	}
 	this.onHover = function() 

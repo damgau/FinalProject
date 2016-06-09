@@ -60,14 +60,12 @@ function SceneAnim() {
 		if (!this.started) {
 			Time.SetTimeWhenSceneBegin();
 			// operation start
-			var sprite1 = new AnimateSprite();
-			this.GameObjects.push(sprite1);
-			var sprite2 = new ImgFixe();
-			this.GameObjects.push(sprite2);
-			var sprite3 = new ImgRotate();
-			this.GameObjects.push(sprite3);
-			var sprite4 = new ImgScaled();
-			this.GameObjects.push(sprite4);
+			var bg = new Background();
+			this.GameObjects.push(bg);
+			var mainChar = new MainChar();
+			this.GameObjects.push(mainChar);
+			var imgScaled = new ImgScaled();
+			this.GameObjects.push(imgScaled);
 
 			this.started = true;
 			console.log('%c System:Scene ' + this.name + " Started !", 'background:#222; color:#bada55');

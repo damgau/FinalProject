@@ -133,8 +133,8 @@
 *	Add NameOfYourGameObject.Start() in your scene.
 */
 
-function ImgFixe() {
-	this.name = "ImgFixe";
+function Background() {
+	this.name = "Background";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
@@ -145,7 +145,7 @@ function ImgFixe() {
 	this.Transform = {};
 	this.Transform.RelativePosition = new Vector(0,0);
 	this.Transform.Position = this.Transform.RelativePosition;
-	this.Transform.Size = new Vector(canvas.width/2,canvas.height/2);
+	this.Transform.Size = new Vector(canvas.width,canvas.height);
 	this.Transform.RelativeScale = new Vector(1,1);
 	this.Transform.Scale = this.Transform.RelativeScale;
 	this.Transform.Pivot = new Vector(0,0);
@@ -227,8 +227,6 @@ function ImgFixe() {
 			}
 			ctx.restore();
 		}
-					
-
 	};
 
 
@@ -238,6 +236,9 @@ function ImgFixe() {
 	this.Start = function() {
 		if (!this.started) {
 			// operation start
+			/*
+																Images["ImagesPath -> Name"]
+			*/
 			this.Renderer.Material.Source = Images["Fond"];
 			this.started = true;
 			console.log('%c System:GameObject ' + this.name + " Started !", 'background:#222; color:#bada55');
