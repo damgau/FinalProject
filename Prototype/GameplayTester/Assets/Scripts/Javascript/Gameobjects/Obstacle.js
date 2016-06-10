@@ -1,31 +1,3 @@
-/**
- * Create a new GameObject <br />
- * @namespace GameObjects/GameObjects
- *
- * @tutorial
- * <ul><li>Copy the content of GameObjects file in a new .js document.</li>
- * <li>Save the new file in Assets/Javascript/GameObjects/NameOfYourGameObject.js .</li>
- * <li>In the index.html add below this comment <!-- GameObjects --> the line:<br/>
- * <script type="text/javascript" src="Assets/Scripts/Javascript/GameObjects/NameOfYourGameObject.js"></script></li>
- * <li>For create a new scene, use this instruction: "new GameObject()".</li>
- * </ul>
- * 
- * 
- * @property {String} name - The name of the object.
- * @property {Boolean} enabled - The active state of the GameObject.
- * @property {Boolean} renderer - The active state of Renderer component
- * @property {Boolean} fixedToCamera -  The active state of Camera if is Fixed
- * @property {Vector} MouseOffset  - Position of mouse
- * @property {Group} Parent - A Group which contain several GameObject
- * @property {Object} Transform  
- * @property {Vector} Transform.RelativePosition - the relative position of GameObject inside a Group 
- * @property {Vector} Transform.Size - size of GameObject
- * @property {Vector} Transform.Scale - scale of GameObject 
- * @property {Vector} Transform.Pivot - pivot position of GameObject
- * @property {Number} Transform.angle - angle of GameObject
- *
- *
- * */
 function Obstacle(_pos, _generalSpeed) 
 {
 	this.name = "Obstacle";
@@ -56,19 +28,6 @@ function Obstacle(_pos, _generalSpeed)
 	this.Transform.Pivot = new Vector(0,0);
 	this.Transform.angle = 0;
 
-	/**
-	 * The Physics component of the GameObject. <br />
-	 * @memberof GameObjects/GameObjects
-	 *
-	 * @property {Object} Physics  
-	 * @property {Boolean} Physics.enabled - The active state of the GameObject.
-	 * @property {Boolean} Physics.clickable - is clickable
-	 * @property {Boolean} Physics.dragAndDroppable - is draggable
-	 * @property {Boolean} Physics.colliderIsSameSizeAsTransform - is has the same size of Tranform size
-	 * @property {Number} Physics.countHovered - counter
-	 *
-	 *
-	 * */
 	this.Physics = {};
 	this.Physics.enabled = true;
 	this.Physics.clickable = false;
@@ -168,26 +127,10 @@ function Obstacle(_pos, _generalSpeed)
 			ctx.restore();
 		}
 	};
-	/**
-	 * @function Awake
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Called at the instruction new GameObject()
-	 * */
 	this.Awake = function() 
 	{
 		Print('System:GameObject ' + this.name + " Created !");
 	};
-
-	/**
-	 * @function Start
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Start the GameObject and show a message in console or launch Update() if already started <br/>
-	 * Set the transform component to the physics collider
-	 * */
 	this.Start = function() 
 	{
 		if (!this.started) {
@@ -205,18 +148,6 @@ function Obstacle(_pos, _generalSpeed)
 		}
 		this.PreUpdate();
 	};
-
-	/**
-	 * @function PreUpdate
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * If GameObject in group (parent), take relative position from parent position <br/>
-	 * If not, set GameObject own position <br/>
-	 *
-	 * Start the camera if exist and set position if fixed
-	 *
-	 * */
 	this.PreUpdate = function() 
 	{
 		if (this.enabled) 
@@ -250,13 +181,6 @@ function Obstacle(_pos, _generalSpeed)
 			this.Update();
 		}			
 	};
-	/**
-	 * @function Update
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Call postUpdate function (each frame)
-	 * */
 	this.Update = function() 
 	{
 		// Deplacement 								Delete gameObj
@@ -276,14 +200,6 @@ function Obstacle(_pos, _generalSpeed)
 
 		this.PostUpdate();	
 	};
-	/**
-	 * @function PostUpdate
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Execute PostUpdate. If DebugMode is active, diplay GameObject in debug mode
-	 *
-	 * */
 	this.PostUpdate = function() 
 	{
 		if (Application.debugMode) {
@@ -294,16 +210,8 @@ function Obstacle(_pos, _generalSpeed)
 		}
 		this.GUI();
 	};
-	/**
-	 * @function GUI
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Display the GUI of GameObject
-	 * */
-	this.GUI = function() 
-	{	
-	};
+
+	this.GUI = function() {};
 	this.setCollider = function () {
 		// "offset" = "marge"
 		var offsetCollide = 10;
@@ -328,40 +236,6 @@ function Obstacle(_pos, _generalSpeed)
 		this.Physics.leftCollider.w = offsetCollide + offsetCollide;
 		this.Physics.leftCollider.h = this.Transform.Size.y + offsetCollide + offsetCollide;
 	};
-	// Return : fix, move
-	this.collideChar = function () {
-		// Check Collision with GO
-		for (var i = 0; i < Scenes["Game"].GameObjects.length; i++) {
-			var go = Scenes["Game"].GameObjects[i];
-			if (go.name != this.name) {
-				if (Physics.CheckCollision(this.Physics.Collider, go.Physics.Collider)) {
-					// 1er cas : charBottom - obsTop
-					if (Physics.CheckCollision(this.Physics.botCollider, go.Physics.topCollider)) {
-						this.isColliding = true;
-						
-					} else {
-						this.isColliding = false;
-					}
-				} 
-			}
-		}
-		if (!this.isColliding) {
-
-			if ( this.Transform.RelativePosition.y < canvas.height - 70) {
-				this.Transform.RelativePosition.y += this.gravity;
-			} else {
-				this.jumped = false;
-			}
-
-		}
-	};
-	/**
-	 * @function onHover
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Counter on hover the GameObject
-	 * */
 	this.onHover = function() 
 	{
 		this.Physics.countHovered ++;	

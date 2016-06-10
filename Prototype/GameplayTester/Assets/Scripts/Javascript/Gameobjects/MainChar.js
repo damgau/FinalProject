@@ -205,10 +205,13 @@ function MainChar()
 	{
 		// 												Gerer le press for jump ( 1 press = 1 jump )
 		if( Input.KeysDown[32] == true ){
-			this.topToReach = this.Transform.RelativePosition.y - this.jumpHeight;
+			if (!this.stateChar.isJumping) {
+				this.topToReach = this.Transform.RelativePosition.y - this.jumpHeight;
+			}
 			this.stateChar.isJumping = true;
 		}
 		this.actionToDo();
+		this.checkCollideObstacle();
 		// Collider  									En fonction des "fonctionnalité" ajouté/supprimé les "set" utile/useless
 		if (this.Physics.colliderIsSameSizeAsTransform) 
 		{
@@ -222,14 +225,6 @@ function MainChar()
 
 		this.PostUpdate();	
 	};
-	/**
-	 * @function PostUpdate
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Execute PostUpdate. If DebugMode is active, diplay GameObject in debug mode
-	 *
-	 * */
 	this.PostUpdate = function() 
 	{
 		if (Application.debugMode) {
@@ -240,18 +235,7 @@ function MainChar()
 		}
 		this.GUI();
 	};
-
-	/**
-	 * @function GUI
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Display the GUI of GameObject
-	 * */
-	this.GUI = function() 
-	{
-		
-	};
+	this.GUI = function() {};
 
 	/*
 				Personnal Methods
@@ -300,7 +284,6 @@ function MainChar()
 						if (this.Transform.RelativePosition.y >= this.topToReach) {
 							this.Transform.RelativePosition.y -= this.ascension;
 						} else {
-							console.log("here");
 							this.jumped = true;
 						}
 					} else {
@@ -326,7 +309,17 @@ function MainChar()
 			break;
 		}
 	}
-
+	this.checkCollideObstacle = function () {
+		for (var i = 0; i < Scenes["Game"].GameObjects.length; i++) {
+			var obs = Scenes["Game"].GameObjects[i];
+			if (obs.name === "Obstacle") {
+			// Check Collision with Obs
+				if (Physics.CheckCollision(this.Physics.Collider, obs.Physics.Collider)) {
+					
+				}
+			}
+		}
+	};
 	/**
 	 * @function onHover
 	 * @memberof GameObjects/GameObjects

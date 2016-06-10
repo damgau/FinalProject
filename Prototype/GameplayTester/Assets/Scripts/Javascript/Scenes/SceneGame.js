@@ -82,7 +82,7 @@ function SceneGame()
 			ctx.fillRect(0,0, canvas.width, canvas.height);
 
 			//if (this.GameObjects.length < 3) {
-				//this.GameObjects.push(new Obstacle(null, this.generalSpeed));
+				this.GameObjects.push(new Obstacle(null, this.generalSpeed));
 			//}
 
 			for (var i = 0; i < this.GameObjects.length; i++) 
