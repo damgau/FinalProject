@@ -12,9 +12,9 @@
  * 
  * @return {Scene}
  * */
-function Scene() 
+function SceneGame() 
 {
-	this.name = "Model";
+	this.name = "Game";
 	this.GameObjects =[];
 	this.Groups = [];
 	this.Cameras = [];
@@ -23,6 +23,11 @@ function Scene()
 	this.started = false;
 
 	this.WorldSize = new Vector(4096,4096);
+
+	/*
+				Personnal Variable
+	*/
+	this.generalSpeed = 0;
 
 	/**
 	 * Called at the instruction new Scene().
@@ -43,6 +48,10 @@ function Scene()
 		{
 			Time.SetTimeWhenSceneBegin();
 			// operation start
+			this.generalSpeed = 5;
+
+			this.GameObjects.push(new MainChar());
+			this.GameObjects.push(new Obstacle(this.generalSpeed));
 			this.started = true;
 			Print('System:Scene ' + this.name + " Started !");
 			Time.SetTimeWhenSceneLoaded();
@@ -57,6 +66,10 @@ function Scene()
 	{
 		if (!Application.GamePaused) 
 		{
+			// Background
+			ctx.fillStyle = "#2C2A2A";
+			ctx.fillRect(0,0, canvas.width, canvas.height);
+
 			for (var i = 0; i < this.GameObjects.length; i++) 
 			{
 				this.GameObjects[i].Start();

@@ -26,14 +26,21 @@
  *
  *
  * */
-function GameObject() 
+function MainChar() 
 {
-	this.name = "Model";
+	this.name = "MainChar";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
 	this.fixedToCamera = true;
 
+
+	/*
+				Personnal Variable
+	*/
+	this.gravity = 0;
+	this.jump = 0;
+ 
 	this.MouseOffset = new Vector();
 
 	this.Parent = null;
@@ -180,6 +187,9 @@ function GameObject()
 	{
 		if (!this.started) {
 			// operation start
+			this.SetPosition( canvas.width*.5 - 10,canvas.height*.5 );
+			this.gravity = 10;
+			this.jump = 100;
 
 			if (this.Physics.colliderIsSameSizeAsTransform) 
 			{
@@ -245,6 +255,19 @@ function GameObject()
 	 * */
 	this.Update = function() 
 	{
+		// Jump & gravity 								INTERGERATE ACCELERATION
+		if ( this.Transform.RelativePosition.y < canvas.height - 70) {
+			this.Transform.RelativePosition.y += this.gravity;
+		}
+		// 												Gerer le press for jump ( 1 press = 1 jump )
+		if( Input.KeysDown[32] == true ){
+			this.Transform.RelativePosition.y -= this.jump;
+		}
+
+		// Position of MainChar
+		ctx.fillStyle = "#2EBF98";
+		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y, 50, 50);
+
 		this.PostUpdate();	
 	};
 	/**
@@ -260,7 +283,7 @@ function GameObject()
 		if (Application.debugMode) {
 			Debug.DebugObject(this);
 		}
-		this.GUI();	
+		this.GUI();
 	};
 
 	/**
