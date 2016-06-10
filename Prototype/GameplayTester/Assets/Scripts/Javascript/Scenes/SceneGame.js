@@ -81,9 +81,9 @@ function SceneGame()
 			ctx.fillStyle = "#2C2A2A";
 			ctx.fillRect(0,0, canvas.width, canvas.height);
 
-			if (this.GameObjects.length < 3) {
+			//if (this.GameObjects.length < 3) {
 				this.GameObjects.push(new Obstacle(null, this.generalSpeed));
-			}
+			//}
 
 			for (var i = 0; i < this.GameObjects.length; i++) 
 			{
@@ -94,9 +94,9 @@ function SceneGame()
 					// 400(number) : marge pour ne pas supprimer l'objet trop tôt
 					// doit etre un peu plus grand que this.GameObjects[i].Transform.Size
 					if (this.GameObjects[i].Transform.Position.x < -400) {
-						this.GameObjects.splice(i,1);
+						//this.GameObjects.splice(i,1);
 						// 													Not sure
-						i--;
+						//i--;
 					}
 				}
 			}

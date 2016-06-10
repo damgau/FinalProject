@@ -1,31 +1,3 @@
-/**
- * Create a new GameObject <br />
- * @namespace GameObjects/GameObjects
- *
- * @tutorial
- * <ul><li>Copy the content of GameObjects file in a new .js document.</li>
- * <li>Save the new file in Assets/Javascript/GameObjects/NameOfYourGameObject.js .</li>
- * <li>In the index.html add below this comment <!-- GameObjects --> the line:<br/>
- * <script type="text/javascript" src="Assets/Scripts/Javascript/GameObjects/NameOfYourGameObject.js"></script></li>
- * <li>For create a new scene, use this instruction: "new GameObject()".</li>
- * </ul>
- * 
- * 
- * @property {String} name - The name of the object.
- * @property {Boolean} enabled - The active state of the GameObject.
- * @property {Boolean} renderer - The active state of Renderer component
- * @property {Boolean} fixedToCamera -  The active state of Camera if is Fixed
- * @property {Vector} MouseOffset  - Position of mouse
- * @property {Group} Parent - A Group which contain several GameObject
- * @property {Object} Transform  
- * @property {Vector} Transform.RelativePosition - the relative position of GameObject inside a Group 
- * @property {Vector} Transform.Size - size of GameObject
- * @property {Vector} Transform.Scale - scale of GameObject 
- * @property {Vector} Transform.Pivot - pivot position of GameObject
- * @property {Number} Transform.angle - angle of GameObject
- *
- *
- * */
 function MainChar() 
 {
 	this.name = "MainChar";
@@ -42,11 +14,12 @@ function MainChar()
 	this.jump = 0;
 	this.isJumping = false;
 	this.jumped = false;
+	this.onThisObstacle = null;
 
 	// 													MAYBE : if spam esp --> double jump is usebug :O
-	this.isColliding = false; 
 	this.collided = false; 
  
+	this.isColliding = false; 
 	this.MouseOffset = new Vector();
 
 	this.Parent = null;
@@ -60,26 +33,12 @@ function MainChar()
 	this.Transform.Pivot = new Vector(0,0);
 	this.Transform.angle = 0;
 
-	/**
-	 * The Physics component of the GameObject. <br />
-	 * @memberof GameObjects/GameObjects
-	 *
-	 * @property {Object} Physics  
-	 * @property {Boolean} Physics.enabled - The active state of the GameObject.
-	 * @property {Boolean} Physics.clickable - is clickable
-	 * @property {Boolean} Physics.dragAndDroppable - is draggable
-	 * @property {Boolean} Physics.colliderIsSameSizeAsTransform - is has the same size of Tranform size
-	 * @property {Number} Physics.countHovered - counter
-	 *
-	 *
-	 * */
 	this.Physics = {};
 	this.Physics.enabled = true;
 	this.Physics.clickable = false;
 	this.Physics.dragAndDroppable = false;
 	this.Physics.colliderIsSameSizeAsTransform = true;
 	this.Physics.countHovered = 0;
-
 	this.Physics.Collider = new Box();
 	/*
 				Personnal Variable
@@ -171,26 +130,10 @@ function MainChar()
 			ctx.restore();
 		}
 	};
-	/**
-	 * @function Awake
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Called at the instruction new GameObject()
-	 * */
 	this.Awake = function() 
 	{
 		Print('System:GameObject ' + this.name + " Created !");
 	};
-
-	/**
-	 * @function Start
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Start the GameObject and show a message in console or launch Update() if already started <br/>
-	 * Set the transform component to the physics collider
-	 * */
 	this.Start = function() 
 	{
 		if (!this.started) {
@@ -227,7 +170,7 @@ function MainChar()
 	{
 		if (this.enabled) 
 		{
-			this.checkCollision();
+			this.collideObstacle();
 
 			if (this.Parent != null) 
 			{
@@ -348,21 +291,25 @@ function MainChar()
 		this.Physics.rightCollider.h = this.Transform.Size.y + offsetCollide + offsetCollide;
 	};
 	// Return : isFall, isRunning
-	this.checkCollision = function () {
+	this.collideObstacle = function () {
 		// Check Collision with GO
-		for (var i = 0; i < Scenes["Game"].GameObjects.length; i++) {
-			var go = Scenes["Game"].GameObjects[i];
-			if (go.name != this.name) {
-				if (Physics.CheckCollision(this.Physics.Collider, go.Physics.Collider)) {
-					this.isColliding = true;
-					// 1er cas : charBottom - obsTop
-					console.log(this.Physics.botCollider, go.Physics.topCollider);
+		if (this.onThisObstacle && Physics.CheckCollision(this.Physics.botCollider, this.onThisObstacle.Physics.topCollider)) {
+			this.isColliding = true;										//Maybe Useless
+		} else {
+			this.onThisObstacle = null;
+			for (var i = 0; i < Scenes["Game"].GameObjects.length; i++) {
+				var go = Scenes["Game"].GameObjects[i];
+				// 															go.name === "Obstacle" probably better for the future
+				if (go.name != this.name) {
 					if (Physics.CheckCollision(this.Physics.botCollider, go.Physics.topCollider)) {
+						console.log("Je suis au dessus !");
+						this.onThisObstacle = go;
+						this.isColliding = true;
 						this.jumped = false;
 						//this.Transform.RelativePosition.y = go.Transform.Position.y - go.Transform.Size.y;
+					} else {
+						this.isColliding = false;
 					}
-				} else {
-					this.isColliding = false;
 				}
 			}
 		}

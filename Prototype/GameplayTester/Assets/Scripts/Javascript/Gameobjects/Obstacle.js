@@ -329,7 +329,7 @@ function Obstacle(_pos, _generalSpeed)
 		this.Physics.leftCollider.h = this.Transform.Size.y + offsetCollide + offsetCollide;
 	};
 	// Return : fix, move
-	this.checkCollision = function () {
+	this.collideChar = function () {
 		// Check Collision with GO
 		for (var i = 0; i < Scenes["Game"].GameObjects.length; i++) {
 			var go = Scenes["Game"].GameObjects[i];
