@@ -26,7 +26,7 @@
  *
  *
  * */
-function Obstacle(_generalSpeed) 
+function Obstacle(_pos, _generalSpeed) 
 {
 	this.name = "Obstacle";
 	this.enabled = true;
@@ -46,7 +46,7 @@ function Obstacle(_generalSpeed)
 	this.Parent = null;
 	
 	this.Transform = {};
-	this.Transform.RelativePosition = new Vector();
+	this.Transform.RelativePosition = _pos || new Vector( canvas.width + 10, canvas.height*.5 );
 	this.Transform.Position = new Vector();
 	this.Transform.Size = new Vector();
 	this.Transform.RelativeScale = new Vector(1,1);
@@ -187,7 +187,6 @@ function Obstacle(_generalSpeed)
 	{
 		if (!this.started) {
 			// operation start
-			this.SetPosition( canvas.width + 10,canvas.height*.5 );
 
 			if (this.Physics.colliderIsSameSizeAsTransform) 
 			{

@@ -51,7 +51,12 @@ function SceneGame()
 			this.generalSpeed = 5;
 
 			this.GameObjects.push(new MainChar());
-			this.GameObjects.push(new Obstacle(this.generalSpeed));
+			var tempObstacle = new Obstacle(
+												new Vector( canvas.width*.5, canvas.height*.5 ),
+												this.generalSpeed
+											); // found solution (go proc  les 1 sur les autres)
+			this.GameObjects.push(tempObstacle);
+			this.GameObjects.push(new Obstacle(null, this.generalSpeed));
 			this.started = true;
 			Print('System:Scene ' + this.name + " Started !");
 			Time.SetTimeWhenSceneLoaded();
@@ -70,14 +75,30 @@ function SceneGame()
 			ctx.fillStyle = "#2C2A2A";
 			ctx.fillRect(0,0, canvas.width, canvas.height);
 
+			if (this.GameObjects.length < 3) {
+				this.GameObjects.push(new Obstacle(null, this.generalSpeed));
+			}
+
 			for (var i = 0; i < this.GameObjects.length; i++) 
 			{
 				this.GameObjects[i].Start();
+
+				// Remove useless GO or Call particuleSystem (effect)
+				if (this.GameObjects[i].name === "Obstacle") {
+					// 400(number) : marge pour ne pas supprimer l'objet trop tôt
+					// doit etre un peu plus grand que this.GameObjects[i].Transform.Size
+					if (this.GameObjects[i].Transform.Position.x < -400) {
+						this.GameObjects.splice(i,1);
+						// 													Not sure
+						i--;
+					}
+				}
 			}
 			for (var i = 0; i < this.Groups.length; i++) 
 			{
 				this.Groups[i].Start();
 			}
+
 		}
 		if (Application.debugMode) 
 		{
