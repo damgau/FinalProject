@@ -139,11 +139,6 @@ function MainChar()
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
-	this.fixedToCamera = true;
-
-	this.MouseOffset = new Vector();
-
-	this.Parent = null;
 	
 	this.Transform = {};
 	this.Transform.RelativePosition = new Vector(canvas.width/3,canvas.height/4);
@@ -245,7 +240,6 @@ function MainChar()
 		}
 	};
 
-
 	this.SetSpriteSheet = function(_img, _sizeFrame) {
 		this.Renderer.isSpriteSheet = true;
 		this.Renderer.Material.SizeFrame = _sizeFrame;
@@ -283,6 +277,8 @@ function MainChar()
 																	2 = height sprite
 			*/
 			this.SetSpriteSheet( Images["sprite"],new Vector(64,64) );
+			//this.SetSpriteSheet( Images["Jump"],new Vector(64,64) );
+
 			/*
 																Temps entre 2 frames
 																Change la valeur, test !
@@ -299,30 +295,15 @@ function MainChar()
 	{
 		if (this.enabled) 
 		{
-			if (this.Parent != null) 
-			{
-				this.Transform.Position.x = this.Transform.RelativePosition.x + this.Parent.Transform.Position.x;
-				this.Transform.Position.y = this.Transform.RelativePosition.y + this.Parent.Transform.Position.y;
+			this.Transform.Position.x = this.Transform.RelativePosition.x;
+			this.Transform.Position.y = this.Transform.RelativePosition.y;
 
-				this.Transform.Scale.x = this.Transform.RelativeScale.x * this.Parent.Transform.Scale.x;
-				this.Transform.Scale.y = this.Transform.RelativeScale.y * this.Parent.Transform.Scale.y;
-			} 
-			else 
-			{
-				this.Transform.Position.x = this.Transform.RelativePosition.x;
-				this.Transform.Position.y = this.Transform.RelativePosition.y;
-
-				this.Transform.Scale.x = this.Transform.RelativeScale.x;
-				this.Transform.Scale.y = this.Transform.RelativeScale.y;
-			}
+			this.Transform.Scale.x = this.Transform.RelativeScale.x;
+			this.Transform.Scale.y = this.Transform.RelativeScale.y;
+			
 			if (Application.LoadedScene.CurrentCamera != null) 
 			{
 				Application.LoadedScene.CurrentCamera.Start();
-				if (!this.fixedToCamera) 
-				{
-					this.Transform.Position.x -= Application.LoadedScene.CurrentCamera.Transform.Position.x;
-					this.Transform.Position.y -= Application.LoadedScene.CurrentCamera.Transform.Position.y;
-				}
 			}
 			
 			this.Update();
@@ -356,12 +337,6 @@ function MainChar()
 	this.onHover = function() 
 	{
 		this.Physics.countHovered ++;	
-	}
-	this.onClicked = function() 
-	{
-		this.MouseOffset.x = Input.MousePosition.x - this.Transform.Position.x;
-		this.MouseOffset.y = Input.MousePosition.y - this.Transform.Position.y;
-		this.Physics.countHovered ++;
 	}
 	this.onUnHovered = function() 
 	{
