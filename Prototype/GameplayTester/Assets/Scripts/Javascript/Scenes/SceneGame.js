@@ -48,7 +48,7 @@ function SceneGame()
 		{
 			Time.SetTimeWhenSceneBegin();
 			// operation start
-			this.generalSpeed = 5;
+			this.generalSpeed = 10;
 
 			this.GameObjects.push(new MainChar());
 			var tempObstacle = new Obstacle(
@@ -57,6 +57,12 @@ function SceneGame()
 											); // found solution (go proc  les 1 sur les autres)
 			this.GameObjects.push(tempObstacle);
 			this.GameObjects.push(new Obstacle(null, this.generalSpeed));
+
+			// boucle for console.log
+			// for (var i = 0; i < this.GameObjects.length; i++) {
+			// 	console.log(this.GameObjects[i].Physics.Collider);
+			// }
+
 			this.started = true;
 			Print('System:Scene ' + this.name + " Started !");
 			Time.SetTimeWhenSceneLoaded();
@@ -94,11 +100,10 @@ function SceneGame()
 					}
 				}
 			}
-			for (var i = 0; i < this.Groups.length; i++) 
-			{
-				this.Groups[i].Start();
-			}
-
+			// for (var i = 0; i < this.Groups.length; i++) 
+			// {
+			// 	this.Groups[i].Start();
+			// }
 		}
 		if (Application.debugMode) 
 		{

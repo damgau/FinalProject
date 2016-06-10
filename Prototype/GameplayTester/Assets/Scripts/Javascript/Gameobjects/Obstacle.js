@@ -40,13 +40,15 @@ function Obstacle(_pos, _generalSpeed)
 	*/
 	this.gravity = 0;
 	this.speed = _generalSpeed;
+
+	this.isColliding = true;
  
 	this.MouseOffset = new Vector();
 
 	this.Parent = null;
 	
 	this.Transform = {};
-	this.Transform.RelativePosition = _pos || new Vector( canvas.width + 10, canvas.height*.5 );
+	this.Transform.RelativePosition = _pos || new Vector( canvas.width + 10, canvas.height*.5 + 120 );
 	this.Transform.Position = new Vector();
 	this.Transform.Size = new Vector();
 	this.Transform.RelativeScale = new Vector(1,1);
@@ -71,14 +73,17 @@ function Obstacle(_pos, _generalSpeed)
 	this.Physics.enabled = true;
 	this.Physics.clickable = false;
 	this.Physics.dragAndDroppable = false;
-	this.Physics.colliderIsSameSizeAsTransform = false;
+	this.Physics.colliderIsSameSizeAsTransform = true;
 	this.Physics.countHovered = 0;
 
-	this.Physics.Collider = 
-	{
-		Position: new Vector(),
-		Size: new Vector()
-	};
+	this.Physics.Collider = new Box();
+
+	/*
+				Personnal Variable
+	*/
+	this.Physics.topCollider = new Box();
+	this.Physics.botCollider = new Box();
+	this.Physics.leftCollider = new Box();
 
 	this.Renderer = 
 	{
@@ -187,10 +192,12 @@ function Obstacle(_pos, _generalSpeed)
 	{
 		if (!this.started) {
 			// operation start
+			this.SetSize(200, 50);
 
+			// Set Collision
 			if (this.Physics.colliderIsSameSizeAsTransform) 
 			{
-				this.Physics.Collider = this.Transform;
+				this.setCollider();
 			}
 
 			this.started = true;
@@ -256,9 +263,16 @@ function Obstacle(_pos, _generalSpeed)
 		
 		this.Transform.RelativePosition.x -= this.speed;
 
+		// Collider  									En fonction des "fonctionnalité" ajouté/supprimé les "set" utile/useless
+		if (this.Physics.colliderIsSameSizeAsTransform) 
+		{
+			this.setCollider();
+		}
+
 		// Position of Obstacle
 		ctx.fillStyle = "#42BF2E";
-		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y, 200, 50);
+		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
+					 this.Transform.Size.x, this.Transform.Size.y);
 
 		this.PostUpdate();	
 	};
@@ -274,6 +288,9 @@ function Obstacle(_pos, _generalSpeed)
 	{
 		if (Application.debugMode) {
 			Debug.DebugObject(this);
+			ctx.fillStyle = "red";
+			var box = this.Physics.topCollider;
+			ctx.fillRect(box.x, box.y, box.w, box.h);
 		}
 		this.GUI();
 	};
@@ -286,6 +303,57 @@ function Obstacle(_pos, _generalSpeed)
 	 * */
 	this.GUI = function() 
 	{	
+	};
+	this.setCollider = function () {
+		// "offset" = "marge"
+		var offsetCollide = 10;
+		//basic Collider
+		this.Physics.Collider.x = this.Transform.RelativePosition.x ;
+		this.Physics.Collider.y = this.Transform.RelativePosition.y ;
+		this.Physics.Collider.w = this.Transform.Size.x ;
+		this.Physics.Collider.h = this.Transform.Size.y ;
+		// top Collider
+		this.Physics.topCollider.x = this.Transform.RelativePosition.x - offsetCollide;
+		this.Physics.topCollider.y = this.Transform.RelativePosition.y - offsetCollide;
+		this.Physics.topCollider.w = this.Transform.Size.x + offsetCollide + offsetCollide;
+		this.Physics.topCollider.h = offsetCollide;
+		// bot Collider
+		this.Physics.botCollider.x = this.Transform.RelativePosition.x - offsetCollide;
+		this.Physics.botCollider.y = this.Transform.RelativePosition.y + this.Transform.Size.y - offsetCollide*.5;
+		this.Physics.botCollider.w = this.Transform.Size.x + offsetCollide  + offsetCollide;
+		this.Physics.botCollider.h = offsetCollide;
+		// left Collider
+		this.Physics.leftCollider.x = this.Transform.RelativePosition.x - offsetCollide;
+		this.Physics.leftCollider.y = this.Transform.RelativePosition.y - offsetCollide;
+		this.Physics.leftCollider.w = offsetCollide + offsetCollide;
+		this.Physics.leftCollider.h = this.Transform.Size.y + offsetCollide + offsetCollide;
+	};
+	// Return : fix, move
+	this.checkCollision = function () {
+		// Check Collision with GO
+		for (var i = 0; i < Scenes["Game"].GameObjects.length; i++) {
+			var go = Scenes["Game"].GameObjects[i];
+			if (go.name != this.name) {
+				if (Physics.CheckCollision(this.Physics.Collider, go.Physics.Collider)) {
+					// 1er cas : charBottom - obsTop
+					if (Physics.CheckCollision(this.Physics.botCollider, go.Physics.topCollider)) {
+						this.isColliding = true;
+						
+					} else {
+						this.isColliding = false;
+					}
+				} 
+			}
+		}
+		if (!this.isColliding) {
+
+			if ( this.Transform.RelativePosition.y < canvas.height - 70) {
+				this.Transform.RelativePosition.y += this.gravity;
+			} else {
+				this.jumped = false;
+			}
+
+		}
 	};
 	/**
 	 * @function onHover
@@ -464,6 +532,5 @@ function Obstacle(_pos, _generalSpeed)
  		}
  		this.Renderer.Animation.Current = this.Renderer.Animation.Animations[0];
 	}
-
 	this.Awake();
 }

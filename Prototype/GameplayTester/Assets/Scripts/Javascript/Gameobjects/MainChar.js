@@ -40,6 +40,12 @@ function MainChar()
 	*/
 	this.gravity = 0;
 	this.jump = 0;
+	this.isJumping = false;
+	this.jumped = false;
+
+	// 													MAYBE : if spam esp --> double jump is usebug :O
+	this.isColliding = false; 
+	this.collided = false; 
  
 	this.MouseOffset = new Vector();
 
@@ -71,14 +77,16 @@ function MainChar()
 	this.Physics.enabled = true;
 	this.Physics.clickable = false;
 	this.Physics.dragAndDroppable = false;
-	this.Physics.colliderIsSameSizeAsTransform = false;
+	this.Physics.colliderIsSameSizeAsTransform = true;
 	this.Physics.countHovered = 0;
 
-	this.Physics.Collider = 
-	{
-		Position: new Vector(),
-		Size: new Vector()
-	};
+	this.Physics.Collider = new Box();
+	/*
+				Personnal Variable
+	*/
+	this.Physics.topCollider = new Box();
+	this.Physics.botCollider = new Box();
+	this.Physics.rightCollider = new Box();
 
 	this.Renderer = 
 	{
@@ -188,12 +196,14 @@ function MainChar()
 		if (!this.started) {
 			// operation start
 			this.SetPosition( canvas.width*.5 - 10,canvas.height*.5 );
+			this.SetSize( 50, 50 );
 			this.gravity = 10;
-			this.jump = 100;
+			this.jump = 400;
 
+			// Set Collision
 			if (this.Physics.colliderIsSameSizeAsTransform) 
 			{
-				this.Physics.Collider = this.Transform;
+				this.setCollider();
 			}
 
 			this.started = true;
@@ -217,6 +227,8 @@ function MainChar()
 	{
 		if (this.enabled) 
 		{
+			this.checkCollision();
+
 			if (this.Parent != null) 
 			{
 				this.Transform.Position.x = this.Transform.RelativePosition.x + this.Parent.Transform.Position.x;
@@ -255,18 +267,24 @@ function MainChar()
 	 * */
 	this.Update = function() 
 	{
-		// Jump & gravity 								INTERGERATE ACCELERATION
-		if ( this.Transform.RelativePosition.y < canvas.height - 70) {
-			this.Transform.RelativePosition.y += this.gravity;
-		}
 		// 												Gerer le press for jump ( 1 press = 1 jump )
 		if( Input.KeysDown[32] == true ){
-			this.Transform.RelativePosition.y -= this.jump;
+			this.isJumping = true;
+			if ( !this.jumped ) {
+				this.Transform.RelativePosition.y -= this.jump;
+				this.jumped = true;
+			}
 		}
 
+		// Collider  									En fonction des "fonctionnalité" ajouté/supprimé les "set" utile/useless
+		if (this.Physics.colliderIsSameSizeAsTransform) 
+			{
+				this.setCollider();
+			}
 		// Position of MainChar
 		ctx.fillStyle = "#2EBF98";
-		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y, 50, 50);
+		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
+					 this.Transform.Size.x, this.Transform.Size.y);
 
 		this.PostUpdate();	
 	};
@@ -282,6 +300,9 @@ function MainChar()
 	{
 		if (Application.debugMode) {
 			Debug.DebugObject(this);
+			ctx.fillStyle = "red";
+			var box = this.Physics.botCollider;
+			ctx.fillRect(box.x, box.y, box.w, box.h);
 		}
 		this.GUI();
 	};
@@ -298,6 +319,66 @@ function MainChar()
 		
 	};
 
+	/*
+				Personnal Methods
+	*/
+
+	this.setCollider = function () {
+		// "offset" = "marge"
+		var offsetCollide = 10;
+		//basic Collider
+		this.Physics.Collider.x = this.Transform.RelativePosition.x ;
+		this.Physics.Collider.y = this.Transform.RelativePosition.y ;
+		this.Physics.Collider.w = this.Transform.Size.x ;
+		this.Physics.Collider.h = this.Transform.Size.y ;
+		// top Collider
+		this.Physics.topCollider.x = this.Transform.RelativePosition.x - offsetCollide;
+		this.Physics.topCollider.y = this.Transform.RelativePosition.y - offsetCollide;
+		this.Physics.topCollider.w = this.Transform.Size.x + offsetCollide + offsetCollide;
+		this.Physics.topCollider.h = offsetCollide;
+		// bot Collider
+		this.Physics.botCollider.x = this.Transform.RelativePosition.x - offsetCollide;
+		this.Physics.botCollider.y = this.Transform.RelativePosition.y + this.Transform.Size.y - offsetCollide;
+		this.Physics.botCollider.w = this.Transform.Size.x + offsetCollide  + offsetCollide;
+		this.Physics.botCollider.h = offsetCollide;
+		// right Collider
+		this.Physics.rightCollider.x = this.Transform.RelativePosition.x + this.Transform.Size.x - offsetCollide;
+		this.Physics.rightCollider.y = this.Transform.RelativePosition.y - offsetCollide;
+		this.Physics.rightCollider.w = offsetCollide + offsetCollide;
+		this.Physics.rightCollider.h = this.Transform.Size.y + offsetCollide + offsetCollide;
+	};
+	// Return : isFall, isRunning
+	this.checkCollision = function () {
+		// Check Collision with GO
+		for (var i = 0; i < Scenes["Game"].GameObjects.length; i++) {
+			var go = Scenes["Game"].GameObjects[i];
+			if (go.name != this.name) {
+				if (Physics.CheckCollision(this.Physics.Collider, go.Physics.Collider)) {
+					this.isColliding = true;
+					// 1er cas : charBottom - obsTop
+					console.log(this.Physics.botCollider, go.Physics.topCollider);
+					if (Physics.CheckCollision(this.Physics.botCollider, go.Physics.topCollider)) {
+						this.jumped = false;
+						//this.Transform.RelativePosition.y = go.Transform.Position.y - go.Transform.Size.y;
+					}
+				} else {
+					this.isColliding = false;
+				}
+			}
+		}
+		if (!this.isColliding) {
+
+			if ( this.Transform.RelativePosition.y < canvas.height - 70) {
+				this.Transform.RelativePosition.y += this.gravity;
+			} else {
+				this.jumped = false;
+			}
+
+		}
+	};
+	this.actionToDo = function() {
+
+	};
 	/**
 	 * @function onHover
 	 * @memberof GameObjects/GameObjects
@@ -475,6 +556,5 @@ function MainChar()
  		}
  		this.Renderer.Animation.Current = this.Renderer.Animation.Animations[0];
 	}
-
 	this.Awake();
 }
