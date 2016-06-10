@@ -11,15 +11,28 @@ function MainChar()
 				Personnal Variable
 	*/
 	this.gravity = 0;
-	this.jump = 0;
-	this.isJumping = false;
-	this.jumped = false;
-	this.onThisObstacle = null;
+	this.jumpHeight = 0;
+	this.ascension = 0;
+	this.topToReach = 0;
 
-	// 													MAYBE : if spam esp --> double jump is usebug :O
-	this.collided = false; 
- 
-	this.isColliding = false; 
+	this.jumped = false;
+
+	this.stateChar = {};
+	this.stateChar.states = [];
+	this.stateChar.states["Run"] = 0;
+	this.stateChar.states["Jumping"] = 1;
+	this.stateChar.states["Hurt"] = 2;
+	this.stateChar.currentState = this.stateChar.states["Run"];
+
+	// set Transition! (Boolean)
+	this.stateChar.isJumping = false; // esp
+	this.stateChar.onElement = false; // on obstacle for example
+	this.stateChar.hurtElement = false; // aie 	
+	
+
+	/*
+	********************************
+	*/
 	this.MouseOffset = new Vector();
 
 	this.Parent = null;
@@ -141,7 +154,8 @@ function MainChar()
 			this.SetPosition( canvas.width*.5 - 10,canvas.height*.5 );
 			this.SetSize( 50, 50 );
 			this.gravity = 10;
-			this.jump = 400;
+			this.jumpHeight = 400;
+			this.ascension = 15;
 
 			// Set Collision
 			if (this.Physics.colliderIsSameSizeAsTransform) 
@@ -154,24 +168,10 @@ function MainChar()
 		}
 		this.PreUpdate();
 	};
-
-	/**
-	 * @function PreUpdate
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * If GameObject in group (parent), take relative position from parent position <br/>
-	 * If not, set GameObject own position <br/>
-	 *
-	 * Start the camera if exist and set position if fixed
-	 *
-	 * */
 	this.PreUpdate = function() 
 	{
 		if (this.enabled) 
 		{
-			this.collideObstacle();
-
 			if (this.Parent != null) 
 			{
 				this.Transform.Position.x = this.Transform.RelativePosition.x + this.Parent.Transform.Position.x;
@@ -201,30 +201,21 @@ function MainChar()
 			this.Update();
 		}			
 	};
-	/**
-	 * @function Update
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Call postUpdate function (each frame)
-	 * */
 	this.Update = function() 
 	{
 		// 												Gerer le press for jump ( 1 press = 1 jump )
 		if( Input.KeysDown[32] == true ){
-			this.isJumping = true;
-			if ( !this.jumped ) {
-				this.Transform.RelativePosition.y -= this.jump;
-				this.jumped = true;
-			}
+			this.topToReach = this.Transform.RelativePosition.y - this.jumpHeight;
+			this.stateChar.isJumping = true;
 		}
-
+		this.actionToDo();
 		// Collider  									En fonction des "fonctionnalité" ajouté/supprimé les "set" utile/useless
 		if (this.Physics.colliderIsSameSizeAsTransform) 
-			{
-				this.setCollider();
-			}
-		// Position of MainChar
+		{
+			this.setCollider();
+		}
+		// draw en fonction de this.StateChar.currentState
+		// Position of MainChar & design
 		ctx.fillStyle = "#2EBF98";
 		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
 					 this.Transform.Size.x, this.Transform.Size.y);
@@ -290,42 +281,52 @@ function MainChar()
 		this.Physics.rightCollider.w = offsetCollide + offsetCollide;
 		this.Physics.rightCollider.h = this.Transform.Size.y + offsetCollide + offsetCollide;
 	};
-	// Return : isFall, isRunning
-	this.collideObstacle = function () {
-		// Check Collision with GO
-		if (this.onThisObstacle && Physics.CheckCollision(this.Physics.botCollider, this.onThisObstacle.Physics.topCollider)) {
-			this.isColliding = true;										//Maybe Useless
-		} else {
-			this.onThisObstacle = null;
-			for (var i = 0; i < Scenes["Game"].GameObjects.length; i++) {
-				var go = Scenes["Game"].GameObjects[i];
-				// 															go.name === "Obstacle" probably better for the future
-				if (go.name != this.name) {
-					if (Physics.CheckCollision(this.Physics.botCollider, go.Physics.topCollider)) {
-						console.log("Je suis au dessus !");
-						this.onThisObstacle = go;
-						this.isColliding = true;
-						this.jumped = false;
-						//this.Transform.RelativePosition.y = go.Transform.Position.y - go.Transform.Size.y;
+
+	this.actionToDo = function(){
+		switch(this.stateChar.currentState){
+			case this.stateChar.states["Run"] :
+				if (this.stateChar.isJumping) this.stateChar.currentState = this.stateChar.states["Jumping"];
+				if (this.stateChar.hurtElement) this.stateChar.currentState = this.stateChar.states["Hurt"];
+				// il court!
+				console.log("Il court");
+				break;
+			case this.stateChar.states["Jumping"] :
+				if (this.stateChar.onElement) this.stateChar.currentState = this.stateChar.states["Run"];
+				if (this.stateChar.hurtElement) this.stateChar.currentState = this.stateChar.states["Hurt"];
+				// il saute ! 
+				if (this.Transform.RelativePosition.y < canvas.height - 50 ) {
+					if (!this.jumped) {
+						// Fake TWEEN (crested = atteins un sommet)
+						if (this.Transform.RelativePosition.y >= this.topToReach) {
+							this.Transform.RelativePosition.y -= this.ascension;
+						} else {
+							console.log("here");
+							this.jumped = true;
+						}
 					} else {
-						this.isColliding = false;
+						
+						this.Transform.RelativePosition.y += this.gravity;
 					}
+				} else {
+					// 															GAME OVER
+					//console.log("GAME OVER");
+					//GODMODE
+					this.stateChar.isJumping = false;
+					this.jumped = false;
+					this.Transform.RelativePosition.y -= 5;
+					this.stateChar.currentState = this.stateChar.states["Run"];
 				}
-			}
+				console.log("Il saute");
+				break;
+			case this.stateChar.states["Hurt"] :
+				if (this.stateChar.isJumping) this.stateChar.currentState = this.stateChar.states["Jumping"];
+				if (this.stateChar.onElement) this.stateChar.currentState = this.stateChar.states["Run"];
+				// il est touché!
+				console.log("Il est touché");
+			break;
 		}
-		if (!this.isColliding) {
+	}
 
-			if ( this.Transform.RelativePosition.y < canvas.height - 70) {
-				this.Transform.RelativePosition.y += this.gravity;
-			} else {
-				this.jumped = false;
-			}
-
-		}
-	};
-	this.actionToDo = function() {
-
-	};
 	/**
 	 * @function onHover
 	 * @memberof GameObjects/GameObjects
