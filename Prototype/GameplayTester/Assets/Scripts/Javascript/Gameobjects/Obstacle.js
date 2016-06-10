@@ -13,8 +13,6 @@ function Obstacle(_pos, _generalSpeed)
 	this.gravity = 0;
 	this.speed = _generalSpeed;
 
-	this.isColliding = true;
- 
 	this.MouseOffset = new Vector();
 
 	this.Parent = null;
@@ -129,7 +127,7 @@ function Obstacle(_pos, _generalSpeed)
 	};
 	this.Awake = function() 
 	{
-		Print('System:GameObject ' + this.name + " Created !");
+		//Print('System:GameObject ' + this.name + " Created !");
 	};
 	this.Start = function() 
 	{
@@ -144,7 +142,7 @@ function Obstacle(_pos, _generalSpeed)
 			}
 
 			this.started = true;
-			Print('System:GameObject ' + this.name + " Started !");
+			//Print('System:GameObject ' + this.name + " Started !");
 		}
 		this.PreUpdate();
 	};

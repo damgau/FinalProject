@@ -37,7 +37,7 @@ var Input =
 		//e.preventDefault();
 		//e.stopPropagation();
 		Input.KeysDown[e.keyCode] = true;
-		//Input.KeysDownRepeat[e.keyCode] = e.repeat;
+		Input.KeysDownRepeat[e.keyCode] = e.repeat;
 	},
 	/**
 	 * 
@@ -52,7 +52,7 @@ var Input =
 	KeyUp: function(e) 
 	{
 		delete Input.KeysDown[e.keyCode];
-		//delete Input.KeysDownRepeat[e.keyCode];
+		delete Input.KeysDownRepeat[e.keyCode];
 	},
 	/**
 	 * 

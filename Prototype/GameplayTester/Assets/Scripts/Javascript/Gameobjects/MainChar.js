@@ -17,6 +17,8 @@ function MainChar()
 
 	this.jumped = false;
 
+	this.obsTouched = null;
+
 	this.stateChar = {};
 	this.stateChar.states = [];
 	this.stateChar.states["Run"] = 0;
@@ -31,7 +33,7 @@ function MainChar()
 	
 
 	/*
-	********************************
+	****************************
 	*/
 	this.MouseOffset = new Vector();
 
@@ -81,15 +83,6 @@ function MainChar()
 			currentIndex: 0,
 			totalAnimationLength: 0.5
 		},
-		/**
-		 * 
-		 * @function Draw
-		 * @memberof GameObjects/GameObjects
-		 *
-		 * @description
-		 * Draw the game object component
-		 *  
-		 * */
 		Draw: function() 
 		{
 			var ScaledSizeX = this.That.Size.x*this.That.Scale.x;
@@ -153,9 +146,20 @@ function MainChar()
 			// operation start
 			this.SetPosition( canvas.width*.5 - 10,canvas.height*.5 );
 			this.SetSize( 50, 50 );
+			
+			/*
+			*********************************
+			*********************************
+			******** ALAN : BOARD ***********
+			*********************************
+			*********************************
+
+			*/
 			this.gravity = 10;
+			// Hauteur à atteindre en plus de la position actuel
 			this.jumpHeight = 400;
-			this.ascension = 15;
+			// vitesse "UP"
+			this.ascension = 20;
 
 			// Set Collision
 			if (this.Physics.colliderIsSameSizeAsTransform) 
@@ -203,15 +207,7 @@ function MainChar()
 	};
 	this.Update = function() 
 	{
-		// 												Gerer le press for jump ( 1 press = 1 jump )
-		if( Input.KeysDown[32] == true ){
-			if (!this.stateChar.isJumping) {
-				this.topToReach = this.Transform.RelativePosition.y - this.jumpHeight;
-			}
-			this.stateChar.isJumping = true;
-		}
 		this.actionToDo();
-		this.checkCollideObstacle();
 		// Collider  									En fonction des "fonctionnalité" ajouté/supprimé les "set" utile/useless
 		if (this.Physics.colliderIsSameSizeAsTransform) 
 		{
@@ -269,28 +265,102 @@ function MainChar()
 	this.actionToDo = function(){
 		switch(this.stateChar.currentState){
 			case this.stateChar.states["Run"] :
-				if (this.stateChar.isJumping) this.stateChar.currentState = this.stateChar.states["Jumping"];
-				if (this.stateChar.hurtElement) this.stateChar.currentState = this.stateChar.states["Hurt"];
+				if (this.stateChar.isJumping) {
+					this.stateChar.currentState = this.stateChar.states["Jumping"];
+					break;
+				} 
+				if (this.stateChar.hurtElement) {
+					this.stateChar.currentState = this.stateChar.states["Hurt"];
+					break;
+				}
 				// il court!
-				console.log("Il court");
+				//console.log("Il court");
+				/*
+				1_ checkCollision with obsTouched
+				*/
+				// if (this.obsTouched && !this.checkCollideObstacleTop()) {
+				if (this.obsTouched ) {
+					 if(!this.checkCollideObstacle()){
+					 	this.stateChar.onElement = false;
+						this.obsTouched = null;
+						this.jumped = true;
+						this.stateChar.isJumping = true;
+					 }
+				}
+				/*
+				2_ esp -> Jump
+				*/				
+				if( Input.KeysDown[32] ){
+					this.topToReach = this.Transform.RelativePosition.y - this.jumpHeight;
+					this.stateChar.onElement = false;
+					this.obsTouched = null;
+					this.stateChar.isJumping = true;
+				}
 				break;
 			case this.stateChar.states["Jumping"] :
-				if (this.stateChar.onElement) this.stateChar.currentState = this.stateChar.states["Run"];
-				if (this.stateChar.hurtElement) this.stateChar.currentState = this.stateChar.states["Hurt"];
-				// il saute ! 
+				if (this.stateChar.onElement) {
+					this.stateChar.currentState = this.stateChar.states["Run"];
+					break;	
+				}
+				if (this.stateChar.hurtElement) {
+					this.stateChar.currentState = this.stateChar.states["Hurt"];
+					break;
+				}
 				if (this.Transform.RelativePosition.y < canvas.height - 50 ) {
+					// JUMP 
 					if (!this.jumped) {
-						// Fake TWEEN (crested = atteins un sommet)
+						/*
+							Fake TWEEN (crested = atteins un sommet)
+						*/
 						if (this.Transform.RelativePosition.y >= this.topToReach) {
 							this.Transform.RelativePosition.y -= this.ascension;
+						/*
+						************************************************
+						*/
+
+						// 													// need to check collision topPlayer - bottomObs && "hurt"
 						} else {
 							this.jumped = true;
 						}
-					} else {
-						
-						this.Transform.RelativePosition.y += this.gravity;
 					}
-				} else {
+					// FALL 
+					else 
+					{
+						// Check collision/frames
+						//console.log(this.checkCollideObstacle());
+
+						if(this.checkCollideObstacle()) {
+							if (this.checkCollideObstacleTop()) {
+								console.log("On Obstacle");
+								this.stateChar.isJumping = false;
+								this.stateChar.onElement = true;
+								this.jumped = false;
+								break;
+								
+							}
+							if (this.checkCollideObstacleRight()) {
+								//console.log("Aie");
+								//this.stateChar.hurtElement = true;
+								//break;
+							}
+							/*
+													Actually, if I'm on middle'obstacle --> Run
+							*/
+							console.log("In Obstacle");
+							this.stateChar.isJumping = false;
+							this.stateChar.onElement = true;
+							this.jumped = false;
+							break;
+							
+						} else {
+							//Fall
+							this.Transform.RelativePosition.y += this.gravity;
+						}
+					}
+				} 
+				// Game Over
+				else 
+				{
 					// 															GAME OVER
 					//console.log("GAME OVER");
 					//GODMODE
@@ -299,26 +369,41 @@ function MainChar()
 					this.Transform.RelativePosition.y -= 5;
 					this.stateChar.currentState = this.stateChar.states["Run"];
 				}
-				console.log("Il saute");
+				//console.log("jump/fall");
 				break;
 			case this.stateChar.states["Hurt"] :
 				if (this.stateChar.isJumping) this.stateChar.currentState = this.stateChar.states["Jumping"];
 				if (this.stateChar.onElement) this.stateChar.currentState = this.stateChar.states["Run"];
-				// il est touché!
-				console.log("Il est touché");
+				console.log("Aïe");
+				// 																Maybe not good idea
+				this.stateChar.hurtElement = false;
+				this.stateChar.isJumping = true;
+				this.Transform.RelativePosition.y += 5;
 			break;
 		}
 	}
+	// 																			Create table-copy(slice) for no conflic with scene when splice item
 	this.checkCollideObstacle = function () {
-		for (var i = 0; i < Scenes["Game"].GameObjects.length; i++) {
-			var obs = Scenes["Game"].GameObjects[i];
+		var tab = Scenes["Game"].GameObjects.slice(0);
+		for (var i = 0; i < tab.length; i++) {
+			var obs = tab[i];
 			if (obs.name === "Obstacle") {
 			// Check Collision with Obs
 				if (Physics.CheckCollision(this.Physics.Collider, obs.Physics.Collider)) {
-					
+					this.obsTouched = obs;
+					return true;
 				}
 			}
 		}
+		return false;
+	};
+	this.checkCollideObstacleTop = function() {
+		if (Physics.CheckCollision(this.Physics.botCollider, this.obsTouched.Physics.topCollider)) return true;
+		else return false;
+	};
+	this.checkCollideObstacleRight = function() {
+		if (Physics.CheckCollision(this.Physics.rightCollider, this.obsTouched.Physics.leftCollider)) return true;
+		else return false;
 	};
 	/**
 	 * @function onHover
