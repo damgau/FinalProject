@@ -201,18 +201,17 @@ function MainChar()
 					this.Transform.Position.y -= Application.LoadedScene.CurrentCamera.Transform.Position.y;
 				}
 			}
-			
+			// Collider  									En fonction des "fonctionnalité" ajouté/supprimé les "set" utile/useless
+			if (this.Physics.colliderIsSameSizeAsTransform) 
+			{
+				this.setCollider();
+			}
 			this.Update();
 		}			
 	};
 	this.Update = function() 
 	{
 		this.actionToDo();
-		// Collider  									En fonction des "fonctionnalité" ajouté/supprimé les "set" utile/useless
-		if (this.Physics.colliderIsSameSizeAsTransform) 
-		{
-			this.setCollider();
-		}
 		// draw en fonction de this.StateChar.currentState
 		// Position of MainChar & design
 		ctx.fillStyle = "#2EBF98";
@@ -226,7 +225,7 @@ function MainChar()
 		if (Application.debugMode) {
 			Debug.DebugObject(this);
 			ctx.fillStyle = "red";
-			var box = this.Physics.botCollider;
+			var box = this.Physics.topCollider;
 			ctx.fillRect(box.x, box.y, box.w, box.h);
 		}
 		this.GUI();
@@ -241,30 +240,32 @@ function MainChar()
 		// "offset" = "marge"
 		var offsetCollide = 10;
 		//basic Collider
-		this.Physics.Collider.x = this.Transform.RelativePosition.x ;
-		this.Physics.Collider.y = this.Transform.RelativePosition.y ;
+		this.Physics.Collider.x = this.Transform.Position.x ;
+		this.Physics.Collider.y = this.Transform.Position.y ;
 		this.Physics.Collider.w = this.Transform.Size.x ;
 		this.Physics.Collider.h = this.Transform.Size.y ;
 		// top Collider
-		this.Physics.topCollider.x = this.Transform.RelativePosition.x - offsetCollide;
-		this.Physics.topCollider.y = this.Transform.RelativePosition.y - offsetCollide;
-		this.Physics.topCollider.w = this.Transform.Size.x + offsetCollide + offsetCollide;
+		this.Physics.topCollider.x = this.Transform.Position.x;
+		this.Physics.topCollider.y = this.Transform.Position.y;
+		this.Physics.topCollider.w = this.Transform.Size.x;
 		this.Physics.topCollider.h = offsetCollide;
 		// bot Collider
-		this.Physics.botCollider.x = this.Transform.RelativePosition.x - offsetCollide;
-		this.Physics.botCollider.y = this.Transform.RelativePosition.y + this.Transform.Size.y - offsetCollide;
-		this.Physics.botCollider.w = this.Transform.Size.x + offsetCollide  + offsetCollide;
+		this.Physics.botCollider.x = this.Transform.Position.x;
+		this.Physics.botCollider.y = this.Transform.Position.y + this.Transform.Size.y - offsetCollide;
+		this.Physics.botCollider.w = this.Transform.Size.x;
 		this.Physics.botCollider.h = offsetCollide;
 		// right Collider
-		this.Physics.rightCollider.x = this.Transform.RelativePosition.x + this.Transform.Size.x - offsetCollide;
-		this.Physics.rightCollider.y = this.Transform.RelativePosition.y - offsetCollide;
-		this.Physics.rightCollider.w = offsetCollide + offsetCollide;
-		this.Physics.rightCollider.h = this.Transform.Size.y + offsetCollide + offsetCollide;
+		this.Physics.rightCollider.x = this.Transform.Position.x + this.Transform.Size.x - offsetCollide;
+		this.Physics.rightCollider.y = this.Transform.Position.y;
+		this.Physics.rightCollider.w = offsetCollide;
+		this.Physics.rightCollider.h = this.Transform.Size.y;
+
 	};
 
 	this.actionToDo = function(){
 		switch(this.stateChar.currentState){
 			case this.stateChar.states["Run"] :
+				//console.log("can't jump : " + this.jumped);
 				if (this.stateChar.isJumping) {
 					this.stateChar.currentState = this.stateChar.states["Jumping"];
 					break;
@@ -306,19 +307,30 @@ function MainChar()
 					this.stateChar.currentState = this.stateChar.states["Hurt"];
 					break;
 				}
-				if (this.Transform.RelativePosition.y < canvas.height - 50 ) {
+				// 														100 = variable to up/down the "GameOver"
+				if (this.Transform.RelativePosition.y < canvas.height - 100) {
 					// JUMP 
 					if (!this.jumped) {
 						/*
 							Fake TWEEN (crested = atteins un sommet)
 						*/
 						if (this.Transform.RelativePosition.y >= this.topToReach) {
-							this.Transform.RelativePosition.y -= this.ascension;
-						/*
-						************************************************
-						*/
 
-						// 													// need to check collision topPlayer - bottomObs && "hurt"
+							if(this.checkCollideObstacle()) {
+								if (this.checkCollideObstacleBot()) {
+									this.jumped = true;
+									console.log("Hurt");
+									this.stateChar.hurtElement = true;
+									break;
+								} else {
+									// si il jump d'un obs
+									this.Transform.RelativePosition.y -= this.ascension;
+								}
+							} else {
+								// si il touche rien, il monte
+								this.Transform.RelativePosition.y -= this.ascension;
+							}
+
 						} else {
 							this.jumped = true;
 						}
@@ -327,30 +339,23 @@ function MainChar()
 					else 
 					{
 						// Check collision/frames
-						//console.log(this.checkCollideObstacle());
-
 						if(this.checkCollideObstacle()) {
+
 							if (this.checkCollideObstacleTop()) {
 								console.log("On Obstacle");
-								this.stateChar.isJumping = false;
-								this.stateChar.onElement = true;
 								this.jumped = false;
+								this.stateChar.onElement = true;
+								this.stateChar.isJumping = false;
+								break;								
+							}
+							if (this.checkCollideObstacleLeft()) {
+								console.log("Hurt");
+								this.stateChar.hurtElement = true;
 								break;
-								
 							}
-							if (this.checkCollideObstacleRight()) {
-								//console.log("Aie");
-								//this.stateChar.hurtElement = true;
-								//break;
-							}
-							/*
-													Actually, if I'm on middle'obstacle --> Run
-							*/
+							//Fall
 							console.log("In Obstacle");
-							this.stateChar.isJumping = false;
-							this.stateChar.onElement = true;
-							this.jumped = false;
-							break;
+							this.Transform.RelativePosition.y += this.gravity;
 							
 						} else {
 							//Fall
@@ -374,10 +379,11 @@ function MainChar()
 			case this.stateChar.states["Hurt"] :
 				if (this.stateChar.isJumping) this.stateChar.currentState = this.stateChar.states["Jumping"];
 				if (this.stateChar.onElement) this.stateChar.currentState = this.stateChar.states["Run"];
-				console.log("Aïe");
+				//console.log("Aïe");
 				// 																Maybe not good idea
 				this.stateChar.hurtElement = false;
 				this.stateChar.isJumping = true;
+				/* ***************************************    TEST  ****************************************** */
 				this.Transform.RelativePosition.y += 5;
 			break;
 		}
@@ -398,13 +404,17 @@ function MainChar()
 		return false;
 	};
 	this.checkCollideObstacleTop = function() {
-		if (Physics.CheckCollision(this.Physics.botCollider, this.obsTouched.Physics.topCollider)) return true;
-		else return false;
+
+		return Physics.CheckCollision(this.Physics.botCollider, this.obsTouched.Physics.topCollider);
 	};
-	this.checkCollideObstacleRight = function() {
-		if (Physics.CheckCollision(this.Physics.rightCollider, this.obsTouched.Physics.leftCollider)) return true;
-		else return false;
+	this.checkCollideObstacleLeft = function() {
+
+		return Physics.CheckCollision(this.Physics.rightCollider, this.obsTouched.Physics.leftCollider);
 	};
+	this.checkCollideObstacleBot = function() {
+
+		return Physics.CheckCollision(this.Physics.topCollider, this.obsTouched.Physics.botCollider);
+	}
 	/**
 	 * @function onHover
 	 * @memberof GameObjects/GameObjects

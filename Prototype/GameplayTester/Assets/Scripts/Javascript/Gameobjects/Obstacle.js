@@ -175,7 +175,12 @@ function Obstacle(_pos, _generalSpeed)
 					this.Transform.Position.y -= Application.LoadedScene.CurrentCamera.Transform.Position.y;
 				}
 			}
-			
+			// Collider  									En fonction des "fonctionnalité" ajouté/supprimé les "set" utile/useless
+			if (this.Physics.colliderIsSameSizeAsTransform) 
+			{
+				this.setCollider();
+			}
+
 			this.Update();
 		}			
 	};
@@ -184,12 +189,6 @@ function Obstacle(_pos, _generalSpeed)
 		// Deplacement 								Delete gameObj
 		
 		this.Transform.RelativePosition.x -= this.speed;
-
-		// Collider  									En fonction des "fonctionnalité" ajouté/supprimé les "set" utile/useless
-		if (this.Physics.colliderIsSameSizeAsTransform) 
-		{
-			this.setCollider();
-		}
 
 		// Position of Obstacle
 		ctx.fillStyle = "#42BF2E";
@@ -203,7 +202,7 @@ function Obstacle(_pos, _generalSpeed)
 		if (Application.debugMode) {
 			Debug.DebugObject(this);
 			ctx.fillStyle = "red";
-			var box = this.Physics.topCollider;
+			var box = this.Physics.botCollider;
 			ctx.fillRect(box.x, box.y, box.w, box.h);
 		}
 		this.GUI();
@@ -214,25 +213,25 @@ function Obstacle(_pos, _generalSpeed)
 		// "offset" = "marge"
 		var offsetCollide = 10;
 		//basic Collider
-		this.Physics.Collider.x = this.Transform.RelativePosition.x ;
-		this.Physics.Collider.y = this.Transform.RelativePosition.y ;
+		this.Physics.Collider.x = this.Transform.Position.x ;
+		this.Physics.Collider.y = this.Transform.Position.y ;
 		this.Physics.Collider.w = this.Transform.Size.x ;
 		this.Physics.Collider.h = this.Transform.Size.y ;
 		// top Collider
-		this.Physics.topCollider.x = this.Transform.RelativePosition.x - offsetCollide;
-		this.Physics.topCollider.y = this.Transform.RelativePosition.y - offsetCollide;
-		this.Physics.topCollider.w = this.Transform.Size.x + offsetCollide + offsetCollide;
+		this.Physics.topCollider.x = this.Transform.Position.x;
+		this.Physics.topCollider.y = this.Transform.Position.y - offsetCollide*.5;
+		this.Physics.topCollider.w = this.Transform.Size.x;
 		this.Physics.topCollider.h = offsetCollide;
 		// bot Collider
-		this.Physics.botCollider.x = this.Transform.RelativePosition.x - offsetCollide;
-		this.Physics.botCollider.y = this.Transform.RelativePosition.y + this.Transform.Size.y - offsetCollide*.5;
-		this.Physics.botCollider.w = this.Transform.Size.x + offsetCollide  + offsetCollide;
+		this.Physics.botCollider.x = this.Transform.Position.x;
+		this.Physics.botCollider.y = this.Transform.Position.y + this.Transform.Size.y - offsetCollide*.5;
+		this.Physics.botCollider.w = this.Transform.Size.x;
 		this.Physics.botCollider.h = offsetCollide;
 		// left Collider
-		this.Physics.leftCollider.x = this.Transform.RelativePosition.x - offsetCollide;
-		this.Physics.leftCollider.y = this.Transform.RelativePosition.y - offsetCollide;
-		this.Physics.leftCollider.w = offsetCollide + offsetCollide;
-		this.Physics.leftCollider.h = this.Transform.Size.y + offsetCollide + offsetCollide;
+		this.Physics.leftCollider.x = this.Transform.Position.x - offsetCollide*.5;
+		this.Physics.leftCollider.y = this.Transform.Position.y;
+		this.Physics.leftCollider.w = offsetCollide;
+		this.Physics.leftCollider.h = this.Transform.Size.y;
 	};
 	this.onHover = function() 
 	{
