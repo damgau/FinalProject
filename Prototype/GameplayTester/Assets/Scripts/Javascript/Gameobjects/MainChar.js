@@ -226,7 +226,7 @@ function MainChar()
 			Debug.DebugObject(this);
 			ctx.fillStyle = "red";
 			var box = this.Physics.topCollider;
-			ctx.fillRect(box.x, box.y, box.w, box.h);
+			//ctx.fillRect(box.x, box.y, box.w, box.h);
 		}
 		this.GUI();
 	};

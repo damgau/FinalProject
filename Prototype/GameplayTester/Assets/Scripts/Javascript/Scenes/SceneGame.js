@@ -81,8 +81,16 @@ function SceneGame()
 			ctx.fillStyle = "#2C2A2A";
 			ctx.fillRect(0,0, canvas.width, canvas.height);
 
+			// generate auto : OBS
 			if (this.GameObjects.length < 3) {
 				this.GameObjects.push(new Obstacle(null, this.generalSpeed));
+			}
+
+			//generate onClick : OBS
+			// 												TEST
+			// if (Input.mouseClick) {
+			if (Input.mouseLongClick) {
+				this.onClick();
 			}
 
 			for (var i = 0; i < this.GameObjects.length; i++) 
@@ -125,6 +133,33 @@ function SceneGame()
 			// Show pause menu
 		}
 	}
+	this.generateObs = function(){
+		// pop obs
+		// point de pivot?
+		// checkCollision with obs if true --> don't pop
 
-	this.Awake()
+	}
+	this.onClick = function(){
+		// Recup MousePos
+		var pos = new Vector(Input.MousePosition.x, Input.MousePosition.y);
+		// Condition to drop GO
+		if (this.canGenerateObs(pos)) {
+
+			//create OBS
+			var obs = new Obstacle(pos, this.generalSpeed);
+			this.GameObjects.push(obs);
+		}
+	}
+	this.canGenerateObs = function (_pos){
+		for (var i = 0; i < this.GameObjects.length; i++) {
+			if (this.GameObjects[i].name === "Obstacle") {
+				if (Physics.CheckCollision(_pos, this.GameObjects[i].Physics.Collider)) {
+					console.log("cant pop");
+					return false
+				}
+			}
+		}
+		return true;
+	}
+	this.Awake();
 }
