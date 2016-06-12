@@ -153,7 +153,9 @@ function SceneGame()
 	this.canGenerateObs = function (_pos){
 		for (var i = 0; i < this.GameObjects.length; i++) {
 			if (this.GameObjects[i].name === "Obstacle") {
-				if (Physics.CheckCollision(_pos, this.GameObjects[i].Physics.Collider)) {
+				// 200, 50 = size box
+				var tmpCollider = new Box(_pos.x, _pos.y, 200, 50);
+				if (Physics.CheckCollision(tmpCollider, this.GameObjects[i].Physics.Collider)) {
 					console.log("cant pop");
 					return false
 				}
