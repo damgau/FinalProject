@@ -11,7 +11,7 @@
  * Create an instance of timer
  *
  * */
-function Timer(_duration, _isRepeat, _Action, _Callback) 
+function Timer(_duration, _isRepeat, _Action, _Callback, _isStarted) 
 {
 	this.ID = 0;
 	this.currentTime = 0;
@@ -19,6 +19,7 @@ function Timer(_duration, _isRepeat, _Action, _Callback)
 	this.repeat = _isRepeat || false;
 	this.Action = _Action || null;
 	this.Callback = _Callback || null;
+	this.isStarted = _isStarted || false;
 
 	this.Awake = function () 
 	{
@@ -30,30 +31,32 @@ function Timer(_duration, _isRepeat, _Action, _Callback)
 
 	this.Update = function() 
 	{
-		if (this.currentTime + Time.deltaTime < this.duration) 
-		{
-			this.currentTime += Time.deltaTime;
-			if (this.Action != null) 
+		if (this.isStarted){
+			if (this.currentTime + Time.deltaTime < this.duration) 
 			{
-				this.Action();
+				this.currentTime += Time.deltaTime;
+				if (this.Action != null) 
+				{
+					this.Action();
+				}
 			}
-		}
-		else 
-		{
-			//End Of Timer
-			//console.log('End Timer');
-			this.currentTime = this.duration;
-			if (this.Callback != null) 
-			{
-				this.Callback();
-			}
-			if (this.repeat)
-			{	
-				this.Reset();
-			} 
 			else 
 			{
-				this.Clear();
+				//End Of Timer
+				//console.log('End Timer');
+				this.currentTime = this.duration;
+				if (this.Callback != null) 
+				{
+					this.Callback();
+				}
+				if (this.repeat)
+				{	
+					this.Reset();
+				} 
+				else 
+				{
+					this.Clear();
+				}
 			}
 		}
 	}

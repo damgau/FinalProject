@@ -14,6 +14,7 @@ function SceneGame()
 				Personnal Variable
 	*/
 	this.generalSpeed = 0;
+	this.timerEnergie = null;
 	/*
 				Test : Jauge d'energie
 	*/
@@ -32,11 +33,22 @@ function SceneGame()
 		if (!this.started) 
 		{
 			Time.SetTimeWhenSceneBegin();
+
 			// operation start
 			this.generalSpeed = 10;
+
 			// nb obstacle utilisable (Energie)
 			this.obsAvailable = 3;
 			this.obsAvailableMax = 3;
+
+			// Timer regenerate obs
+			//						 _Action : augmenter la jauge graphiquement
+			// 						ATTENTION : Ne pas oublier de reset (action) si Timer n'est pas "fini"
+			//						_CallBack : Increment 
+			// Timer(_duration, _isRepeat, _Action, _Callback, _isStarted) 
+			//						Need to "call" methods?
+			this.timerEnergie = new Timer(3, true, null, this.canIncrementEnergie, false);
+
 
 			this.GameObjects.push(new MainChar());
 			var tempObstacle = new Obstacle(
@@ -71,6 +83,7 @@ function SceneGame()
 
 			// generate auto : OBS
 			if (this.GameObjects.length < 3) {
+
 				this.GameObjects.push(new Obstacle(null, this.generalSpeed));
 			}
 
@@ -78,8 +91,12 @@ function SceneGame()
 			// 												TEST
 			// if (Input.mouseClick) {
 			if (Input.mouseLongClick) {
+
 				this.onClick();
+				this.timerEnergie.isStarted = false;
+				this.timerEnergie.Reset();
 			}
+			this.regenEnergie();
 
 			for (var i = 0; i < this.GameObjects.length; i++) 
 			{
@@ -121,11 +138,6 @@ function SceneGame()
 			// Show pause menu
 		}
 	}
-	this.generateObs = function(){					// Actually useless
-		// pop obs
-		// point de pivot?
-		// checkCollision with obs if true --> don't pop
-	}
 	this.onClick = function(){
 		// Recup MousePos
 		var pos = new Vector(Input.MousePosition.x, Input.MousePosition.y);
@@ -140,6 +152,11 @@ function SceneGame()
 		}
 	}
 	this.canGenerateObs = function (_pos){
+		// check if the energie is available
+		if (this.obsAvailable < 1) {
+			console.log("YOU NEED ENERGIE");
+			return false;
+		}
 		for (var i = 0; i < this.GameObjects.length; i++) {
 			// check if cursor is on obs
 			if (this.GameObjects[i].name === "Obstacle") {
@@ -150,12 +167,28 @@ function SceneGame()
 					return false
 				}
 			}
-			// check if the energie is available
-			if (this.obsAvailable < 1) {
-				return false;
-			}
 		}
 		return true;
 	}
+	this.regenEnergie = function(){
+
+		// if dont click timerEnergie 
+		// if 2s regen
+		if (!Input.mouseLongClick) {
+			this.timerEnergie.isStarted = true;
+		}
+	}
+	this.incrementEnergie = function(){
+
+		this.obsAvailable++;
+		console.log("Energie up : " + this.obsAvailable);
+	}
+	this.canIncrementEnergie = function(){
+		if (Scenes["Game"].obsAvailable < Scenes["Game"].obsAvailableMax) {
+
+			Scenes["Game"].incrementEnergie();
+		}
+	}
+
 	this.Awake();
 }
