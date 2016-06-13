@@ -15,6 +15,7 @@ function SceneGame()
 	*/
 	this.generalSpeed = 0;
 	this.timerEnergie = null;
+	var _self = this;
 	/*
 				Test : Jauge d'energie
 	*/
@@ -47,7 +48,7 @@ function SceneGame()
 			//						_CallBack : Increment 
 			// Timer(_duration, _isRepeat, _Action, _Callback, _isStarted) 
 			//						Need to "call" methods?
-			this.timerEnergie = new Timer(3, true, null, this.canIncrementEnergie, false);
+			this.timerEnergie = new Timer(2, true, null, this.canIncrementEnergie, false);
 
 
 			this.GameObjects.push(new MainChar());
@@ -184,9 +185,13 @@ function SceneGame()
 		console.log("Energie up : " + this.obsAvailable);
 	}
 	this.canIncrementEnergie = function(){
-		if (Scenes["Game"].obsAvailable < Scenes["Game"].obsAvailableMax) {
+		// if (Scenes["Game"].obsAvailable < Scenes["Game"].obsAvailableMax) {
 
-			Scenes["Game"].incrementEnergie();
+		// 	Scenes["Game"].incrementEnergie();
+		// }
+		if (_self.obsAvailable < Scenes["Game"].obsAvailableMax) {
+
+			_self.incrementEnergie();
 		}
 	}
 
