@@ -15,12 +15,20 @@ function SceneGame()
 	*/
 	this.generalSpeed = 0;
 	this.timerEnergie = null;
+	this.timerReward = null;
 	var _self = this;
 	/*
 				Test : Jauge d'energie
 	*/
 	this.obsAvailable = 0;
 	this.obsAvailableMax = 0;
+	/*
+				GUI : Jauge Energie
+	*/
+	this.maxWidth = 200;
+	this.widthByEnergie = 0;
+	this.currentWidth = 0;
+	this.reloadWidth = 0; 
 
 
 	this.Awake = function() 
@@ -48,8 +56,8 @@ function SceneGame()
 			//						_CallBack : Increment 
 			// Timer(_duration, _isRepeat, _Action, _Callback, _isStarted) 
 			//						Need to "call" methods?
-			this.timerEnergie = new Timer(2, true, null, this.canIncrementEnergie, false);
-
+			this.timerEnergie = new Timer(2, true, this.IncrementGUIEnergie, this.canIncrementEnergie, false);
+			this.timerReward = new Timer(5, true, null, this.generateReward, true);
 
 			this.GameObjects.push(new MainChar());
 			var tempObstacle = new Obstacle(
@@ -83,15 +91,16 @@ function SceneGame()
 			ctx.fillRect(0,0, canvas.width, canvas.height);
 
 			// generate auto : OBS
-			if (this.GameObjects.length < 3) {
+			if (this.GameObjects.length < 5) {
 
 				this.GameObjects.push(new Obstacle(null, this.generalSpeed));
 			}
 
+
 			//generate onClick : OBS
 			// 												TEST
-			// if (Input.mouseClick) {
-			if (Input.mouseLongClick) {
+			if (Input.mouseClick) {
+			//if (Input.mouseLongClick) {
 
 				this.onClick();
 				this.timerEnergie.isStarted = false;
@@ -104,10 +113,20 @@ function SceneGame()
 				this.GameObjects[i].Start();
 
 				// Remove useless GO or Call particuleSystem (effect)
-				if (this.GameObjects[i].name === "Obstacle") {
+				if (this.GameObjects[i].name === "Obstacle" || this.GameObjects[i].name === "Reward") {
 					// 400(number) : marge pour ne pas supprimer l'objet trop tôt
 					// doit etre un peu plus grand que this.GameObjects[i].Transform.Size
 					if (this.GameObjects[i].Transform.Position.x < -400) {
+						this.GameObjects.splice(i,1);
+						// 													Not sure
+						i--;
+					}
+				}
+				// Remove reward catched
+				if (this.GameObjects[i].name === "Reward") {
+					// GameObjects[0] = Player
+					if (Physics.CheckCollision(this.GameObjects[0].Physics.Collider, this.GameObjects[i].Physics.Collider)) {
+						this.incrementEnergie();
 						this.GameObjects.splice(i,1);
 						// 													Not sure
 						i--;
@@ -118,6 +137,9 @@ function SceneGame()
 			// {
 			// 	this.Groups[i].Start();
 			// }
+			
+			this.widthByEnergie = this.maxWidth/this.obsAvailableMax;
+			this.currentWidth = this.widthByEnergie*this.obsAvailable;
 		}
 		if (Application.debugMode) 
 		{
@@ -125,14 +147,28 @@ function SceneGame()
 		}
 		this.GUI();
 	}
-	/**
-	 * Called each frame, code all the GUI here.
-	 * */
 	this.GUI = function() 
 	{
 		if (!Application.GamePaused) 
 		{
 			//Show UI
+
+			// Jauge ENERGIE
+			
+			// Permet de ne pas reload si on a le max de obs dispo  (reload < 99 --> "debug graphique")
+			if (this.obsAvailable < this.obsAvailableMax && this.reloadWidth < 99) {
+				// modifier la largeur en fonction du temps (reload)
+				ctx.fillStyle = "#F2C53C";
+				ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.1,
+							 this.currentWidth + this.widthByEnergie*this.reloadWidth/100, 50);
+			}
+			
+			// modifier la largeur en fonction du nombre disponible
+			ctx.fillStyle = "#FFF000";
+			ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.1,
+						 this.currentWidth, 50);
+
+
 		} 
 		else 
 		{
@@ -180,19 +216,23 @@ function SceneGame()
 		}
 	}
 	this.incrementEnergie = function(){
-
-		this.obsAvailable++;
-		console.log("Energie up : " + this.obsAvailable);
+		if (this.obsAvailable < this.obsAvailableMax) {
+			this.obsAvailable++;
+			console.log("Energie up : " + this.obsAvailable);
+		}
 	}
 	this.canIncrementEnergie = function(){
-		// if (Scenes["Game"].obsAvailable < Scenes["Game"].obsAvailableMax) {
-
-		// 	Scenes["Game"].incrementEnergie();
-		// }
-		if (_self.obsAvailable < Scenes["Game"].obsAvailableMax) {
-
-			_self.incrementEnergie();
-		}
+		//Scenes["Game"].incrementEnergie();
+		
+		_self.incrementEnergie();	
+	}
+	this.IncrementGUIEnergie = function(){
+		//_self.reloadWidth (in %)
+		_self.reloadWidth = 100/(this.duration/this.currentTime);
+	}
+	this.generateReward = function(){
+		console.log("create Reward");
+		_self.GameObjects.push(new Reward(null, _self.generalSpeed));
 	}
 
 	this.Awake();

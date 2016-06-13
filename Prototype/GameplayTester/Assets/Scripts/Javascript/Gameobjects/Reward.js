@@ -1,6 +1,6 @@
-function Obstacle(_pos, _generalSpeed) 
+function Reward(_pos, _generalSpeed) 
 {
-	this.name = "Obstacle";
+	this.name = "Reward";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
@@ -18,7 +18,8 @@ function Obstacle(_pos, _generalSpeed)
 	this.Parent = null;
 	
 	this.Transform = {};
-	this.Transform.RelativePosition = _pos || new Vector(canvas.width + 10, Math.Random.RangeInt(500, canvas.height - 150, false));
+	this.Transform.RelativePosition = _pos || new Vector(canvas.width + 10, 
+														Math.Random.RangeInt(10, canvas.height - 250, false));
 	this.Transform.Position = new Vector();
 	this.Transform.Size = new Vector();
 	this.Transform.RelativeScale = new Vector(1,1);
@@ -133,7 +134,7 @@ function Obstacle(_pos, _generalSpeed)
 	{
 		if (!this.started) {
 			// operation start
-			this.SetSize(200, 50);
+			this.SetSize(50, 50);
 
 			// Set Collision
 			if (this.Physics.colliderIsSameSizeAsTransform) 
@@ -186,12 +187,11 @@ function Obstacle(_pos, _generalSpeed)
 	};
 	this.Update = function() 
 	{
-		// Deplacement 								Delete gameObj
-		
+		// Deplacement
 		this.Transform.RelativePosition.x -= this.speed;
 
 		// Position of Obstacle
-		ctx.fillStyle = "#42BF2E";
+		ctx.fillStyle = "#FBE102";
 		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
 					 this.Transform.Size.x, this.Transform.Size.y);
 
@@ -201,37 +201,17 @@ function Obstacle(_pos, _generalSpeed)
 	{
 		if (Application.debugMode) {
 			Debug.DebugObject(this);
-			ctx.fillStyle = "red";
-			var box = this.Physics.botCollider;
-			//ctx.fillRect(box.x, box.y, box.w, box.h);
 		}
 		this.GUI();
 	};
 
 	this.GUI = function() {};
 	this.setCollider = function () {
-		// "offset" = "marge"
-		var offsetCollide = 10;
 		//basic Collider
 		this.Physics.Collider.x = this.Transform.Position.x ;
 		this.Physics.Collider.y = this.Transform.Position.y ;
 		this.Physics.Collider.w = this.Transform.Size.x ;
 		this.Physics.Collider.h = this.Transform.Size.y ;
-		// top Collider
-		this.Physics.topCollider.x = this.Transform.Position.x;
-		this.Physics.topCollider.y = this.Transform.Position.y - offsetCollide*.5;
-		this.Physics.topCollider.w = this.Transform.Size.x;
-		this.Physics.topCollider.h = offsetCollide;
-		// bot Collider
-		this.Physics.botCollider.x = this.Transform.Position.x;
-		this.Physics.botCollider.y = this.Transform.Position.y + this.Transform.Size.y - offsetCollide*.5;
-		this.Physics.botCollider.w = this.Transform.Size.x;
-		this.Physics.botCollider.h = offsetCollide;
-		// left Collider
-		this.Physics.leftCollider.x = this.Transform.Position.x - offsetCollide*.5;
-		this.Physics.leftCollider.y = this.Transform.Position.y;
-		this.Physics.leftCollider.w = offsetCollide;
-		this.Physics.leftCollider.h = this.Transform.Size.y;
 	};
 	this.onHover = function() 
 	{
