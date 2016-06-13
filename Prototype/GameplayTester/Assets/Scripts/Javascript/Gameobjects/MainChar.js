@@ -16,7 +16,6 @@ function MainChar()
 	this.topToReach = 0;
 
 	this.jumped = false;
-
 	this.obsTouched = null;
 
 	this.stateChar = {};
@@ -35,6 +34,7 @@ function MainChar()
 	/*
 	****************************
 	*/
+	
 	this.MouseOffset = new Vector();
 
 	this.Parent = null;
@@ -157,7 +157,7 @@ function MainChar()
 			*/
 			this.gravity = 10;
 			// Hauteur à atteindre en plus de la position actuel
-			this.jumpHeight = 400;
+			this.jumpHeight = 300;
 			// vitesse "UP"
 			this.ascension = 20;
 

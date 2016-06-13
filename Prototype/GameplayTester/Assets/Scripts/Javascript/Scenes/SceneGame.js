@@ -1,17 +1,3 @@
-/**
- * Create a new Scene
- * <ul><li>Copy the content of this file in a new .js document.</li>
- * <li>Save the new file in Assets/Javascript/Scenes/NameOfYourScene.js .</li>
- * <li>In the index.html add below this comment <!-- Scene --> the line: 
-*                    "<script type="text/javascript" src="Assets/Scripts/Javascript/Scenes/NameOfYourGameObject.js"></script>"</li>
- * <li>For create a new scene, use this instruction: "new Scene()".</li>
- * </ul>
- * <strong>To load your scene, use this instruction: "Application.LoadLevel(LevelName)".</strong>
- * 
- * @class
- * 
- * @return {Scene}
- * */
 function SceneGame() 
 {
 	this.name = "Game";
@@ -28,20 +14,19 @@ function SceneGame()
 				Personnal Variable
 	*/
 	this.generalSpeed = 0;
+	/*
+				Test : Jauge d'energie
+	*/
+	this.obsAvailable = 0;
+	this.obsAvailableMax = 0;
 
-	/**
-	 * Called at the instruction new Scene().
-	 * */
+
 	this.Awake = function() 
 	{
 		console.clear();
 		Print('System:Scene ' + this.name + " Created !");
 	}
-	
-	/**
-	 * Start the Scene and show a message in console or launch Update() if already started
-	 * Called at the first use of scene in game.
-	 * */
+
 	this.Start = function() 
 	{
 		if (!this.started) 
@@ -49,6 +34,9 @@ function SceneGame()
 			Time.SetTimeWhenSceneBegin();
 			// operation start
 			this.generalSpeed = 10;
+			// nb obstacle utilisable (Energie)
+			this.obsAvailable = 3;
+			this.obsAvailableMax = 3;
 
 			this.GameObjects.push(new MainChar());
 			var tempObstacle = new Obstacle(
@@ -133,11 +121,10 @@ function SceneGame()
 			// Show pause menu
 		}
 	}
-	this.generateObs = function(){
+	this.generateObs = function(){					// Actually useless
 		// pop obs
 		// point de pivot?
 		// checkCollision with obs if true --> don't pop
-
 	}
 	this.onClick = function(){
 		// Recup MousePos
@@ -148,10 +135,13 @@ function SceneGame()
 			//create OBS
 			var obs = new Obstacle(pos, this.generalSpeed);
 			this.GameObjects.push(obs);
+			this.obsAvailable--;
+			console.log(this.obsAvailable);
 		}
 	}
 	this.canGenerateObs = function (_pos){
 		for (var i = 0; i < this.GameObjects.length; i++) {
+			// check if cursor is on obs
 			if (this.GameObjects[i].name === "Obstacle") {
 				// 200, 50 = size box
 				var tmpCollider = new Box(_pos.x, _pos.y, 200, 50);
@@ -159,6 +149,10 @@ function SceneGame()
 					console.log("cant pop");
 					return false
 				}
+			}
+			// check if the energie is available
+			if (this.obsAvailable < 1) {
+				return false;
 			}
 		}
 		return true;
