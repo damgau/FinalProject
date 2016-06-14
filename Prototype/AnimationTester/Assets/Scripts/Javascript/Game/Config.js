@@ -35,6 +35,7 @@ var ImagesPath =
 	// { name:"monImage",path: "background/image.png"},
 	{ name:"Boy",path: "/Character Boy.png"},
 	{ name:"Fond",path: "/Fond.jpg"},
-	{ name:"sprite",path: "/drake.png"}
+	{ name:"sprite",path: "/drake.png"},
+	{ name:"Runner",path: "/Vendor/runner.png"}
 ];
 var Images = {};
