@@ -1,6 +1,6 @@
-function MainChar() 
+function MainCharRun() 
 {
-	this.name = "MainChar";
+	this.name = "MainCharRun";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
@@ -9,14 +9,6 @@ function MainChar()
 	this.MouseOffset = new Vector();
 
 	this.Parent = null;
-
-			// TWEEN v0.2
-	this.jumpAnim = null;
-	this.gravityTween = null;
-	this.gravityValue = 0;
-	this.tabValue = [];
-
-	this.canJump = true;
 	
 	this.Transform = {};
 	this.Transform.RelativePosition = new Vector();
@@ -133,14 +125,10 @@ function MainChar()
 	{
 		if (!this.started) {
 			// operation start
-			this.SetPosition(200, canvas.height - 200);
+			this.SetPosition(600, canvas.height - 200);
 			this.SetSize(50, 50);
 			
 			this.SetSpriteSheet( Images["Runner"],new Vector(16,17) );
-
-			this.createTween();
-
-
 
 			this.Renderer.Animation.totalAnimationLength = .2;
 			this.Renderer.Animation.animated = true;
@@ -192,40 +180,8 @@ function MainChar()
 
 	this.Update = function() 
 	{
-			// TWEEN V0.2
-			// Monter
-			if (this.canJump) {
-				// reset TWEEN (Timer)
-				// Monter
-				this.jumpAnim = new TweenAnim([this.Transform.RelativePosition.y],
-												[-300],
-												.5,
-												"Quadratic",
-												"Out");
-				this.canJump = false;
-			}
-			//  & Descendre
-			if (this.jumpAnim.isFinished) {
-				this.gravityValue = this.gravityTween.recoverValue();
-				this.Transform.RelativePosition.y += this.gravityValue[0];
-				if (this.Transform.RelativePosition.y > canvas.height - 200) {
-					// stop fallAnim & this.canJump = true
-					//reset gravityTween
-					this.canJump = true;
-					this.gravityTween.Reset();					
-				}
-			}
-			else {
-				// Je monte !!
-				this.tabValue = this.jumpAnim.recoverValue();
-				this.Transform.RelativePosition.y = this.tabValue[0];
-			}
-
-			
-
 		this.Renderer.Draw();
 		this.PostUpdate();
-
 	};
 
 	this.PostUpdate = function() 
@@ -240,14 +196,6 @@ function MainChar()
 	{
 		
 	};
-	this.createTween = function() {
-		// descendre : acc TWEEN
-		this.gravityTween = new TweenAnim([0],
-										[10],
-										.5,
-										"Quartic",
-										"Out");
-	}
 
 	this.onHover = function() 
 	{

@@ -133,22 +133,22 @@
 *	Add NameOfYourGameObject.Start() in your scene.
 */
 
-function ImgScaled() {
-	this.name = "ImgScaled";
+function Background() {
+	this.name = "Background";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
 	this.FixedToCamera = true;
-	this.index;
+
 	this.Parent = null;
 	
 	this.Transform = {};
-	this.Transform.RelativePosition = new Vector(3*(canvas.width/4),3*(canvas.height/4));
+	this.Transform.RelativePosition = new Vector(0,0);
 	this.Transform.Position = this.Transform.RelativePosition;
-	this.Transform.Size = new Vector(100,200);
+	this.Transform.Size = new Vector(canvas.width,canvas.height);
 	this.Transform.RelativeScale = new Vector(1,1);
 	this.Transform.Scale = this.Transform.RelativeScale;
-	this.Transform.Pivot = new Vector(0.5,0.5);
+	this.Transform.Pivot = new Vector(0,0);
 	this.Transform.angle = 0;
 
 	this.Physics = {};
@@ -158,8 +158,8 @@ function ImgScaled() {
 	this.Physics.ColliderIsSameSizeAsTransform = false;
 	this.Physics.countHovered = 0;
 	this.Physics.Collider = {
-		Position: new Vector(),
-		Size: new Vector()
+		position: new Vector(),
+		size: new Vector()
 	};
 
 	this.Renderer = {
@@ -227,8 +227,6 @@ function ImgScaled() {
 			}
 			ctx.restore();
 		}
-					
-
 	};
 
 
@@ -238,8 +236,10 @@ function ImgScaled() {
 	this.Start = function() {
 		if (!this.started) {
 			// operation start
-			this.Renderer.Material.Source = Images["Boy"];
-			this.index = -0.02;
+			/*
+																Images["ImagesPath -> Name"]
+			*/
+			this.Renderer.Material.Source = Images["Fond"];
 			this.started = true;
 			console.log('%c System:GameObject ' + this.name + " Started !", 'background:#222; color:#bada55');
 		}
@@ -272,16 +272,8 @@ function ImgScaled() {
 			
 	};
 	this.Update = function() {
+		
 		this.Renderer.Draw();
-		this.Transform.Scale.x += this.index;
-		this.Transform.Scale.y += this.index;
-		 if(this.Transform.Scale.x<=0){
-		 	this.index = 0.02; 
-		 }
-		 if(this.Transform.Scale.x>=1){
-		 	this.index = -0.02; 
-		 }
-
 
 		this.PosUpdate();	
 	};
