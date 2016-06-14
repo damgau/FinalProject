@@ -1,40 +1,39 @@
-function MainChar() 
+/**
+ * Create a new GameObject <br />
+ * @namespace GameObjects/GameObjects
+ *
+ * @tutorial
+ * <ul><li>Copy the content of GameObjects file in a new .js document.</li>
+ * <li>Save the new file in Assets/Javascript/GameObjects/NameOfYourGameObject.js .</li>
+ * <li>In the index.html add below this comment <!-- GameObjects --> the line:<br/>
+ * <script type="text/javascript" src="Assets/Scripts/Javascript/GameObjects/NameOfYourGameObject.js"></script></li>
+ * <li>For create a new scene, use this instruction: "new GameObject()".</li>
+ * </ul>
+ * 
+ * 
+ * @property {String} name - The name of the object.
+ * @property {Boolean} enabled - The active state of the GameObject.
+ * @property {Boolean} renderer - The active state of Renderer component
+ * @property {Boolean} fixedToCamera -  The active state of Camera if is Fixed
+ * @property {Vector} MouseOffset  - Position of mouse
+ * @property {Group} Parent - A Group which contain several GameObject
+ * @property {Object} Transform  
+ * @property {Vector} Transform.RelativePosition - the relative position of GameObject inside a Group 
+ * @property {Vector} Transform.Size - size of GameObject
+ * @property {Vector} Transform.Scale - scale of GameObject 
+ * @property {Vector} Transform.Pivot - pivot position of GameObject
+ * @property {Number} Transform.angle - angle of GameObject
+ *
+ *
+ * */
+function GameObject() 
 {
-	this.name = "MainChar";
+	this.name = "Model";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
 	this.fixedToCamera = true;
 
-
-	/*
-				Personnal Variable
-	*/
-	this.gravity = 0;
-	this.jumpHeight = 0;
-	this.ascension = 0;
-	this.topToReach = 0;
-
-	this.jumped = false;
-	this.obsTouched = null;
-
-	this.stateChar = {};
-	this.stateChar.states = [];
-	this.stateChar.states["Run"] = 0;
-	this.stateChar.states["Jumping"] = 1;
-	this.stateChar.states["Hurt"] = 2;
-	this.stateChar.currentState = this.stateChar.states["Run"];
-
-	// set Transition! (Boolean)
-	this.stateChar.isJumping = false; // esp
-	this.stateChar.onElement = false; // on obstacle for example
-	this.stateChar.hurtElement = false; // aie 	
-	
-
-	/*
-	****************************
-	*/
-	
 	this.MouseOffset = new Vector();
 
 	this.Parent = null;
@@ -48,19 +47,31 @@ function MainChar()
 	this.Transform.Pivot = new Vector(0,0);
 	this.Transform.angle = 0;
 
+	/**
+	 * The Physics component of the GameObject. <br />
+	 * @memberof GameObjects/GameObjects
+	 *
+	 * @property {Object} Physics  
+	 * @property {Boolean} Physics.enabled - The active state of the GameObject.
+	 * @property {Boolean} Physics.clickable - is clickable
+	 * @property {Boolean} Physics.dragAndDroppable - is draggable
+	 * @property {Boolean} Physics.colliderIsSameSizeAsTransform - is has the same size of Tranform size
+	 * @property {Number} Physics.countHovered - counter
+	 *
+	 *
+	 * */
 	this.Physics = {};
 	this.Physics.enabled = true;
 	this.Physics.clickable = false;
 	this.Physics.dragAndDroppable = false;
-	this.Physics.colliderIsSameSizeAsTransform = true;
+	this.Physics.colliderIsSameSizeAsTransform = false;
 	this.Physics.countHovered = 0;
-	this.Physics.Collider = new Box();
-	/*
-				Personnal Variable
-	*/
-	this.Physics.topCollider = new Box();
-	this.Physics.botCollider = new Box();
-	this.Physics.rightCollider = new Box();
+
+	this.Physics.Collider = 
+	{
+		Position: new Vector(),
+		Size: new Vector()
+	};
 
 	this.Renderer = 
 	{
@@ -83,6 +94,15 @@ function MainChar()
 			currentIndex: 0,
 			totalAnimationLength: 0.5
 		},
+		/**
+		 * 
+		 * @function Draw
+		 * @memberof GameObjects/GameObjects
+		 *
+		 * @description
+		 * Draw the game object component
+		 *  
+		 * */
 		Draw: function() 
 		{
 			var ScaledSizeX = this.That.Size.x*this.That.Scale.x;
@@ -136,35 +156,34 @@ function MainChar()
 			ctx.restore();
 		}
 	};
+	/**
+	 * @function Awake
+	 * @memberof GameObjects/GameObjects
+	 * @description
+	 *
+	 * Called at the instruction new GameObject()
+	 * */
 	this.Awake = function() 
 	{
 		Print('System:GameObject ' + this.name + " Created !");
 	};
+
+	/**
+	 * @function Start
+	 * @memberof GameObjects/GameObjects
+	 * @description
+	 *
+	 * Start the GameObject and show a message in console or launch Update() if already started <br/>
+	 * Set the transform component to the physics collider
+	 * */
 	this.Start = function() 
 	{
 		if (!this.started) {
 			// operation start
-			this.SetPosition( canvas.width*.5 - 10,canvas.height*.5 );
-			this.SetSize( 50, 50 );
-			
-			/*
-			*********************************
-			*********************************
-			******** ALAN : BOARD ***********
-			*********************************
-			*********************************
 
-			*/
-			this.gravity = 10;
-			// Hauteur à atteindre en plus de la position actuel
-			this.jumpHeight = 300;
-			// vitesse "UP"
-			this.ascension = 20;
-
-			// Set Collision
 			if (this.Physics.colliderIsSameSizeAsTransform) 
 			{
-				this.setCollider();
+				this.Physics.Collider = this.Transform;
 			}
 
 			this.started = true;
@@ -172,6 +191,18 @@ function MainChar()
 		}
 		this.PreUpdate();
 	};
+
+	/**
+	 * @function PreUpdate
+	 * @memberof GameObjects/GameObjects
+	 * @description
+	 *
+	 * If GameObject in group (parent), take relative position from parent position <br/>
+	 * If not, set GameObject own position <br/>
+	 *
+	 * Start the camera if exist and set position if fixed
+	 *
+	 * */
 	this.PreUpdate = function() 
 	{
 		if (this.enabled) 
@@ -201,255 +232,49 @@ function MainChar()
 					this.Transform.Position.y -= Application.LoadedScene.CurrentCamera.Transform.Position.y;
 				}
 			}
-			// Collider  									En fonction des "fonctionnalité" ajouté/supprimé les "set" utile/useless
-			if (this.Physics.colliderIsSameSizeAsTransform) 
-			{
-				this.setCollider();
-			}
+			
 			this.Update();
 		}			
 	};
+	/**
+	 * @function Update
+	 * @memberof GameObjects/GameObjects
+	 * @description
+	 *
+	 * Call postUpdate function (each frame)
+	 * */
 	this.Update = function() 
 	{
-		// voir les conséquences, diférence entre utiliser un sort avant/apres "actionToDo"
-		// Ajouter un état castingSpell?
-		this.actionToDo();
-		// draw en fonction de this.StateChar.currentState
-		// Position of MainChar & design
-		ctx.fillStyle = "#2EBF98";
-		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
-					 this.Transform.Size.x, this.Transform.Size.y);
-
 		this.PostUpdate();	
 	};
+	/**
+	 * @function PostUpdate
+	 * @memberof GameObjects/GameObjects
+	 * @description
+	 *
+	 * Execute PostUpdate. If DebugMode is active, diplay GameObject in debug mode
+	 *
+	 * */
 	this.PostUpdate = function() 
 	{
 		if (Application.debugMode) {
 			Debug.DebugObject(this);
-			ctx.fillStyle = "red";
-			var box = this.Physics.topCollider;
-			//ctx.fillRect(box.x, box.y, box.w, box.h);
 		}
-		this.GUI();
-	};
-	this.GUI = function() {};
-
-	/*
-				Personnal Methods
-	*/
-
-	this.setCollider = function () {
-		// "offset" = "marge"
-		var offsetCollide = 10;
-		//basic Collider
-		this.Physics.Collider.x = this.Transform.Position.x ;
-		this.Physics.Collider.y = this.Transform.Position.y ;
-		this.Physics.Collider.w = this.Transform.Size.x ;
-		this.Physics.Collider.h = this.Transform.Size.y ;
-		// top Collider
-		this.Physics.topCollider.x = this.Transform.Position.x;
-		this.Physics.topCollider.y = this.Transform.Position.y;
-		this.Physics.topCollider.w = this.Transform.Size.x;
-		this.Physics.topCollider.h = offsetCollide;
-		// bot Collider
-		this.Physics.botCollider.x = this.Transform.Position.x;
-		this.Physics.botCollider.y = this.Transform.Position.y + this.Transform.Size.y - offsetCollide;
-		this.Physics.botCollider.w = this.Transform.Size.x;
-		this.Physics.botCollider.h = offsetCollide;
-		// right Collider
-		this.Physics.rightCollider.x = this.Transform.Position.x + this.Transform.Size.x - offsetCollide;
-		this.Physics.rightCollider.y = this.Transform.Position.y;
-		this.Physics.rightCollider.w = offsetCollide;
-		this.Physics.rightCollider.h = this.Transform.Size.y;
-
+		this.GUI();	
 	};
 
-	this.actionToDo = function(){
-		switch(this.stateChar.currentState){
-			case this.stateChar.states["Run"] :
-				//console.log("can't jump : " + this.jumped);
-				if (this.stateChar.isJumping) {
-					this.stateChar.currentState = this.stateChar.states["Jumping"];
-					break;
-				} 
-				if (this.stateChar.hurtElement) {
-					this.stateChar.currentState = this.stateChar.states["Hurt"];
-					break;
-				}
-				// il court!
-				//console.log("Il court");
-				/*
-				1_ checkCollision with obsTouched
-				*/
-				// if (this.obsTouched && !this.checkCollideObstacleTop()) {
-				if (this.obsTouched ) {
-					 if(!Physics.CheckCollision(this.Physics.Collider, this.obsTouched.Physics.Collider)){
-					 	this.stateChar.onElement = false;
-						this.obsTouched = null;
-						this.jumped = true;
-						this.stateChar.isJumping = true;
-						break;
-					 }
-				}
-				/*
-				2_ esp -> Jump
-				*/				
-				if( Input.KeysDown[32] ){
-					this.topToReach = this.Transform.RelativePosition.y - this.jumpHeight;
-					this.stateChar.onElement = false;
-					this.obsTouched = null;
-					this.stateChar.isJumping = true;
-					break;
-				}
-				break;
-			case this.stateChar.states["Jumping"] :
-				if (this.stateChar.onElement) {
-					this.stateChar.currentState = this.stateChar.states["Run"];
-					break;	
-				}
-				if (this.stateChar.hurtElement) {
-					this.stateChar.currentState = this.stateChar.states["Hurt"];
-					break;
-				}
-				// 														100 = variable to up/down the "GameOver"
-				if (this.Transform.RelativePosition.y < canvas.height - 100) {
-					// JUMP 
-					if (!this.jumped) {
-						/*
-							Fake TWEEN (crested = atteins un sommet)
-						*/
-						if (this.Transform.RelativePosition.y >= this.topToReach) {
-
-							if(this.checkCollideObstacle()) {
-								if (this.checkCollideObstacleBot()) {
-									this.jumped = true;
-									console.log("Hurt");
-									this.stateChar.hurtElement = true;
-									break;
-								} else {
-									// si il jump d'un obs
-									this.Transform.RelativePosition.y -= this.ascension;
-								}
-							} else {
-								// si il touche rien, il monte
-								this.Transform.RelativePosition.y -= this.ascension;
-							}
-
-						} else {
-							this.jumped = true;
-						}
-					}
-					// FALL 
-					else 
-					{
-						// Check collision/frames
-						if(this.checkCollideObstacle()) {
-
-							if (this.checkCollideObstacleTop()) {
-								console.log("On Obstacle");
-								this.jumped = false;
-								this.stateChar.onElement = true;
-								this.stateChar.isJumping = false;
-								break;								
-							}
-							if (this.checkCollideObstacleLeft()) {
-								console.log("Hurt");
-								this.stateChar.hurtElement = true;
-								break;
-							}
-							//Fall
-							console.log("In Obstacle");
-							this.Transform.RelativePosition.y += this.gravity;
-							
-						} else {
-							//Fall
-							this.Transform.RelativePosition.y += this.gravity;
-						}
-					}
-				} 
-				// Game Over
-				else 
-				{
-					// 															GAME OVER
-					//console.log("GAME OVER");
-					//GODMODE
-					this.stateChar.isJumping = false;
-					this.jumped = false;
-					this.Transform.RelativePosition.y -= 5;
-					this.stateChar.currentState = this.stateChar.states["Run"];
-				}
-				//console.log("jump/fall");
-				break;
-			case this.stateChar.states["Hurt"] :
-				if (this.stateChar.isJumping) this.stateChar.currentState = this.stateChar.states["Jumping"];
-				if (this.stateChar.onElement) this.stateChar.currentState = this.stateChar.states["Run"];
-				//console.log("Aïe");
-				// 																Maybe not good idea
-				// checkCollision (obsTouched?)
-				// si faux -> hurtEle = false
-				// si faux -> hurtEle = isJumping = true
-				if (this.obsTouched ) {
-					 if(!Physics.CheckCollision(this.Physics.Collider, this.obsTouched.Physics.Collider)){
-					 	this.obsTouched.speed = Scenes["Game"].generalSpeed;
-					 	this.stateChar.hurtElement = false;
-						this.obsTouched = null;
-						this.jumped = true;
-						this.stateChar.isJumping = true;
-						break;
-					 }
-					 else {
-					 	// checkCollision (obsTouched?)
-						// si vrai -> y-- (obsTouched x --> don't move)
-						this.obsTouched.speed = 0;
-						this.Transform.RelativePosition.y += this.gravity;	
-					 }
-				}
-			break;
-		}
-	}
-	// 																			Create table-copy(slice) for no conflic with scene when splice item
-	// this.checkCollideObstacle = function () {
-	// 	var tab = Scenes["Game"].GameObjects.slice(0);
-	// 	for (var i = 0; i < tab.length; i++) {
-	// 		var obs = tab[i];
-	// 		if (obs.name === "Obstacle") {
-	// 		// Check Collision with Obs
-	// 			if (Physics.CheckCollision(this.Physics.Collider, obs.Physics.Collider)) {
-	// 				this.obsTouched = obs;
-	// 				return true;
-	// 			}
-	// 		}
-	// 	}
-	// 	return false;
-	// };
 	/**
-																				A TEST : CheckCollideObs avec le "VRAI" Tableau
-	*/
-	this.checkCollideObstacle = function () {
-		for (var i = 0; i <  Scenes["Game"].GameObjects.length; i++) {
-			var obs =  Scenes["Game"].GameObjects[i];
-			if (obs.name === "Obstacle") {
-			// Check Collision with Obs
-				if (Physics.CheckCollision(this.Physics.Collider, obs.Physics.Collider)) {
-					this.obsTouched = obs;
-					return true;
-				}
-			}
-		}
-		return false;
+	 * @function GUI
+	 * @memberof GameObjects/GameObjects
+	 * @description
+	 *
+	 * Display the GUI of GameObject
+	 * */
+	this.GUI = function() 
+	{
+		
 	};
-	this.checkCollideObstacleTop = function() {
 
-		return Physics.CheckCollision(this.Physics.botCollider, this.obsTouched.Physics.topCollider);
-	};
-	this.checkCollideObstacleLeft = function() {
-
-		return Physics.CheckCollision(this.Physics.rightCollider, this.obsTouched.Physics.leftCollider);
-	};
-	this.checkCollideObstacleBot = function() {
-
-		return Physics.CheckCollision(this.Physics.topCollider, this.obsTouched.Physics.botCollider);
-	}
 	/**
 	 * @function onHover
 	 * @memberof GameObjects/GameObjects
@@ -627,5 +452,6 @@ function MainChar()
  		}
  		this.Renderer.Animation.Current = this.Renderer.Animation.Animations[0];
 	}
+
 	this.Awake();
 }
