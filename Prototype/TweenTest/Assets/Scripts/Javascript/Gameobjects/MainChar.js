@@ -1,31 +1,3 @@
-/**
- * Create a new GameObject <br />
- * @namespace GameObjects/GameObjects
- *
- * @tutorial
- * <ul><li>Copy the content of GameObjects file in a new .js document.</li>
- * <li>Save the new file in Assets/Javascript/GameObjects/NameOfYourGameObject.js .</li>
- * <li>In the index.html add below this comment <!-- GameObjects --> the line:<br/>
- * <script type="text/javascript" src="Assets/Scripts/Javascript/GameObjects/NameOfYourGameObject.js"></script></li>
- * <li>For create a new scene, use this instruction: "new GameObject()".</li>
- * </ul>
- * 
- * 
- * @property {String} name - The name of the object.
- * @property {Boolean} enabled - The active state of the GameObject.
- * @property {Boolean} renderer - The active state of Renderer component
- * @property {Boolean} fixedToCamera -  The active state of Camera if is Fixed
- * @property {Vector} MouseOffset  - Position of mouse
- * @property {Group} Parent - A Group which contain several GameObject
- * @property {Object} Transform  
- * @property {Vector} Transform.RelativePosition - the relative position of GameObject inside a Group 
- * @property {Vector} Transform.Size - size of GameObject
- * @property {Vector} Transform.Scale - scale of GameObject 
- * @property {Vector} Transform.Pivot - pivot position of GameObject
- * @property {Number} Transform.angle - angle of GameObject
- *
- *
- * */
 function MainChar() 
 {
 	this.name = "MainChar";
@@ -37,6 +9,16 @@ function MainChar()
 	this.MouseOffset = new Vector();
 
 	this.Parent = null;
+
+	/* TEST */
+			// TWEEN v0.1
+	this.heightJump;
+	this.timerJump;
+	this.isJumping = false;
+	this.objetTest = null;
+			// TWEEN v0.2
+	this.jumpAnim = null;
+	this.tabValue = [];
 	
 	this.Transform = {};
 	this.Transform.RelativePosition = new Vector();
@@ -47,19 +29,6 @@ function MainChar()
 	this.Transform.Pivot = new Vector(0,0);
 	this.Transform.angle = 0;
 
-	/**
-	 * The Physics component of the GameObject. <br />
-	 * @memberof GameObjects/GameObjects
-	 *
-	 * @property {Object} Physics  
-	 * @property {Boolean} Physics.enabled - The active state of the GameObject.
-	 * @property {Boolean} Physics.clickable - is clickable
-	 * @property {Boolean} Physics.dragAndDroppable - is draggable
-	 * @property {Boolean} Physics.colliderIsSameSizeAsTransform - is has the same size of Tranform size
-	 * @property {Number} Physics.countHovered - counter
-	 *
-	 *
-	 * */
 	this.Physics = {};
 	this.Physics.enabled = true;
 	this.Physics.clickable = false;
@@ -156,35 +125,31 @@ function MainChar()
 			ctx.restore();
 		}
 	};
-	/**
-	 * @function Awake
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Called at the instruction new GameObject()
-	 * */
+
 	this.Awake = function() 
 	{
 		Print('System:GameObject ' + this.name + " Created !");
 	};
 
-	/**
-	 * @function Start
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Start the GameObject and show a message in console or launch Update() if already started <br/>
-	 * Set the transform component to the physics collider
-	 * */
 	this.Start = function() 
 	{
 		if (!this.started) {
 			// operation start
 			this.SetPosition(200, canvas.height - 200);
 			this.SetSize(50, 50);
+			// nb is the height ! 
+			this.heightJump = -50;
+			// TWEEN V0.1
+			// for tween "progress" 66 : 66secondes?milli?
+			this.timerJump = new Timer(.22, false, null, null, false);
 			this.SetSpriteSheet( Images["Runner"],new Vector(16,17) );
+
+
 			this.Renderer.Animation.totalAnimationLength = .2;
 			this.Renderer.Animation.animated = true;
+
+			// Test : Tween
+			//position = Transform
 
 			if (this.Physics.colliderIsSameSizeAsTransform) 
 			{
@@ -197,17 +162,6 @@ function MainChar()
 		this.PreUpdate();
 	};
 
-	/**
-	 * @function PreUpdate
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * If GameObject in group (parent), take relative position from parent position <br/>
-	 * If not, set GameObject own position <br/>
-	 *
-	 * Start the camera if exist and set position if fixed
-	 *
-	 * */
 	this.PreUpdate = function() 
 	{
 		if (this.enabled) 
@@ -241,28 +195,45 @@ function MainChar()
 			this.Update();
 		}			
 	};
-	/**
-	 * @function Update
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Call postUpdate function (each frame)
-	 * */
+
 	this.Update = function() 
 	{
-		// Le faire monter et descendre ! 
-		// TWEEN
+		// // TWEEN v0.1
+		// if( Input.KeysDown[32] ){
+		// 	this.isJumping = true;
+		// 	this.objetTest = this.Transform.RelativePosition.y;
+		// }
+		// if (this.isJumping) {
+		// 	console.log("height : " + this.Transform.RelativePosition.y);
+		// 	console.log("timer growing up : " + this.timerJump.currentTime);
+		// 	this.timerJump.isStarted = true;
+		// 	this.Transform.RelativePosition.y = Tween.Linear(this.timerJump.currentTime,
+		// 													this.objetTest,
+		// 													this.heightJump,
+		// 													this.timerJump.duration);
+		// }
+
+			// TWEEN V0.2
+			if (this.jumpAnim == null) {
+				if( Input.KeysDown[32] ){
+					//TweenAnim(_startValue, _changeValue, _duration, _type, _underType)
+					this.jumpAnim = new TweenAnim([this.Transform.RelativePosition.y],
+														[-500],
+														3,
+														"Exponential",
+														"Out");
+				}
+			} else {
+				this.tabValue = this.jumpAnim.recoverValue();
+				this.Transform.RelativePosition.y = this.tabValue[0];
+			}
+			
+
 		this.Renderer.Draw();
 		this.PostUpdate();
+
 	};
-	/**
-	 * @function PostUpdate
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Execute PostUpdate. If DebugMode is active, diplay GameObject in debug mode
-	 *
-	 * */
+
 	this.PostUpdate = function() 
 	{
 		if (Application.debugMode) {
@@ -271,65 +242,28 @@ function MainChar()
 		this.GUI();	
 	};
 
-	/**
-	 * @function GUI
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Display the GUI of GameObject
-	 * */
 	this.GUI = function() 
 	{
 		
 	};
 
-	/**
-	 * @function onHover
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Counter on hover the GameObject
-	 * */
 	this.onHover = function() 
 	{
 		this.Physics.countHovered ++;	
 	};
 
-	/**
-	 * @function onClicked
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Set the MouseOffset with mouse position <br/>
-	 * Increment the countHovered
-	 * */
 	this.onClicked = function() 
 	{
 		this.MouseOffset.x = Input.MousePosition.x - this.Transform.Position.x;
 		this.MouseOffset.y = Input.MousePosition.y - this.Transform.Position.y;
 		this.Physics.countHovered ++;
 	};
-	/**
-	 * @function onUnHovered
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Reinitialize the countHovered to 0
-	 * */
+	
 	this.onUnHovered = function() 
 	{
 		this.Physics.countHovered = 0;
 	};
-	/**
-	 * @function SetPosition
-	 * @memberof GameObjects/GameObjects
-	 *
-	 * @param {Number} _x
-	 * @param {Number} _y
-	 * 
-	 * @description
-	 * set the x and y position(Transform) of game object
-	 * */
+	
 	this.SetPosition = function(_x, _y)
 	{
 	    if(typeof _x != 'number') PrintErr("Parameter x in SetPosition Go");
@@ -338,16 +272,6 @@ function MainChar()
 		this.Transform.RelativePosition.y = _y;
 	};
 
-	/**
-	 * @function SetPositionCollider
-	 * @memberof GameObjects/GameObjects
-	 *
-	 * @param {Number} _x
-	 * @param {Number} _y
-	 * 
-	 * @description
-	 * set the x and y position(Physics collider) of game object
-	 * */
 	this.SetPositionCollider = function(_x, _y)
 	{
 	    if(typeof _x != 'number') PrintErr("Parameter x in SetPositionCollider Go");
@@ -356,16 +280,6 @@ function MainChar()
 		this.Physics.Collider.Position.y = _y;
 	};
 
-	/**
-	 * @function SetSize
-	 * @memberof GameObjects/GameObjects
-	 *
-	 * @param {Number} _x
-	 * @param {Number} _y
-	 * 
-	 * @description
-	 * set the x and y for the size of game object
-	 * */
 	this.SetSize = function(_x, _y)
 	{
 	    if(typeof _x != 'number') PrintErr("Parameter x in SetSize Go");
@@ -374,16 +288,6 @@ function MainChar()
 		this.Transform.Size.y = _y;
 	};
 
-	/**
-	 * @function SetColliderSize
-	 * @memberof GameObjects/GameObjects
-	 *
-	 * @param {Number} _x
-	 * @param {Number} _y
-	 * 
-	 * @description
-	 * set the x and y for the collider size of game object
-	 * */
 	this.SetColliderSize = function(_x, _y)
 	{
 	    if(typeof _x != 'number') PrintErr("Parameter x in SetColliderSize Go");
@@ -392,16 +296,6 @@ function MainChar()
 		this.Physics.Collider.Size.y = _y;
 	};
 
-	/**
-	 * @function SetScale
-	 * @memberof GameObjects/GameObjects
-	 *
-	 * @param {Number} _x
-	 * @param {Number} _y
-	 * 
-	 * @description
-	 * set the x and y for the scale of game object
-	 * */
 	this.SetScale = function(_x, _y)
 	{
 	    if(typeof _x != 'number') PrintErr("Parameter x in SetScale Go");
@@ -410,16 +304,6 @@ function MainChar()
 		this.Transform.RelativeScale.y = _y;
 	};
 
-	/**
-	 * @function SetPivot
-	 * @memberof GameObjects/GameObjects
-	 *
-	 * @param {Number} _x
-	 * @param {Number} _y
-	 * 
-	 * @description
-	 * set the x and y for the pivot of game object
-	 * */
 	this.SetPivot = function(_x, _y)
 	{
 	    if(typeof _x != 'number') PrintErr("Parameter x in SetPivot Go");
@@ -427,18 +311,7 @@ function MainChar()
 		this.Transform.Pivot.x = _x;
 		this.Transform.Pivot.y = _y;
 	};
-	/**
-	 * @function SetSpriteSheet
-	 * @memberof GameObjects/GameObjects
-	 *
-	 * @param {String} _img - the source image of sprite sheet
-	 * @param {Vector} _sizeFrame - the size frame of the sprite
-	 * @param {Number} _animationLength - how many frame has the sprite sheet
-	 *
-	 * @description
-	 *
-	 * Set the sprite sheet source image, the size of one frame and the number of frame the sprite sheet has.
-	 * */
+
 	this.SetSpriteSheet = function(_img, _sizeFrame) {
 		this.Renderer.isSpriteSheet = true;
 		this.Renderer.Material.SizeFrame = _sizeFrame;
