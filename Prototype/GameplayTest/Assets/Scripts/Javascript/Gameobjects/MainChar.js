@@ -374,6 +374,14 @@ function MainChar()
 				}
 				else {
 					console.log("WTF");
+					if (this.tweenJump.isFinished) {
+						this.relativeValue = this.tweenGravity.recoverValue();
+						this.Transform.RelativePosition.y += this.relativeValue[0];	
+					} else {
+						this.relativeValue = this.tweenJump.recoverValue();
+						this.Transform.RelativePosition.y = this.relativeValue[0];
+					}
+					
 				}
 			}
 			// Down || UP
