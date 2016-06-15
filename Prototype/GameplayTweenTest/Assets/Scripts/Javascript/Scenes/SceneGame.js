@@ -103,7 +103,6 @@ function SceneGame()
 			//if (Input.mouseLongClick) {
 
 				this.onClick();
-				this.timerEnergie.isStarted = false;
 				this.timerEnergie.Reset();
 			}
 			this.regenEnergie();

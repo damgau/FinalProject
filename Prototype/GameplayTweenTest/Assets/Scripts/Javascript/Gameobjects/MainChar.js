@@ -324,9 +324,9 @@ function MainChar()
 		return Physics.CheckCollision(this.Physics.topCollider, this.obsTouched.Physics.botCollider);
 	};
 	this.run = function() {
-		this.tweenGravity.Reset();
 
 		if( Input.KeysDown[32] ){
+			this.tweenGravity.Reset();
 			this.stateChar.onElement = false;
 			this.stateChar.isJumping = true;
 			// Lancer le tween pour jump!
@@ -385,8 +385,11 @@ function MainChar()
 				}
 				// DOWN
 				else {
+					
 					this.relativeValue = this.tweenGravity.recoverValue();
 					this.Transform.RelativePosition.y += this.relativeValue[0];
+					//console.log(this.tweenGravity);
+					// TIMER a pas été Awake!
 				}
 			}
 		}

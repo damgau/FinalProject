@@ -15,7 +15,6 @@ function TweenAnim(_startValue, _changeValue, _duration, _type, _underType){
 
 	this.callback = function(){
 		_self.isFinished = true;
-		//console.log("tween is finish");
 	}
 	this.timer = new Timer(this.duration, false, null, this.callback, false);
 
@@ -53,7 +52,6 @@ function TweenAnim(_startValue, _changeValue, _duration, _type, _underType){
 		return this.tweenValue;
 	}
 	this.Reset = function(){
-		_self = this;
 		this.isFinished = false;
 		this.timer.Reset();
 	}
