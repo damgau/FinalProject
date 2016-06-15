@@ -375,7 +375,7 @@ function MainChar()
 					//GODMODE
 					this.stateChar.isJumping = false;
 					this.jumped = false;
-					//this.Transform.RelativePosition.y -= 5;
+					this.Transform.RelativePosition.y -= 5;
 					this.stateChar.currentState = this.stateChar.states["Run"];
 				}
 				//console.log("jump/fall");

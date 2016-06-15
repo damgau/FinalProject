@@ -185,7 +185,7 @@ function SceneGame()
 			var obs = new Obstacle(pos, this.generalSpeed);
 			this.GameObjects.push(obs);
 			this.obsAvailable--;
-			console.log(this.obsAvailable);
+			//console.log(this.obsAvailable);
 		}
 	}
 	this.canGenerateObs = function (_pos){
@@ -218,7 +218,7 @@ function SceneGame()
 	this.incrementEnergie = function(){
 		if (this.obsAvailable < this.obsAvailableMax) {
 			this.obsAvailable++;
-			console.log("Energie up : " + this.obsAvailable);
+			//console.log("Energie up : " + this.obsAvailable);
 		}
 	}
 	this.canIncrementEnergie = function(){
@@ -231,7 +231,7 @@ function SceneGame()
 		_self.reloadWidth = 100/(this.duration/this.currentTime);
 	}
 	this.generateReward = function(){
-		console.log("create Reward");
+		//console.log("create Reward");
 		_self.GameObjects.push(new Reward(null, _self.generalSpeed));
 	}
 

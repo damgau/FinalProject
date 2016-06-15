@@ -177,7 +177,6 @@ var Time =
 		this.FPS = (1000 / this.averageDelay).toFixed(1);
 
 		this.TimeOfLastFrame = this.Time;
-
 		for (var i = 0; i < this.Timers.length; i++) {
 			this.Timers[i].Update();
 		}

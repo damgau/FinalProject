@@ -12,10 +12,7 @@ function MainChar()
 	*/
 	this.gravity = 0;
 	this.jumpHeight = 0;
-	this.ascension = 0;
-	this.topToReach = 0;
 
-	this.jumped = false;
 	this.obsTouched = null;
 
 	this.stateChar = {};
@@ -30,6 +27,13 @@ function MainChar()
 	this.stateChar.onElement = false; // on obstacle for example
 	this.stateChar.hurtElement = false; // aie 	
 	
+	// TWEEN
+	this.tweenJump = null;
+	this.tweenGravity = null;
+	//tweenSpell ? 
+
+	// tab qui va recupere les informations donner par un tween
+	this.relativeValue = [];
 
 	/*
 	****************************
@@ -147,19 +151,11 @@ function MainChar()
 			this.SetPosition( canvas.width*.5 - 10,canvas.height*.5 );
 			this.SetSize( 50, 50 );
 			
-			/*
-			*********************************
-			*********************************
-			******** ALAN : BOARD ***********
-			*********************************
-			*********************************
-
-			*/
 			this.gravity = 10;
 			// Hauteur à atteindre en plus de la position actuel
-			this.jumpHeight = 300;
-			// vitesse "UP"
-			this.ascension = 20;
+			this.jumpHeight = -300;
+			//								_startValue, _changeValue, _duration, _type, _underType
+			this.tweenGravity = new TweenAnim([0],[this.gravity], .5, "Quartic", "Out");
 
 			// Set Collision
 			if (this.Physics.colliderIsSameSizeAsTransform) 
@@ -265,9 +261,9 @@ function MainChar()
 	};
 
 	this.actionToDo = function(){
+		//console.log(this.stateChar.currentState);
 		switch(this.stateChar.currentState){
 			case this.stateChar.states["Run"] :
-				//console.log("can't jump : " + this.jumped);
 				if (this.stateChar.isJumping) {
 					this.stateChar.currentState = this.stateChar.states["Jumping"];
 					break;
@@ -276,31 +272,7 @@ function MainChar()
 					this.stateChar.currentState = this.stateChar.states["Hurt"];
 					break;
 				}
-				// il court!
-				//console.log("Il court");
-				/*
-				1_ checkCollision with obsTouched
-				*/
-				// if (this.obsTouched && !this.checkCollideObstacleTop()) {
-				if (this.obsTouched ) {
-					 if(!Physics.CheckCollision(this.Physics.Collider, this.obsTouched.Physics.Collider)){
-					 	this.stateChar.onElement = false;
-						this.obsTouched = null;
-						this.jumped = true;
-						this.stateChar.isJumping = true;
-						break;
-					 }
-				}
-				/*
-				2_ esp -> Jump
-				*/				
-				if( Input.KeysDown[32] ){
-					this.topToReach = this.Transform.RelativePosition.y - this.jumpHeight;
-					this.stateChar.onElement = false;
-					this.obsTouched = null;
-					this.stateChar.isJumping = true;
-					break;
-				}
+				this.run();
 				break;
 			case this.stateChar.states["Jumping"] :
 				if (this.stateChar.onElement) {
@@ -311,120 +283,21 @@ function MainChar()
 					this.stateChar.currentState = this.stateChar.states["Hurt"];
 					break;
 				}
-				// 														100 = variable to up/down the "GameOver"
-				if (this.Transform.RelativePosition.y < canvas.height - 100) {
-					// JUMP 
-					if (!this.jumped) {
-						/*
-							Fake TWEEN (crested = atteins un sommet)
-						*/
-						if (this.Transform.RelativePosition.y >= this.topToReach) {
-
-							if(this.checkCollideObstacle()) {
-								if (this.checkCollideObstacleBot()) {
-									this.jumped = true;
-									console.log("Hurt");
-									this.stateChar.hurtElement = true;
-									break;
-								} else {
-									// si il jump d'un obs
-									this.Transform.RelativePosition.y -= this.ascension;
-								}
-							} else {
-								// si il touche rien, il monte
-								this.Transform.RelativePosition.y -= this.ascension;
-							}
-
-						} else {
-							this.jumped = true;
-						}
-					}
-					// FALL 
-					else 
-					{
-						// Check collision/frames
-						if(this.checkCollideObstacle()) {
-
-							if (this.checkCollideObstacleTop()) {
-								console.log("On Obstacle");
-								this.jumped = false;
-								this.stateChar.onElement = true;
-								this.stateChar.isJumping = false;
-								break;								
-							}
-							if (this.checkCollideObstacleLeft()) {
-								console.log("Hurt");
-								this.stateChar.hurtElement = true;
-								break;
-							}
-							//Fall
-							console.log("In Obstacle");
-							this.Transform.RelativePosition.y += this.gravity;
-							
-						} else {
-							//Fall
-							this.Transform.RelativePosition.y += this.gravity;
-						}
-					}
-				} 
-				// Game Over
-				else 
-				{
-					// 															GAME OVER
-					//console.log("GAME OVER");
-					//GODMODE
-					this.stateChar.isJumping = false;
-					this.jumped = false;
-					//this.Transform.RelativePosition.y -= 5;
-					this.stateChar.currentState = this.stateChar.states["Run"];
-				}
-				//console.log("jump/fall");
+				this.jump();
 				break;
 			case this.stateChar.states["Hurt"] :
-				if (this.stateChar.isJumping) this.stateChar.currentState = this.stateChar.states["Jumping"];
-				if (this.stateChar.onElement) this.stateChar.currentState = this.stateChar.states["Run"];
-				//console.log("Aïe");
-				// 																Maybe not good idea
-				// checkCollision (obsTouched?)
-				// si faux -> hurtEle = false
-				// si faux -> hurtEle = isJumping = true
-				if (this.obsTouched ) {
-					 if(!Physics.CheckCollision(this.Physics.Collider, this.obsTouched.Physics.Collider)){
-					 	this.obsTouched.speed = Scenes["Game"].generalSpeed;
-					 	this.stateChar.hurtElement = false;
-						this.obsTouched = null;
-						this.jumped = true;
-						this.stateChar.isJumping = true;
-						break;
-					 }
-					 else {
-					 	// checkCollision (obsTouched?)
-						// si vrai -> y-- (obsTouched x --> don't move)
-						this.obsTouched.speed = 0;
-						this.Transform.RelativePosition.y += this.gravity;	
-					 }
+				if (this.stateChar.isJumping){
+					this.stateChar.currentState = this.stateChar.states["Jumping"];
+					break;
 				}
-			break;
+				if (this.stateChar.onElement) {
+					this.stateChar.currentState = this.stateChar.states["Run"];
+					break;	
+				}
+				this.hurt();
+				break;
 		}
 	}
-	// 																			Create table-copy(slice) for no conflic with scene when splice item
-	// this.checkCollideObstacle = function () {
-	// 	var tab = Scenes["Game"].GameObjects.slice(0);
-	// 	for (var i = 0; i < tab.length; i++) {
-	// 		var obs = tab[i];
-	// 		if (obs.name === "Obstacle") {
-	// 		// Check Collision with Obs
-	// 			if (Physics.CheckCollision(this.Physics.Collider, obs.Physics.Collider)) {
-	// 				this.obsTouched = obs;
-	// 				return true;
-	// 			}
-	// 		}
-	// 	}
-	// 	return false;
-	// };
-	/**
-																				A TEST : CheckCollideObs avec le "VRAI" Tableau
-	*/
 	this.checkCollideObstacle = function () {
 		for (var i = 0; i <  Scenes["Game"].GameObjects.length; i++) {
 			var obs =  Scenes["Game"].GameObjects[i];
@@ -449,6 +322,108 @@ function MainChar()
 	this.checkCollideObstacleBot = function() {
 
 		return Physics.CheckCollision(this.Physics.topCollider, this.obsTouched.Physics.botCollider);
+	};
+	this.run = function() {
+		this.tweenGravity.Reset();
+
+		if( Input.KeysDown[32] ){
+			this.stateChar.onElement = false;
+			this.stateChar.isJumping = true;
+			// Lancer le tween pour jump!
+			this.tweenJump = new TweenAnim([this.Transform.RelativePosition.y],[this.jumpHeight], .5, "Quadratic", "Out");
+			this.tweenJump.Start();
+		}
+
+		else if (this.obsTouched) {
+			if (!Physics.CheckCollision(this.Physics.Collider, this.obsTouched.Physics.Collider)) {
+				this.stateChar.onElement = false;
+				this.stateChar.isJumping = true;
+				// call gravity
+				this.tweenGravity.Start();
+			}
+		}
+		else {
+			// Starter or GameOver
+		}
+	};
+	this.jump = function() {
+		if (!this.gameOver()) {
+			if (this.checkCollideObstacle()) {
+				// Run
+				if (this.checkCollideObstacleTop()) {
+					if (this.tweenJump.isFinished) {
+						this.stateChar.onElement = true;
+						this.stateChar.isJumping = false;
+					}
+					else {
+						this.relativeValue = this.tweenJump.recoverValue();
+						this.Transform.RelativePosition.y = this.relativeValue[0];
+					}
+				}
+				// Down
+				else if (this.checkCollideObstacleBot()) {
+					this.tweenJump.isFinished = true;
+					this.tweenGravity.Start();
+					this.relativeValue = this.tweenGravity.recoverValue();
+					this.Transform.RelativePosition.y += this.relativeValue[0];
+				}
+				// Hurt
+				else if (this.checkCollideObstacleLeft()) {
+					this.stateChar.hurtElement = true;
+					this.stateChar.isJumping = false;
+				}
+				else {
+					console.log("WTF");
+				}
+			}
+			// Down || UP
+			else {
+				// UP
+				if (!this.tweenJump.isFinished) {
+					this.relativeValue = this.tweenJump.recoverValue();
+					this.Transform.RelativePosition.y = this.relativeValue[0];
+				}
+				// DOWN
+				else {
+					this.relativeValue = this.tweenGravity.recoverValue();
+					this.Transform.RelativePosition.y += this.relativeValue[0];
+				}
+			}
+		}
+		// Game Over
+		else {
+			this.stateChar.onElement = true;
+			this.stateChar.isJumping = false;
+			this.obsTouched = null;
+			this.Transform.RelativePosition.y -= 5;
+			
+		}
+	};
+	this.hurt = function() {
+		if (Physics.CheckCollision(this.Physics.Collider, this.obsTouched.Physics.Collider)) {
+			if (this.tweenJump.isFinished) {
+				this.obsTouched.speed = 0;
+				this.relativeValue = this.tweenGravity.recoverValue();
+				this.Transform.RelativePosition.y += this.relativeValue[0];
+			} else {
+				this.relativeValue = this.tweenJump.recoverValue();
+				this.Transform.RelativePosition.y = this.relativeValue[0];
+			}
+		}
+		else {
+			this.obsTouched.speed = Scenes["Game"].generalSpeed;
+			//														Need to create tweenObs (0 --> Scenes["Game"].generalSpeed)
+			this.stateChar.isJumping = true;
+			this.stateChar.hurtElement = false;
+		}
+
+	};
+	this.gameOver = function(){
+		if (this.Transform.RelativePosition.y > canvas.height - 100) {
+			console.log("Game Over");
+			return true;
+		}
+		return false;
 	}
 	/**
 	 * @function onHover

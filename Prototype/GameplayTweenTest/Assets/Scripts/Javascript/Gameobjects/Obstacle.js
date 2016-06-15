@@ -203,7 +203,7 @@ function Obstacle(_pos, _generalSpeed)
 			Debug.DebugObject(this);
 			ctx.fillStyle = "red";
 			var box = this.Physics.botCollider;
-			//ctx.fillRect(box.x, box.y, box.w, box.h);
+			ctx.fillRect(box.x, box.y, box.w, box.h);
 		}
 		this.GUI();
 	};
@@ -224,9 +224,9 @@ function Obstacle(_pos, _generalSpeed)
 		this.Physics.topCollider.h = offsetCollide;
 		// bot Collider
 		this.Physics.botCollider.x = this.Transform.Position.x;
-		this.Physics.botCollider.y = this.Transform.Position.y + this.Transform.Size.y - offsetCollide*.5;
+		this.Physics.botCollider.y = this.Transform.Position.y + this.Transform.Size.y - offsetCollide*2;
 		this.Physics.botCollider.w = this.Transform.Size.x;
-		this.Physics.botCollider.h = offsetCollide;
+		this.Physics.botCollider.h = offsetCollide*2;
 		// left Collider
 		this.Physics.leftCollider.x = this.Transform.Position.x - offsetCollide*.5;
 		this.Physics.leftCollider.y = this.Transform.Position.y;

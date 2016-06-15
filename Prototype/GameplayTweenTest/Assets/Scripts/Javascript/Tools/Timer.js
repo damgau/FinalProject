@@ -63,6 +63,8 @@ function Timer(_duration, _isRepeat, _Action, _Callback, _isStarted)
 
 	this.Reset = function() 
 	{
+		this.Awake();
+		this.isStarted = false;
 		this.currentTime = 0;
 	}
 
