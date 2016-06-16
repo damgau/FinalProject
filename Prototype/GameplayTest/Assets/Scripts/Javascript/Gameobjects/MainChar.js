@@ -10,6 +10,7 @@ function MainChar()
 	/*
 				Personnal Variable
 	*/
+	_self = this;
 	this.gravity = 0;
 	this.jumpHeight = 0;
 
@@ -35,6 +36,10 @@ function MainChar()
 	// E Ekko
 	this.tweenSpell = null;
 	//tweenSpell ?
+
+	// Timer : Spells
+	this.timerSpell = null;
+	this.canUseSpell = true;
 
 	// tab qui va recupere les informations donner par un tween
 	this.relativeValue = [];
@@ -161,6 +166,11 @@ function MainChar()
 			//								_startValue, _changeValue, _duration, _type, _underType
 			this.tweenGravity = new TweenAnim([0],[this.gravity], .5, "Quartic", "Out");
 
+			// Timer Spell
+			//this.timerSpell = new Timer(_duration, _isRepeat, _Action, _Callback, _isStarted);
+			// Action --> draw/write 4 - 3 - 2 - 1 "UP"
+			// Callback ? "UP"
+			this.timerSpell = new Timer(4, true, null, this.callbackSpell, false);
 			// Set Collision
 			if (this.Physics.colliderIsSameSizeAsTransform) 
 			{
@@ -212,8 +222,11 @@ function MainChar()
 	this.Update = function() 
 	{
 		// A Z E R
-		if (Input.KeysDown[65]) {
+		if (!this.stateChar.castingSpell && this.canUseSpell) {
+			if (Input.KeysDown[65]) {
+			this.timerSpell.Reset();
 			this.stateChar.castingSpell = true;
+			}
 		}
 		this.actionToDo();
 		// draw en fonction de this.StateChar.currentState (sprite)
@@ -468,37 +481,34 @@ function MainChar()
 		}
 	};
 	this.spell = function() {
-
 		if (!this.tweenSpell) {
-			var mousePos = Input.MousePosition;
 
-			// Y
-			var yDest = this.Transform.Position.y - mousePos.y;
-			if (yDest > this.jumpHeight) {
-				yDest = -this.jumpHeight;
-			}
-			if (yDest < -this.jumpHeight) {
-				yDest = this.jumpHeight;	
-			}
-			this.tweenSpell = new TweenAnim([this.Transform.Position.y], [-yDest], .2, "Exponential", "In");
-
-			// X
-			// for tab GO -> tweenSpell -> result[1] || tweenUseDash
-			// cooldown
-				
+			this.tweenSpell = new TweenAnim([this.Transform.Position.y], [this.jumpHeight], .2, "Exponential", "Out");
+			for (var i = 0; i <  Scenes["Game"].GameObjects.length; i++) {
+				var obj = Scenes["Game"].GameObjects[i];
+				if (obj.name === "Obstacle") {
+					obj.tweenSpell = new TweenAnim([obj.Transform.Position.x], [this.jumpHeight], .2, "Exponential", "Out");
+				}
+			}		
 		}
 		else {
 			if (!this.tweenSpell.isFinished) {
-				this.relativeValue = this.tweenSpell.recoverValue();
-				this.Transform.RelativePosition.y = this.relativeValue[0];
-			} else {
+					this.relativeValue = this.tweenSpell.recoverValue();
+					this.Transform.RelativePosition.y = this.relativeValue[0];
+			}
+			else {
 
 				// set this.tweenSpell = null when spell is finish (for "init" next spell)
 				this.tweenSpell = null;
-				this.stateChar.castingSpell = false;				
+				this.stateChar.castingSpell = false;
+				this.timerSpell.isStarted = true;
+				this.canUseSpell = false;		
+				//console.log(this.timerSpell.isStarted)
 			}
 		}
-
+	}
+	this.callbackSpell = function(){
+		_self.canUseSpell = true;
 	}
 	this.gameOver = function(){
 		if (this.Transform.RelativePosition.y > canvas.height - 100) {

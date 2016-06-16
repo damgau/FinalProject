@@ -14,6 +14,7 @@ function Obstacle(_pos, _generalSpeed)
 	this.speed = _generalSpeed;
 	//tween
 	this.tweenSpeed = null;
+	this.tweenSpell = null;
 	// tab qui va recupere les informations donner par un tween
 	this.relativeValue = [];
 
@@ -191,10 +192,15 @@ function Obstacle(_pos, _generalSpeed)
 	this.Update = function() 
 	{
 		// Deplacement 								Delete gameObj
-		if (this.tweenSpeed && !this.tweenSpeed.isFinished) {
+		if (this.tweenSpell && !this.tweenSpell.isFinished){
+			this.relativeValue = this.tweenSpell.recoverValue();
+			this.Transform.RelativePosition.x = this.relativeValue[0]; 	
+		}
+		else if (this.tweenSpeed && !this.tweenSpeed.isFinished) {
 			this.relativeValue = this.tweenSpeed.recoverValue();
 			this.Transform.RelativePosition.x -= this.relativeValue[0]; 
-		} else {
+		} 
+		else {
 			this.Transform.RelativePosition.x -= this.speed;
 		}
 		

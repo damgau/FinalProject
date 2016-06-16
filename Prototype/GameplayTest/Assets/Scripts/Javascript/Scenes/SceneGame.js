@@ -30,6 +30,11 @@ function SceneGame()
 	this.currentWidth = 0;
 	this.reloadWidth = 0; 
 
+	/* GUI SPELL */
+
+	this.nbSpell = 4;
+	this.widthBySpell = 0;
+
 
 	this.Awake = function() 
 	{
@@ -148,7 +153,6 @@ function SceneGame()
 			//Show UI
 
 			// Jauge ENERGIE
-			
 			// Permet de ne pas reload si on a le max de obs dispo  (reload < 99 --> "debug graphique")
 			if (this.obsAvailable < this.obsAvailableMax && this.reloadWidth < 99) {
 				// modifier la largeur en fonction du temps (reload)
@@ -156,12 +160,14 @@ function SceneGame()
 				ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.1,
 							 this.currentWidth + this.widthByEnergie*this.reloadWidth/100, 50);
 			}
-			
 			// modifier la largeur en fonction du nombre disponible
 			ctx.fillStyle = "#FFF000";
 			ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.1,
 						 this.currentWidth, 50);
-
+			// Spell
+			ctx.fillStyle = "#FFFFFF";
+			ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.16,
+						 this.currentWidth, 50);
 
 		} 
 		else 
