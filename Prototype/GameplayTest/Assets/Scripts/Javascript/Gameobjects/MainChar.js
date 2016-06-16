@@ -413,7 +413,7 @@ function MainChar()
 	this.hurt = function() {
 		if (Physics.CheckCollision(this.Physics.Collider, this.obsTouched.Physics.Collider)) {
 			if (this.tweenJump.isFinished) {
-				this.obsTouched.speed = 0;
+				//this.obsTouched.speed = 0;
 				this.relativeValue = this.tweenGravity.recoverValue();
 				this.Transform.RelativePosition.y += this.relativeValue[0];
 			} else {
@@ -422,8 +422,11 @@ function MainChar()
 			}
 		}
 		else {
-			this.obsTouched.speed = Scenes["Game"].generalSpeed;
 			//														Need to create tweenObs (0 --> Scenes["Game"].generalSpeed)
+			//this.obsTouched.speed = Scenes["Game"].generalSpeed;
+			this.obsTouched.tweenSpeed = new TweenAnim([0],[Scenes["Game"].generalSpeed],
+														 1, "Quadratic", "Out");
+			//this.obsTouched.tweenSpeed.Start();
 			this.stateChar.isJumping = true;
 			this.stateChar.hurtElement = false;
 		}

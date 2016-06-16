@@ -51,11 +51,7 @@ function SceneGame()
 			this.obsAvailableMax = 3;
 
 			// Timer regenerate obs
-			//						 _Action : augmenter la jauge graphiquement
 			// 						ATTENTION : Ne pas oublier de reset (action) si Timer n'est pas "fini"
-			//						_CallBack : Increment 
-			// Timer(_duration, _isRepeat, _Action, _Callback, _isStarted) 
-			//						Need to "call" methods?
 			this.timerEnergie = new Timer(2, true, this.IncrementGUIEnergie, this.canIncrementEnergie, false);
 			this.timerReward = new Timer(5, true, null, this.generateReward, true);
 
@@ -98,7 +94,6 @@ function SceneGame()
 
 
 			//generate onClick : OBS
-			// 												TEST
 			if (Input.mouseClick) {
 			//if (Input.mouseLongClick) {
 
@@ -182,6 +177,8 @@ function SceneGame()
 
 			//create OBS
 			var obs = new Obstacle(pos, this.generalSpeed);
+			obs.tweenSpeed = new TweenAnim([0],[Scenes["Game"].generalSpeed],
+														 1, "Quadratic", "Out");
 			this.GameObjects.push(obs);
 			this.obsAvailable--;
 			//console.log(this.obsAvailable);

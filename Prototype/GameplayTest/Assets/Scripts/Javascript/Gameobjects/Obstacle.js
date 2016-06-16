@@ -12,6 +12,10 @@ function Obstacle(_pos, _generalSpeed)
 	*/
 	this.gravity = 0;
 	this.speed = _generalSpeed;
+	//tween
+	this.tweenSpeed = null;
+	// tab qui va recupere les informations donner par un tween
+	this.relativeValue = [];
 
 	this.MouseOffset = new Vector();
 
@@ -187,8 +191,13 @@ function Obstacle(_pos, _generalSpeed)
 	this.Update = function() 
 	{
 		// Deplacement 								Delete gameObj
+		if (this.tweenSpeed && !this.tweenSpeed.isFinished) {
+			this.relativeValue = this.tweenSpeed.recoverValue();
+			this.Transform.RelativePosition.x -= this.relativeValue[0]; 
+		} else {
+			this.Transform.RelativePosition.x -= this.speed;
+		}
 		
-		this.Transform.RelativePosition.x -= this.speed;
 
 		// Position of Obstacle
 		ctx.fillStyle = "#42BF2E";
