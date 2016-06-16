@@ -1,6 +1,6 @@
-function Obstacle(_pos, _generalSpeed) 
+function MainChar() 
 {
-	this.name = "Obstacle";
+	this.name = "MainChar";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
@@ -11,18 +11,40 @@ function Obstacle(_pos, _generalSpeed)
 				Personnal Variable
 	*/
 	this.gravity = 0;
-	this.speed = _generalSpeed;
-	//tween
-	this.tweenSpeed = null;
+	this.jumpHeight = 0;
+
+	this.obsTouched = null;
+
+	this.stateChar = {};
+	this.stateChar.states = [];
+	this.stateChar.states["Run"] = 0;
+	this.stateChar.states["Jumping"] = 1;
+	this.stateChar.states["Hurt"] = 2;
+	this.stateChar.currentState = this.stateChar.states["Run"];
+
+	// set Transition! (Boolean)
+	this.stateChar.isJumping = false; // esp
+	this.stateChar.onElement = false; // on obstacle for example
+	this.stateChar.hurtElement = false; // aie 	
+	
+	// TWEEN
+	this.tweenJump = null;
+	this.tweenGravity = null;
+	//tweenSpell ? 
+
 	// tab qui va recupere les informations donner par un tween
 	this.relativeValue = [];
 
+	/*
+	****************************
+	*/
+	
 	this.MouseOffset = new Vector();
 
 	this.Parent = null;
 	
 	this.Transform = {};
-	this.Transform.RelativePosition = _pos || new Vector(canvas.width + 10, Math.Random.RangeInt(500, canvas.height - 150, false));
+	this.Transform.RelativePosition = new Vector();
 	this.Transform.Position = new Vector();
 	this.Transform.Size = new Vector();
 	this.Transform.RelativeScale = new Vector(1,1);
@@ -36,15 +58,13 @@ function Obstacle(_pos, _generalSpeed)
 	this.Physics.dragAndDroppable = false;
 	this.Physics.colliderIsSameSizeAsTransform = true;
 	this.Physics.countHovered = 0;
-
 	this.Physics.Collider = new Box();
-
 	/*
 				Personnal Variable
 	*/
 	this.Physics.topCollider = new Box();
 	this.Physics.botCollider = new Box();
-	this.Physics.leftCollider = new Box();
+	this.Physics.rightCollider = new Box();
 
 	this.Renderer = 
 	{
@@ -67,15 +87,6 @@ function Obstacle(_pos, _generalSpeed)
 			currentIndex: 0,
 			totalAnimationLength: 0.5
 		},
-		/**
-		 * 
-		 * @function Draw
-		 * @memberof GameObjects/GameObjects
-		 *
-		 * @description
-		 * Draw the game object component
-		 *  
-		 * */
 		Draw: function() 
 		{
 			var ScaledSizeX = this.That.Size.x*this.That.Scale.x;
@@ -131,13 +142,20 @@ function Obstacle(_pos, _generalSpeed)
 	};
 	this.Awake = function() 
 	{
-		//Print('System:GameObject ' + this.name + " Created !");
+		Print('System:GameObject ' + this.name + " Created !");
 	};
 	this.Start = function() 
 	{
 		if (!this.started) {
 			// operation start
-			this.SetSize(200, 50);
+			this.SetPosition( canvas.width*.4,canvas.height*.5 );
+			this.SetSize( 50, 50 );
+			
+			this.gravity = 10;
+			// Hauteur à atteindre en plus de la position actuel
+			this.jumpHeight = -(canvas.height*.32);
+			//								_startValue, _changeValue, _duration, _type, _underType
+			this.tweenGravity = new TweenAnim([0],[this.gravity], .5, "Quartic", "Out");
 
 			// Set Collision
 			if (this.Physics.colliderIsSameSizeAsTransform) 
@@ -146,7 +164,7 @@ function Obstacle(_pos, _generalSpeed)
 			}
 
 			this.started = true;
-			//Print('System:GameObject ' + this.name + " Started !");
+			Print('System:GameObject ' + this.name + " Started !");
 		}
 		this.PreUpdate();
 	};
@@ -184,23 +202,17 @@ function Obstacle(_pos, _generalSpeed)
 			{
 				this.setCollider();
 			}
-
 			this.Update();
 		}			
 	};
 	this.Update = function() 
 	{
-		// Deplacement 								Delete gameObj
-		if (this.tweenSpeed && !this.tweenSpeed.isFinished) {
-			this.relativeValue = this.tweenSpeed.recoverValue();
-			this.Transform.RelativePosition.x -= this.relativeValue[0]; 
-		} else {
-			this.Transform.RelativePosition.x -= this.speed;
-		}
-		
-
-		// Position of Obstacle
-		ctx.fillStyle = "#42BF2E";
+		// voir les conséquences, diférence entre utiliser un sort avant/apres "actionToDo"
+		// Ajouter un état castingSpell?
+		this.actionToDo();
+		// draw en fonction de this.StateChar.currentState
+		// Position of MainChar & design
+		ctx.fillStyle = "#2EBF98";
 		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
 					 this.Transform.Size.x, this.Transform.Size.y);
 
@@ -211,13 +223,17 @@ function Obstacle(_pos, _generalSpeed)
 		if (Application.debugMode) {
 			Debug.DebugObject(this);
 			ctx.fillStyle = "red";
-			var box = this.Physics.botCollider;
+			var box = this.Physics.topCollider;
 			//ctx.fillRect(box.x, box.y, box.w, box.h);
 		}
 		this.GUI();
 	};
-
 	this.GUI = function() {};
+
+	/*
+				Personnal Methods
+	*/
+
 	this.setCollider = function () {
 		// "offset" = "marge"
 		var offsetCollide = 10;
@@ -228,20 +244,208 @@ function Obstacle(_pos, _generalSpeed)
 		this.Physics.Collider.h = this.Transform.Size.y ;
 		// top Collider
 		this.Physics.topCollider.x = this.Transform.Position.x;
-		this.Physics.topCollider.y = this.Transform.Position.y - offsetCollide*.5;
+		this.Physics.topCollider.y = this.Transform.Position.y;
 		this.Physics.topCollider.w = this.Transform.Size.x;
 		this.Physics.topCollider.h = offsetCollide;
 		// bot Collider
 		this.Physics.botCollider.x = this.Transform.Position.x;
-		this.Physics.botCollider.y = this.Transform.Position.y + this.Transform.Size.y - offsetCollide*2;
+		this.Physics.botCollider.y = this.Transform.Position.y + this.Transform.Size.y - offsetCollide;
 		this.Physics.botCollider.w = this.Transform.Size.x;
-		this.Physics.botCollider.h = offsetCollide*2;
-		// left Collider
-		this.Physics.leftCollider.x = this.Transform.Position.x - offsetCollide*.5;
-		this.Physics.leftCollider.y = this.Transform.Position.y;
-		this.Physics.leftCollider.w = offsetCollide;
-		this.Physics.leftCollider.h = this.Transform.Size.y;
+		this.Physics.botCollider.h = offsetCollide;
+		// right Collider
+		this.Physics.rightCollider.x = this.Transform.Position.x + this.Transform.Size.x - offsetCollide;
+		this.Physics.rightCollider.y = this.Transform.Position.y;
+		this.Physics.rightCollider.w = offsetCollide;
+		this.Physics.rightCollider.h = this.Transform.Size.y;
+
 	};
+
+	this.actionToDo = function(){
+		//console.log(this.stateChar.currentState);
+		switch(this.stateChar.currentState){
+			case this.stateChar.states["Run"] :
+				if (this.stateChar.isJumping) {
+					this.stateChar.currentState = this.stateChar.states["Jumping"];
+					break;
+				} 
+				if (this.stateChar.hurtElement) {
+					this.stateChar.currentState = this.stateChar.states["Hurt"];
+					break;
+				}
+				this.run();
+				break;
+			case this.stateChar.states["Jumping"] :
+				if (this.stateChar.onElement) {
+					this.stateChar.currentState = this.stateChar.states["Run"];
+					break;	
+				}
+				if (this.stateChar.hurtElement) {
+					this.stateChar.currentState = this.stateChar.states["Hurt"];
+					break;
+				}
+				this.jump();
+				break;
+			case this.stateChar.states["Hurt"] :
+				if (this.stateChar.isJumping){
+					this.stateChar.currentState = this.stateChar.states["Jumping"];
+					break;
+				}
+				if (this.stateChar.onElement) {
+					this.stateChar.currentState = this.stateChar.states["Run"];
+					break;	
+				}
+				this.hurt();
+				break;
+		}
+	}
+	this.checkCollideObstacle = function () {
+		for (var i = 0; i <  Scenes["Game"].GameObjects.length; i++) {
+			var obs =  Scenes["Game"].GameObjects[i];
+			if (obs.name === "Obstacle") {
+			// Check Collision with Obs
+				if (Physics.CheckCollision(this.Physics.Collider, obs.Physics.Collider)) {
+					this.obsTouched = obs;
+					return true;
+				}
+			}
+		}
+		return false;
+	};
+	this.checkCollideObstacleTop = function() {
+
+		return Physics.CheckCollision(this.Physics.botCollider, this.obsTouched.Physics.topCollider);
+	};
+	this.checkCollideObstacleLeft = function() {
+
+		return Physics.CheckCollision(this.Physics.rightCollider, this.obsTouched.Physics.leftCollider);
+	};
+	this.checkCollideObstacleBot = function() {
+
+		return Physics.CheckCollision(this.Physics.topCollider, this.obsTouched.Physics.botCollider);
+	};
+	this.run = function() {
+
+		if( Input.KeysDown[32] ){
+			this.tweenGravity.Reset();
+			this.stateChar.onElement = false;
+			this.stateChar.isJumping = true;
+			// Lancer le tween pour jump!
+			this.tweenJump = new TweenAnim([this.Transform.RelativePosition.y],[this.jumpHeight], .5, "Quadratic", "Out");
+			this.tweenJump.Start();
+		}
+
+		else if (this.obsTouched) {
+			if (!Physics.CheckCollision(this.Physics.Collider, this.obsTouched.Physics.Collider)) {
+				this.stateChar.onElement = false;
+				this.stateChar.isJumping = true;
+				// call gravity
+				this.tweenGravity.Start();
+			}
+		}
+		else {
+			// Starter or GameOver
+		}
+	};
+	this.jump = function() {
+		if (!this.gameOver()) {
+			if (this.checkCollideObstacle()) {
+				// Run
+				if (this.checkCollideObstacleTop()) {
+					if (this.tweenJump.isFinished) {
+						this.stateChar.onElement = true;
+						this.stateChar.isJumping = false;
+					}
+					else {
+						this.relativeValue = this.tweenJump.recoverValue();
+						this.Transform.RelativePosition.y = this.relativeValue[0];
+					}
+				}
+				// Down
+				else if (this.checkCollideObstacleBot()) {
+					this.tweenJump.isFinished = true;
+					this.tweenGravity.Start();
+					this.relativeValue = this.tweenGravity.recoverValue();
+					this.Transform.RelativePosition.y += this.relativeValue[0];
+				}
+				// Hurt
+				else if (this.checkCollideObstacleLeft()) {
+					this.stateChar.hurtElement = true;
+					this.stateChar.isJumping = false;
+				}
+				else {
+					console.log("WTF");
+					if (this.tweenJump.isFinished) {
+						this.relativeValue = this.tweenGravity.recoverValue();
+						this.Transform.RelativePosition.y += this.relativeValue[0];	
+					} else {
+						this.relativeValue = this.tweenJump.recoverValue();
+						this.Transform.RelativePosition.y = this.relativeValue[0];
+					}
+					
+				}
+			}
+			// Down || UP
+			else {
+				// UP
+				if (!this.tweenJump.isFinished) {
+					this.relativeValue = this.tweenJump.recoverValue();
+					this.Transform.RelativePosition.y = this.relativeValue[0];
+				}
+				// DOWN
+				else {
+					
+					this.relativeValue = this.tweenGravity.recoverValue();
+					this.Transform.RelativePosition.y += this.relativeValue[0];
+					//console.log(this.tweenGravity);
+					// TIMER a pas été Awake!
+				}
+			}
+		}
+		// Game Over
+		else {
+			this.stateChar.onElement = true;
+			this.stateChar.isJumping = false;
+			this.obsTouched = null;
+			this.Transform.RelativePosition.y -= 5;
+			
+		}
+	};
+	this.hurt = function() {
+		if (Physics.CheckCollision(this.Physics.Collider, this.obsTouched.Physics.Collider)) {
+			if (this.tweenJump.isFinished) {
+				//this.obsTouched.speed = 0;
+				this.relativeValue = this.tweenGravity.recoverValue();
+				this.Transform.RelativePosition.y += this.relativeValue[0];
+			} else {
+				this.relativeValue = this.tweenJump.recoverValue();
+				this.Transform.RelativePosition.y = this.relativeValue[0];
+			}
+		}
+		else {
+			//														Need to create tweenObs (0 --> Scenes["Game"].generalSpeed)
+			//this.obsTouched.speed = Scenes["Game"].generalSpeed;
+			this.obsTouched.tweenSpeed = new TweenAnim([0],[Scenes["Game"].generalSpeed],
+														 1, "Quadratic", "Out");
+			//this.obsTouched.tweenSpeed.Start();
+			this.stateChar.isJumping = true;
+			this.stateChar.hurtElement = false;
+		}
+
+	};
+	this.gameOver = function(){
+		if (this.Transform.RelativePosition.y > canvas.height - 100) {
+			console.log("Game Over");
+			return true;
+		}
+		return false;
+	}
+	/**
+	 * @function onHover
+	 * @memberof GameObjects/GameObjects
+	 * @description
+	 *
+	 * Counter on hover the GameObject
+	 * */
 	this.onHover = function() 
 	{
 		this.Physics.countHovered ++;	

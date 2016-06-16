@@ -53,7 +53,7 @@ function SceneGame()
 			// Timer regenerate obs
 			// 						ATTENTION : Ne pas oublier de reset (action) si Timer n'est pas "fini"
 			this.timerEnergie = new Timer(2, true, this.IncrementGUIEnergie, this.canIncrementEnergie, false);
-			this.timerReward = new Timer(2, true, null, this.generateReward, true);
+			this.timerReward = new Timer(5, true, null, this.generateReward, true);
 
 			this.GameObjects.push(new MainChar());
 			var tempObstacle = new Obstacle(

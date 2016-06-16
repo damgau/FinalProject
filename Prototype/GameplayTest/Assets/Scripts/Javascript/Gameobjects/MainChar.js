@@ -20,17 +20,21 @@ function MainChar()
 	this.stateChar.states["Run"] = 0;
 	this.stateChar.states["Jumping"] = 1;
 	this.stateChar.states["Hurt"] = 2;
+	this.stateChar.states["Spell"] = 3;
 	this.stateChar.currentState = this.stateChar.states["Run"];
 
 	// set Transition! (Boolean)
 	this.stateChar.isJumping = false; // esp
 	this.stateChar.onElement = false; // on obstacle for example
-	this.stateChar.hurtElement = false; // aie 	
+	this.stateChar.hurtElement = false; // aie 
+	this.stateChar.castingSpell = false;
 	
 	// TWEEN
 	this.tweenJump = null;
 	this.tweenGravity = null;
-	//tweenSpell ? 
+	// E Ekko
+	this.tweenSpell = null;
+	//tweenSpell ?
 
 	// tab qui va recupere les informations donner par un tween
 	this.relativeValue = [];
@@ -148,12 +152,12 @@ function MainChar()
 	{
 		if (!this.started) {
 			// operation start
-			this.SetPosition( canvas.width*.5 - 10,canvas.height*.5 );
+			this.SetPosition( canvas.width*.4,canvas.height*.5 );
 			this.SetSize( 50, 50 );
 			
 			this.gravity = 10;
 			// Hauteur à atteindre en plus de la position actuel
-			this.jumpHeight = -300;
+			this.jumpHeight = -(canvas.height*.32);
 			//								_startValue, _changeValue, _duration, _type, _underType
 			this.tweenGravity = new TweenAnim([0],[this.gravity], .5, "Quartic", "Out");
 
@@ -207,10 +211,12 @@ function MainChar()
 	};
 	this.Update = function() 
 	{
-		// voir les conséquences, diférence entre utiliser un sort avant/apres "actionToDo"
-		// Ajouter un état castingSpell?
+		// A Z E R
+		if (Input.KeysDown[65]) {
+			this.stateChar.castingSpell = true;
+		}
 		this.actionToDo();
-		// draw en fonction de this.StateChar.currentState
+		// draw en fonction de this.StateChar.currentState (sprite)
 		// Position of MainChar & design
 		ctx.fillStyle = "#2EBF98";
 		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
@@ -264,6 +270,10 @@ function MainChar()
 		//console.log(this.stateChar.currentState);
 		switch(this.stateChar.currentState){
 			case this.stateChar.states["Run"] :
+				if (this.stateChar.castingSpell) {
+					this.stateChar.currentState = this.stateChar.states["Spell"];
+					break;
+				}
 				if (this.stateChar.isJumping) {
 					this.stateChar.currentState = this.stateChar.states["Jumping"];
 					break;
@@ -275,6 +285,10 @@ function MainChar()
 				this.run();
 				break;
 			case this.stateChar.states["Jumping"] :
+				if (this.stateChar.castingSpell) {
+					this.stateChar.currentState = this.stateChar.states["Spell"];
+					break;
+				}
 				if (this.stateChar.onElement) {
 					this.stateChar.currentState = this.stateChar.states["Run"];
 					break;	
@@ -286,6 +300,10 @@ function MainChar()
 				this.jump();
 				break;
 			case this.stateChar.states["Hurt"] :
+				if (this.stateChar.castingSpell) {
+					this.stateChar.currentState = this.stateChar.states["Spell"];
+					break;
+				}
 				if (this.stateChar.isJumping){
 					this.stateChar.currentState = this.stateChar.states["Jumping"];
 					break;
@@ -295,6 +313,24 @@ function MainChar()
 					break;	
 				}
 				this.hurt();
+				break;
+			case this.stateChar.states["Spell"] : 
+
+				if (!this.stateChar.castingSpell) {
+					if (this.stateChar.isJumping) {
+						this.stateChar.currentState = this.stateChar.states["Jumping"];
+						break;
+					}
+					if (this.stateChar.onElement) {
+						this.stateChar.currentState = this.stateChar.states["Run"];
+						break;	
+					}
+					if (this.stateChar.hurtElement) {
+						this.stateChar.currentState = this.stateChar.states["Hurt"];
+						break;
+					}
+				}
+				this.spell();
 				break;
 		}
 	}
@@ -430,8 +466,40 @@ function MainChar()
 			this.stateChar.isJumping = true;
 			this.stateChar.hurtElement = false;
 		}
-
 	};
+	this.spell = function() {
+
+		if (!this.tweenSpell) {
+			var mousePos = Input.MousePosition;
+
+			// Y
+			var yDest = this.Transform.Position.y - mousePos.y;
+			if (yDest > this.jumpHeight) {
+				yDest = -this.jumpHeight;
+			}
+			if (yDest < -this.jumpHeight) {
+				yDest = this.jumpHeight;	
+			}
+			this.tweenSpell = new TweenAnim([this.Transform.Position.y], [-yDest], .2, "Exponential", "In");
+
+			// X
+			// for tab GO -> tweenSpell -> result[1] || tweenUseDash
+			// cooldown
+				
+		}
+		else {
+			if (!this.tweenSpell.isFinished) {
+				this.relativeValue = this.tweenSpell.recoverValue();
+				this.Transform.RelativePosition.y = this.relativeValue[0];
+			} else {
+
+				// set this.tweenSpell = null when spell is finish (for "init" next spell)
+				this.tweenSpell = null;
+				this.stateChar.castingSpell = false;				
+			}
+		}
+
+	}
 	this.gameOver = function(){
 		if (this.Transform.RelativePosition.y > canvas.height - 100) {
 			console.log("Game Over");

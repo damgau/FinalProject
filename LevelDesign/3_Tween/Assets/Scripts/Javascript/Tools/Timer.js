@@ -68,12 +68,14 @@ function Timer(_duration, _isRepeat, _Action, _Callback, _isStarted)
 		if (this.isCleared) {
 			this.isCleared = false;
 			this.Awake();
+			this.isStarted = false;
+			this.currentTime = 0;
+
+		} else {
+
+			this.isStarted = false;
+			this.currentTime = 0;
 		}
-		if (this.repeat) this.isStarted = true;
-		else this.isStarted = false;
-
-		this.currentTime = 0;
-
 	}
 
 	this.Clear = function() 
