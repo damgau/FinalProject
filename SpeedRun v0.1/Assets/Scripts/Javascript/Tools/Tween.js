@@ -191,13 +191,5 @@ var Tween =
         In: function (_t, _b, _c, _d) {return _c - Tween.Bounce.Out(_d - _t, 0, _c, _d) + _b;},
         Out: function (_t, _b, _c, _d) {if ((_t /= _d) < (1 / 2.75)) {return _c * (7.5625 * _t * _t) + _b;} else if (_t < (2 / 2.75)) {return _c * (7.5625 * (_t -= (1.5 / 2.75)) * _t + .75) + _b;} else if (_t < (2.5 / 2.75)) {return _c * (7.5625 * (_t -= (2.25 / 2.75)) * _t + .9375) + _b;} else {return _c * (7.5625 * (_t -= (2.625 / 2.75)) * _t + .984375) + _b;}},
         InOut: function (_t, _b, _c, _d) {if (_t < _d / 2) return Tween.Bounce.In(_t * 2, 0, _c, _d) * .5 + _b; return Tween.Bounce.Out(_t * 2 - _d, 0, _c, _d) * .5 + c * .5 + _b;}
-    },
-    CreateTimedTween: function(_tween, _duration, _startValue, _changeInValue ) 
-    {
-        var timer = new Timer(_duration, true, function() {
-            var timer = this;
-            var s = Tween.Bounce.InOut(timer.currentTime, _startValue, _changeInValue, _duration );
-        });
-         
     }
 };

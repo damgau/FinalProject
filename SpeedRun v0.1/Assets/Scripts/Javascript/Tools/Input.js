@@ -34,8 +34,9 @@ var Input =
 	 * */
 	KeyDown: function(e) 
 	{
-		e.preventDefault();
-		e.stopPropagation();
+		//e.preventDefault();
+		//e.stopPropagation();
+		//console.log(e.keyCode);
 		Input.KeysDown[e.keyCode] = true;
 		Input.KeysDownRepeat[e.keyCode] = e.repeat;
 	},

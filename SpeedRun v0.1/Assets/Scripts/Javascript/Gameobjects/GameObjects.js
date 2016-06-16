@@ -26,13 +26,44 @@
  *
  *
  * */
-function GameObject() 
+function MainChar() 
 {
-	this.name = "Model";
+	this.name = "MainChar";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
 	this.fixedToCamera = true;
+
+	/*
+				Personnal Variable
+	*/
+	_self = this;
+	this.gravity = 0;
+	this.jumpHeight = 0;
+	this.obsTouched = null;
+
+	/*
+				StateMachine
+	*/
+	this.stateChar = {};
+	this.stateChar.states = [];
+	this.stateChar.states["Run"] = 0;
+	this.stateChar.states["Jumping"] = 1;
+	this.stateChar.states["Hurt"] = 2;
+	this.stateChar.states["Spell"] = 3;
+	this.stateChar.currentState = this.stateChar.states["Run"];
+
+	// Transition State
+	this.stateChar.isJumping = false;
+	this.stateChar.onElement = false;
+	this.stateChar.hurtElement = false;
+	this.stateChar.castingSpell = false;
+
+	/*
+				TWEEN
+	*/
+	
+
 
 	this.MouseOffset = new Vector();
 
