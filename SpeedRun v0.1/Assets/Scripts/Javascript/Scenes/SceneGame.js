@@ -1,4 +1,4 @@
-function SceneGame() 
+function SceneGame(_difMode) 
 {
 	this.name = "Game";
 	this.GameObjects =[];
@@ -13,6 +13,10 @@ function SceneGame()
 	/*
 				Personnal Variable
 	*/
+
+	this.diffMode = _difMode;
+	this.obsToGenerate = 0;
+
 	this.generalSpeed = 0;
 	this.timerEnergie = null;
 	this.timerReward = null;
@@ -95,9 +99,23 @@ function SceneGame()
 			ctx.fillRect(0,0, canvas.width, canvas.height);
 
 			// generate auto : OBS
-			if (this.GameObjects.length < 5) {
+			if (this.diffMode === "easy") {
+				this.obsToGenerate = 10;
+			}
+			if (this.diffMode === "normal") {
+				this.obsToGenerate = 5;
 
-				this.GameObjects.push(new Obstacle(null, this.generalSpeed));
+			}
+			if (this.diffMode === "hard") {
+				this.obsToGenerate = 2;
+
+			}
+			if (this.GameObjects.length < this.obsToGenerate) {
+				var pos = new Vector(canvas.width + 10,Math.Random.RangeInt(500, canvas.height - 150, false));
+				if (this.canGenerateObs(pos)) {
+					var obs = new Obstacle(pos, this.generalSpeed);
+					this.GameObjects.push(obs);
+				}
 			}
 
 
@@ -154,6 +172,11 @@ function SceneGame()
 		if (!Application.GamePaused) 
 		{
 			//Show UI
+
+			// Score
+			ctx.fillStyle = "#F4F3F3";
+			ctx.fillText( this.GameObjects[0].score,canvas.width - canvas.width*.1, canvas.height*.1,
+						 this.currentWidth, 50);
 
 			// Jauge ENERGIE
 			// Permet de ne pas reload si on a le max de obs dispo  (reload < 99 --> "debug graphique")

@@ -11,6 +11,7 @@ function MainChar()
 				Personnal Variable
 	*/
 	_self = this;
+	this.score = 0;
 	this.gravity = 0;
 	this.jumpHeight = 0;
 
@@ -25,9 +26,9 @@ function MainChar()
 	this.stateChar.currentState = this.stateChar.states["Run"];
 
 	// set Transition! (Boolean)
-	this.stateChar.isJumping = false; // esp
-	this.stateChar.onElement = false; // on obstacle for example
-	this.stateChar.hurtElement = false; // aie 
+	this.stateChar.isJumping = false;
+	this.stateChar.onElement = false;
+	this.stateChar.hurtElement = false; 
 	this.stateChar.castingSpell = false;
 	
 	// TWEEN
@@ -82,7 +83,7 @@ function MainChar()
 		That: this.Transform,
 		Material: 
 		{
-			Source: "",
+			Source: Images["Runner"],
 			SizeFrame: new Vector(),
 			CurrentFrame: new Vector(),
 		},
@@ -159,6 +160,7 @@ function MainChar()
 			// operation start
 			this.SetPosition( canvas.width*.4,canvas.height*.5 );
 			this.SetSize( 50, 50 );
+			this.SetSpriteSheet( Images["Runner"],new Vector(16,17));
 			
 			this.gravity = 10;
 			// Hauteur à atteindre en plus de la position actuel
@@ -171,6 +173,16 @@ function MainChar()
 			// Action --> draw/write 4 - 3 - 2 - 1 "UP"
 			// Callback ? "UP"
 			this.timerDash = new Timer(4, true, null, this.callbackSpell, false);
+
+			// Starter Jump
+			this.tweenGravity.Reset();
+			this.stateChar.onElement = false;
+			this.stateChar.isJumping = true;
+			// Lancer le tween pour jump!
+			this.tweenJump = new TweenAnim([this.Transform.RelativePosition.y],[this.jumpHeight], .5, "Quadratic", "Out");
+			this.tweenJump.Start();
+
+
 			// Set Collision
 			if (this.Physics.colliderIsSameSizeAsTransform) 
 			{
@@ -221,6 +233,7 @@ function MainChar()
 	};
 	this.Update = function() 
 	{
+		this.score++;
 		// A Z E R
 		if (!this.stateChar.castingSpell && this.canUseDash) {
 			if (Input.KeysDown[65]) {
@@ -231,10 +244,10 @@ function MainChar()
 		this.actionToDo();
 		// draw en fonction de this.StateChar.currentState (sprite)
 		// Position of MainChar & design
-		ctx.fillStyle = "#2EBF98";
-		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
-					 this.Transform.Size.x, this.Transform.Size.y);
-
+		//ctx.fillStyle = "#2EBF98";
+		//ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
+		//			 this.Transform.Size.x, this.Transform.Size.y);
+		this.Renderer.Draw();
 		this.PostUpdate();	
 	};
 	this.PostUpdate = function() 
@@ -450,12 +463,18 @@ function MainChar()
 				}
 			}
 		}
-		// Game Over
 		else {
-			this.stateChar.onElement = true;
-			this.stateChar.isJumping = false;
-			this.obsTouched = null;
-			this.Transform.RelativePosition.y -= 5;
+			// Game Over
+			if (this.score > Scenes["Home"].bestScore) {
+				Scenes["Home"].bestScore = this.score;
+			}
+			Time.Timers = [];
+			Application.LoadedScene = Scenes["Home"];			
+			// Cheat Mode
+			// this.stateChar.onElement = true;
+			// this.stateChar.isJumping = false;
+			// this.obsTouched = null;
+			// this.Transform.RelativePosition.y -= 5;
 			
 		}
 	};
@@ -512,7 +531,7 @@ function MainChar()
 		_self.canUseDash = true;
 	}
 	this.gameOver = function(){
-		if (this.Transform.RelativePosition.y > canvas.height - 100) {
+		if (this.Transform.RelativePosition.y > canvas.height) {
 			console.log("Game Over");
 			return true;
 		}
@@ -674,13 +693,30 @@ function MainChar()
 	 *
 	 * Set the sprite sheet source image, the size of one frame and the number of frame the sprite sheet has.
 	 * */
-	this.SetSpriteSheet = function(_img, _sizeFrame, _animationLength) 
+	/*this.SetSpriteSheet = function(_img, _sizeFrame, _animationLength) 
 	{
 	    if(typeof _img != 'string') PrintErr("Parameter img in SetSpriteSheet");
 		if(!(_sizeFrame instanceof(Vector))) PrintErr("Parameter sizeFrame in SetSpriteSheet");
 	    if(typeof _animationLength != 'number') PrintErr("Parameter animationLength in SetSpriteSheet");
 		this.Renderer.isSpriteSheet = true;
 		this.Animation.totalAnimationLength = _animationLength || 0.5;
+		this.Renderer.Material.SizeFrame = _sizeFrame;
+ 		this.Renderer.Material.Source = _img;
+ 		this.Renderer.Material.CurrentFrame = new Vector(0,0);
+ 		for (var i = 0; i < _img.height; i += this.Renderer.Material.SizeFrame.y) 
+ 		{
+ 			var array = [];
+ 			for (var j = 0; j < _img.width; j += this.Renderer.Material.SizeFrame.x) 
+ 			{
+ 				array.push(new Vector(j, i));
+ 			}
+ 			this.Renderer.Animation.Animations.push(array);
+ 		}
+ 		this.Renderer.Animation.Current = this.Renderer.Animation.Animations[0];
+	}*/
+
+	this.SetSpriteSheet = function(_img, _sizeFrame) {
+		this.Renderer.isSpriteSheet = true;
 		this.Renderer.Material.SizeFrame = _sizeFrame;
  		this.Renderer.Material.Source = _img;
  		this.Renderer.Material.CurrentFrame = new Vector(0,0);

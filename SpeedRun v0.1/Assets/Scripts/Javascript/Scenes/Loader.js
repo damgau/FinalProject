@@ -40,6 +40,8 @@ function Loader()
 			Time.SetTimeWhenGameBegin();
 			// operation start
 			//Scenes["SceneHub"] = new SceneHub();
+			Scenes["Home"] = new SceneHome();
+			Scenes["Game"] = new SceneGame();
 
 			LoadImages();
 			this.started = true;

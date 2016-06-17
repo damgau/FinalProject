@@ -1,25 +1,29 @@
-function MainChar() 
+function Obstacle(_pos, _generalSpeed) 
 {
-	this.name = "MainChar";
+	this.name = "Obstacle";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
 	this.fixedToCamera = true;
 
+
+	/*
+				Personnal Variable
+	*/
+	this.gravity = 0;
+	this.speed = _generalSpeed;
+	//tween
+	this.tweenSpeed = null;
+	this.tweenSpell = null;
+	// tab qui va recupere les informations donner par un tween
+	this.relativeValue = [];
+
 	this.MouseOffset = new Vector();
 
 	this.Parent = null;
-
-			// TWEEN v0.2
-	this.jumpAnim = null;
-	this.gravityTween = null;
-	this.gravityValue = 0;
-	this.tabValue = [];
-
-	this.canJump = true;
 	
 	this.Transform = {};
-	this.Transform.RelativePosition = new Vector();
+	this.Transform.RelativePosition = _pos || new Vector(canvas.width + 10, Math.Random.RangeInt(500, canvas.height - 150, false));
 	this.Transform.Position = new Vector();
 	this.Transform.Size = new Vector();
 	this.Transform.RelativeScale = new Vector(1,1);
@@ -31,19 +35,22 @@ function MainChar()
 	this.Physics.enabled = true;
 	this.Physics.clickable = false;
 	this.Physics.dragAndDroppable = false;
-	this.Physics.colliderIsSameSizeAsTransform = false;
+	this.Physics.colliderIsSameSizeAsTransform = true;
 	this.Physics.countHovered = 0;
 
-	this.Physics.Collider = 
-	{
-		Position: new Vector(),
-		Size: new Vector()
-	};
+	this.Physics.Collider = new Box();
+
+	/*
+				Personnal Variable
+	*/
+	this.Physics.topCollider = new Box();
+	this.Physics.botCollider = new Box();
+	this.Physics.leftCollider = new Box();
 
 	this.Renderer = 
 	{
 		isVisible: true,
-		isSpriteSheet: true,
+		isSpriteSheet: false,
 		That: this.Transform,
 		Material: 
 		{
@@ -123,39 +130,27 @@ function MainChar()
 			ctx.restore();
 		}
 	};
-
 	this.Awake = function() 
 	{
-		Print('System:GameObject ' + this.name + " Created !");
+		//Print('System:GameObject ' + this.name + " Created !");
 	};
-
 	this.Start = function() 
 	{
 		if (!this.started) {
 			// operation start
-			this.SetPosition(200, canvas.height - 200);
-			this.SetSize(300, 500);
-			
-			this.SetSpriteSheet( Images["Jump"],new Vector(33,100) );
+			this.SetSize(200, 50);
 
-			this.createTween();
-
-
-
-			this.Renderer.Animation.totalAnimationLength = .5;
-			this.Renderer.Animation.animated = true;
-
+			// Set Collision
 			if (this.Physics.colliderIsSameSizeAsTransform) 
 			{
-				this.Physics.Collider = this.Transform;
+				this.setCollider();
 			}
 
 			this.started = true;
-			Print('System:GameObject ' + this.name + " Started !");
+			//Print('System:GameObject ' + this.name + " Started !");
 		}
 		this.PreUpdate();
 	};
-
 	this.PreUpdate = function() 
 	{
 		if (this.enabled) 
@@ -185,87 +180,114 @@ function MainChar()
 					this.Transform.Position.y -= Application.LoadedScene.CurrentCamera.Transform.Position.y;
 				}
 			}
-			
+			// Collider  									En fonction des "fonctionnalité" ajouté/supprimé les "set" utile/useless
+			if (this.Physics.colliderIsSameSizeAsTransform) 
+			{
+				this.setCollider();
+			}
+
 			this.Update();
 		}			
 	};
-
 	this.Update = function() 
 	{
-			// TWEEN V0.2
-			// Monter
-			if (this.canJump) {
-				// reset TWEEN (Timer)
-				// Monter
-				this.jumpAnim = new TweenAnim([this.Transform.RelativePosition.y],
-												[-300],
-												.5,
-												"Quadratic",
-												"Out");
-				this.canJump = false;
-			}
-			//  & Descendre
-			if (this.jumpAnim.isFinished) {
-				this.gravityValue = this.gravityTween.recoverValue();
-				this.Transform.RelativePosition.y += this.gravityValue[0];
-				if (this.Transform.RelativePosition.y > canvas.height - 500) {
-					// stop fallAnim & this.canJump = true
-					//reset gravityTween
-					this.canJump = true;
-					this.gravityTween.Reset();					
-				}
-			}
-			else {
-				// Je monte !!
-				this.tabValue = this.jumpAnim.recoverValue();
-				this.Transform.RelativePosition.y = this.tabValue[0];
-			}
+		// Deplacement 								Delete gameObj
+		if (this.tweenSpell && !this.tweenSpell.isFinished){
+			this.relativeValue = this.tweenSpell.recoverValue();
+			this.Transform.RelativePosition.x = this.relativeValue[0]; 	
+		}
+		else if (this.tweenSpeed && !this.tweenSpeed.isFinished) {
+			this.relativeValue = this.tweenSpeed.recoverValue();
+			this.Transform.RelativePosition.x -= this.relativeValue[0]; 
+		} 
+		else {
+			this.Transform.RelativePosition.x -= this.speed;
+		}
+		
 
-			
+		// Position of Obstacle
+		ctx.fillStyle = "#42BF2E";
+		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
+					 this.Transform.Size.x, this.Transform.Size.y);
 
-		this.Renderer.Draw();
-		this.PostUpdate();
-
+		this.PostUpdate();	
 	};
-
 	this.PostUpdate = function() 
 	{
 		if (Application.debugMode) {
 			Debug.DebugObject(this);
+			ctx.fillStyle = "red";
+			var box = this.Physics.botCollider;
+			//ctx.fillRect(box.x, box.y, box.w, box.h);
 		}
-		this.GUI();	
+		this.GUI();
 	};
 
-	this.GUI = function() 
-	{
-		
+	this.GUI = function() {};
+	this.setCollider = function () {
+		// "offset" = "marge"
+		var offsetCollide = 10;
+		//basic Collider
+		this.Physics.Collider.x = this.Transform.Position.x ;
+		this.Physics.Collider.y = this.Transform.Position.y ;
+		this.Physics.Collider.w = this.Transform.Size.x ;
+		this.Physics.Collider.h = this.Transform.Size.y ;
+		// top Collider
+		this.Physics.topCollider.x = this.Transform.Position.x;
+		this.Physics.topCollider.y = this.Transform.Position.y - offsetCollide*.5;
+		this.Physics.topCollider.w = this.Transform.Size.x;
+		this.Physics.topCollider.h = offsetCollide;
+		// bot Collider
+		this.Physics.botCollider.x = this.Transform.Position.x;
+		this.Physics.botCollider.y = this.Transform.Position.y + this.Transform.Size.y - offsetCollide*2;
+		this.Physics.botCollider.w = this.Transform.Size.x;
+		this.Physics.botCollider.h = offsetCollide*2;
+		// left Collider
+		this.Physics.leftCollider.x = this.Transform.Position.x - offsetCollide*.5;
+		this.Physics.leftCollider.y = this.Transform.Position.y;
+		this.Physics.leftCollider.w = offsetCollide;
+		this.Physics.leftCollider.h = this.Transform.Size.y;
 	};
-	this.createTween = function() {
-		// descendre : acc TWEEN
-		this.gravityTween = new TweenAnim([0],
-										[10],
-										.5,
-										"Quartic",
-										"Out");
-	}
-
 	this.onHover = function() 
 	{
 		this.Physics.countHovered ++;	
 	};
 
+	/**
+	 * @function onClicked
+	 * @memberof GameObjects/GameObjects
+	 * @description
+	 *
+	 * Set the MouseOffset with mouse position <br/>
+	 * Increment the countHovered
+	 * */
 	this.onClicked = function() 
 	{
 		this.MouseOffset.x = Input.MousePosition.x - this.Transform.Position.x;
 		this.MouseOffset.y = Input.MousePosition.y - this.Transform.Position.y;
 		this.Physics.countHovered ++;
 	};
-	
+	/**
+	 * @function onUnHovered
+	 * @memberof GameObjects/GameObjects
+	 * @description
+	 *
+	 * Reinitialize the countHovered to 0
+	 * */
 	this.onUnHovered = function() 
 	{
 		this.Physics.countHovered = 0;
 	};
-	
+	/**
+	 * @function SetPosition
+	 * @memberof GameObjects/GameObjects
+	 *
+	 * @param {Number} _x
+	 * @param {Number} _y
+	 * 
+	 * @description
+	 * set the x and y position(Transform) of game object
+	 * */
 	this.SetPosition = function(_x, _y)
 	{
 	    if(typeof _x != 'number') PrintErr("Parameter x in SetPosition Go");
@@ -274,6 +296,16 @@ function MainChar()
 		this.Transform.RelativePosition.y = _y;
 	};
 
+	/**
+	 * @function SetPositionCollider
+	 * @memberof GameObjects/GameObjects
+	 *
+	 * @param {Number} _x
+	 * @param {Number} _y
+	 * 
+	 * @description
+	 * set the x and y position(Physics collider) of game object
+	 * */
 	this.SetPositionCollider = function(_x, _y)
 	{
 	    if(typeof _x != 'number') PrintErr("Parameter x in SetPositionCollider Go");
@@ -282,6 +314,16 @@ function MainChar()
 		this.Physics.Collider.Position.y = _y;
 	};
 
+	/**
+	 * @function SetSize
+	 * @memberof GameObjects/GameObjects
+	 *
+	 * @param {Number} _x
+	 * @param {Number} _y
+	 * 
+	 * @description
+	 * set the x and y for the size of game object
+	 * */
 	this.SetSize = function(_x, _y)
 	{
 	    if(typeof _x != 'number') PrintErr("Parameter x in SetSize Go");
@@ -290,6 +332,16 @@ function MainChar()
 		this.Transform.Size.y = _y;
 	};
 
+	/**
+	 * @function SetColliderSize
+	 * @memberof GameObjects/GameObjects
+	 *
+	 * @param {Number} _x
+	 * @param {Number} _y
+	 * 
+	 * @description
+	 * set the x and y for the collider size of game object
+	 * */
 	this.SetColliderSize = function(_x, _y)
 	{
 	    if(typeof _x != 'number') PrintErr("Parameter x in SetColliderSize Go");
@@ -298,6 +350,16 @@ function MainChar()
 		this.Physics.Collider.Size.y = _y;
 	};
 
+	/**
+	 * @function SetScale
+	 * @memberof GameObjects/GameObjects
+	 *
+	 * @param {Number} _x
+	 * @param {Number} _y
+	 * 
+	 * @description
+	 * set the x and y for the scale of game object
+	 * */
 	this.SetScale = function(_x, _y)
 	{
 	    if(typeof _x != 'number') PrintErr("Parameter x in SetScale Go");
@@ -306,6 +368,16 @@ function MainChar()
 		this.Transform.RelativeScale.y = _y;
 	};
 
+	/**
+	 * @function SetPivot
+	 * @memberof GameObjects/GameObjects
+	 *
+	 * @param {Number} _x
+	 * @param {Number} _y
+	 * 
+	 * @description
+	 * set the x and y for the pivot of game object
+	 * */
 	this.SetPivot = function(_x, _y)
 	{
 	    if(typeof _x != 'number') PrintErr("Parameter x in SetPivot Go");
@@ -313,9 +385,25 @@ function MainChar()
 		this.Transform.Pivot.x = _x;
 		this.Transform.Pivot.y = _y;
 	};
-
-	this.SetSpriteSheet = function(_img, _sizeFrame) {
+	/**
+	 * @function SetSpriteSheet
+	 * @memberof GameObjects/GameObjects
+	 *
+	 * @param {String} _img - the source image of sprite sheet
+	 * @param {Vector} _sizeFrame - the size frame of the sprite
+	 * @param {Number} _animationLength - how many frame has the sprite sheet
+	 *
+	 * @description
+	 *
+	 * Set the sprite sheet source image, the size of one frame and the number of frame the sprite sheet has.
+	 * */
+	this.SetSpriteSheet = function(_img, _sizeFrame, _animationLength) 
+	{
+	    if(typeof _img != 'string') PrintErr("Parameter img in SetSpriteSheet");
+		if(!(_sizeFrame instanceof(Vector))) PrintErr("Parameter sizeFrame in SetSpriteSheet");
+	    if(typeof _animationLength != 'number') PrintErr("Parameter animationLength in SetSpriteSheet");
 		this.Renderer.isSpriteSheet = true;
+		this.Animation.totalAnimationLength = _animationLength || 0.5;
 		this.Renderer.Material.SizeFrame = _sizeFrame;
  		this.Renderer.Material.Source = _img;
  		this.Renderer.Material.CurrentFrame = new Vector(0,0);
@@ -330,6 +418,5 @@ function MainChar()
  		}
  		this.Renderer.Animation.Current = this.Renderer.Animation.Animations[0];
 	}
-
 	this.Awake();
 }

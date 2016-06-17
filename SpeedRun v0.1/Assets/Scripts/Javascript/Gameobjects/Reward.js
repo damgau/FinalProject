@@ -1,76 +1,25 @@
-/**
- * Create a new GameObject <br />
- * @namespace GameObjects/GameObjects
- *
- * @tutorial
- * <ul><li>Copy the content of GameObjects file in a new .js document.</li>
- * <li>Save the new file in Assets/Javascript/GameObjects/NameOfYourGameObject.js .</li>
- * <li>In the index.html add below this comment <!-- GameObjects --> the line:<br/>
- * <script type="text/javascript" src="Assets/Scripts/Javascript/GameObjects/NameOfYourGameObject.js"></script></li>
- * <li>For create a new scene, use this instruction: "new GameObject()".</li>
- * </ul>
- * 
- * 
- * @property {String} name - The name of the object.
- * @property {Boolean} enabled - The active state of the GameObject.
- * @property {Boolean} renderer - The active state of Renderer component
- * @property {Boolean} fixedToCamera -  The active state of Camera if is Fixed
- * @property {Vector} MouseOffset  - Position of mouse
- * @property {Group} Parent - A Group which contain several GameObject
- * @property {Object} Transform  
- * @property {Vector} Transform.RelativePosition - the relative position of GameObject inside a Group 
- * @property {Vector} Transform.Size - size of GameObject
- * @property {Vector} Transform.Scale - scale of GameObject 
- * @property {Vector} Transform.Pivot - pivot position of GameObject
- * @property {Number} Transform.angle - angle of GameObject
- *
- *
- * */
-function MainChar() 
+function Reward(_pos, _generalSpeed) 
 {
-	this.name = "MainChar";
+	this.name = "Reward";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
 	this.fixedToCamera = true;
 
+
 	/*
 				Personnal Variable
 	*/
-	_self = this;
 	this.gravity = 0;
-	this.jumpHeight = 0;
-	this.obsTouched = null;
-
-	/*
-				StateMachine
-	*/
-	this.stateChar = {};
-	this.stateChar.states = [];
-	this.stateChar.states["Run"] = 0;
-	this.stateChar.states["Jumping"] = 1;
-	this.stateChar.states["Hurt"] = 2;
-	this.stateChar.states["Spell"] = 3;
-	this.stateChar.currentState = this.stateChar.states["Run"];
-
-	// Transition State
-	this.stateChar.isJumping = false;
-	this.stateChar.onElement = false;
-	this.stateChar.hurtElement = false;
-	this.stateChar.castingSpell = false;
-
-	/*
-				TWEEN
-	*/
-	
-
+	this.speed = _generalSpeed;
 
 	this.MouseOffset = new Vector();
 
 	this.Parent = null;
 	
 	this.Transform = {};
-	this.Transform.RelativePosition = new Vector();
+	this.Transform.RelativePosition = _pos || new Vector(canvas.width + 10, 
+														Math.Random.RangeInt(10, canvas.height - 250, false));
 	this.Transform.Position = new Vector();
 	this.Transform.Size = new Vector();
 	this.Transform.RelativeScale = new Vector(1,1);
@@ -78,31 +27,21 @@ function MainChar()
 	this.Transform.Pivot = new Vector(0,0);
 	this.Transform.angle = 0;
 
-	/**
-	 * The Physics component of the GameObject. <br />
-	 * @memberof GameObjects/GameObjects
-	 *
-	 * @property {Object} Physics  
-	 * @property {Boolean} Physics.enabled - The active state of the GameObject.
-	 * @property {Boolean} Physics.clickable - is clickable
-	 * @property {Boolean} Physics.dragAndDroppable - is draggable
-	 * @property {Boolean} Physics.colliderIsSameSizeAsTransform - is has the same size of Tranform size
-	 * @property {Number} Physics.countHovered - counter
-	 *
-	 *
-	 * */
 	this.Physics = {};
 	this.Physics.enabled = true;
 	this.Physics.clickable = false;
 	this.Physics.dragAndDroppable = false;
-	this.Physics.colliderIsSameSizeAsTransform = false;
+	this.Physics.colliderIsSameSizeAsTransform = true;
 	this.Physics.countHovered = 0;
 
-	this.Physics.Collider = 
-	{
-		Position: new Vector(),
-		Size: new Vector()
-	};
+	this.Physics.Collider = new Box();
+
+	/*
+				Personnal Variable
+	*/
+	this.Physics.topCollider = new Box();
+	this.Physics.botCollider = new Box();
+	this.Physics.leftCollider = new Box();
 
 	this.Renderer = 
 	{
@@ -187,53 +126,27 @@ function MainChar()
 			ctx.restore();
 		}
 	};
-	/**
-	 * @function Awake
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Called at the instruction new GameObject()
-	 * */
 	this.Awake = function() 
 	{
-		Print('System:GameObject ' + this.name + " Created !");
+		//Print('System:GameObject ' + this.name + " Created !");
 	};
-
-	/**
-	 * @function Start
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Start the GameObject and show a message in console or launch Update() if already started <br/>
-	 * Set the transform component to the physics collider
-	 * */
 	this.Start = function() 
 	{
 		if (!this.started) {
 			// operation start
+			this.SetSize(50, 50);
 
+			// Set Collision
 			if (this.Physics.colliderIsSameSizeAsTransform) 
 			{
-				this.Physics.Collider = this.Transform;
+				this.setCollider();
 			}
 
 			this.started = true;
-			Print('System:GameObject ' + this.name + " Started !");
+			//Print('System:GameObject ' + this.name + " Started !");
 		}
 		this.PreUpdate();
 	};
-
-	/**
-	 * @function PreUpdate
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * If GameObject in group (parent), take relative position from parent position <br/>
-	 * If not, set GameObject own position <br/>
-	 *
-	 * Start the camera if exist and set position if fixed
-	 *
-	 * */
 	this.PreUpdate = function() 
 	{
 		if (this.enabled) 
@@ -263,56 +176,43 @@ function MainChar()
 					this.Transform.Position.y -= Application.LoadedScene.CurrentCamera.Transform.Position.y;
 				}
 			}
-			
+			// Collider  									En fonction des "fonctionnalité" ajouté/supprimé les "set" utile/useless
+			if (this.Physics.colliderIsSameSizeAsTransform) 
+			{
+				this.setCollider();
+			}
+
 			this.Update();
 		}			
 	};
-	/**
-	 * @function Update
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Call postUpdate function (each frame)
-	 * */
 	this.Update = function() 
 	{
+		// Deplacement
+		this.Transform.RelativePosition.x -= this.speed;
+
+		// Position of Obstacle
+		ctx.fillStyle = "#FBE102";
+		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
+					 this.Transform.Size.x, this.Transform.Size.y);
+
 		this.PostUpdate();	
 	};
-	/**
-	 * @function PostUpdate
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Execute PostUpdate. If DebugMode is active, diplay GameObject in debug mode
-	 *
-	 * */
 	this.PostUpdate = function() 
 	{
 		if (Application.debugMode) {
 			Debug.DebugObject(this);
 		}
-		this.GUI();	
+		this.GUI();
 	};
 
-	/**
-	 * @function GUI
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Display the GUI of GameObject
-	 * */
-	this.GUI = function() 
-	{
-		
+	this.GUI = function() {};
+	this.setCollider = function () {
+		//basic Collider
+		this.Physics.Collider.x = this.Transform.Position.x ;
+		this.Physics.Collider.y = this.Transform.Position.y ;
+		this.Physics.Collider.w = this.Transform.Size.x ;
+		this.Physics.Collider.h = this.Transform.Size.y ;
 	};
-
-	/**
-	 * @function onHover
-	 * @memberof GameObjects/GameObjects
-	 * @description
-	 *
-	 * Counter on hover the GameObject
-	 * */
 	this.onHover = function() 
 	{
 		this.Physics.countHovered ++;	
@@ -483,6 +383,5 @@ function MainChar()
  		}
  		this.Renderer.Animation.Current = this.Renderer.Animation.Animations[0];
 	}
-
 	this.Awake();
 }

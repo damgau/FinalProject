@@ -92,6 +92,7 @@ function ImageLoaded(_imageLoaded)
 	/* Place your first Scene 
 		Application.LoadedScene = Scenes["SceneName"];
 	*/
+	Application.LoadedScene = Scenes["Home"];
 }
 /**
  * 

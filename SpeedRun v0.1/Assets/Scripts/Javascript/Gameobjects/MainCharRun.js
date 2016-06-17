@@ -1,6 +1,7 @@
-function MainChar() 
+function MainCharRun() 
 {
-	this.name = "MainChar";
+	// Button "Static" to start the game
+	this.name = "MainCharRun";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
@@ -9,14 +10,6 @@ function MainChar()
 	this.MouseOffset = new Vector();
 
 	this.Parent = null;
-
-			// TWEEN v0.2
-	this.jumpAnim = null;
-	this.gravityTween = null;
-	this.gravityValue = 0;
-	this.tabValue = [];
-
-	this.canJump = true;
 	
 	this.Transform = {};
 	this.Transform.RelativePosition = new Vector();
@@ -34,11 +27,7 @@ function MainChar()
 	this.Physics.colliderIsSameSizeAsTransform = false;
 	this.Physics.countHovered = 0;
 
-	this.Physics.Collider = 
-	{
-		Position: new Vector(),
-		Size: new Vector()
-	};
+	this.Physics.Collider = new Box();
 
 	this.Renderer = 
 	{
@@ -133,17 +122,18 @@ function MainChar()
 	{
 		if (!this.started) {
 			// operation start
-			this.SetPosition(200, canvas.height - 200);
-			this.SetSize(300, 500);
+			this.SetPosition(canvas.width*.5, canvas.height - 200);
+			this.SetSize(50, 50);
+			this.Physics.Collider = new Box(this.Transform.RelativePosition.x,
+											this.Transform.RelativePosition.y,
+											this.Transform.Size.x,
+											this.Transform.Size.y);
 			
-			this.SetSpriteSheet( Images["Jump"],new Vector(33,100) );
+			this.SetSpriteSheet( Images["Runner"],new Vector(16,17) );
 
-			this.createTween();
-
-
-
-			this.Renderer.Animation.totalAnimationLength = .5;
+			this.Renderer.Animation.totalAnimationLength = .2;
 			this.Renderer.Animation.animated = true;
+
 
 			if (this.Physics.colliderIsSameSizeAsTransform) 
 			{
@@ -192,40 +182,12 @@ function MainChar()
 
 	this.Update = function() 
 	{
-			// TWEEN V0.2
-			// Monter
-			if (this.canJump) {
-				// reset TWEEN (Timer)
-				// Monter
-				this.jumpAnim = new TweenAnim([this.Transform.RelativePosition.y],
-												[-300],
-												.5,
-												"Quadratic",
-												"Out");
-				this.canJump = false;
-			}
-			//  & Descendre
-			if (this.jumpAnim.isFinished) {
-				this.gravityValue = this.gravityTween.recoverValue();
-				this.Transform.RelativePosition.y += this.gravityValue[0];
-				if (this.Transform.RelativePosition.y > canvas.height - 500) {
-					// stop fallAnim & this.canJump = true
-					//reset gravityTween
-					this.canJump = true;
-					this.gravityTween.Reset();					
-				}
-			}
-			else {
-				// Je monte !!
-				this.tabValue = this.jumpAnim.recoverValue();
-				this.Transform.RelativePosition.y = this.tabValue[0];
-			}
-
-			
-
+		if (Input.mouseClick && Physics.CheckCollision(Input.MousePosition, this.Physics.Collider)) {
+			Scenes["Game"] = new SceneGame(Scenes["Home"].difficultyMode);
+			Application.LoadedScene = Scenes["Game"];
+		}
 		this.Renderer.Draw();
 		this.PostUpdate();
-
 	};
 
 	this.PostUpdate = function() 
@@ -240,14 +202,6 @@ function MainChar()
 	{
 		
 	};
-	this.createTween = function() {
-		// descendre : acc TWEEN
-		this.gravityTween = new TweenAnim([0],
-										[10],
-										.5,
-										"Quartic",
-										"Out");
-	}
 
 	this.onHover = function() 
 	{
