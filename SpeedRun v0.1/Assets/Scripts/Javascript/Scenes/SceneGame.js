@@ -216,12 +216,15 @@ function SceneGame(_difMode)
 	}
 	this.onClick = function(){
 		// Recup MousePos
-		var pos = new Vector(Input.MousePosition.x, Input.MousePosition.y);
+		// offset
+		var offsetX = Input.MousePosition.x - 100;
+		var offsetY = Input.MousePosition.y + 25;
+		var relativePos = new Vector(offsetX, offsetY);
 		// Condition to drop GO
-		if (this.canGenerateObs(pos)) {
+		if (this.canGenerateObs(relativePos)) {
 
 			//create OBS
-			var obs = new Obstacle(pos, this.generalSpeed);
+			var obs = new Obstacle(relativePos, this.generalSpeed);
 			obs.tweenSpeed = new TweenAnim([0],[Scenes["Game"].generalSpeed],
 														 1, "Quadratic", "Out");
 			this.GameObjects.push(obs);
