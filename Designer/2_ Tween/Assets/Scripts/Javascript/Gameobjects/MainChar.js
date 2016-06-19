@@ -142,7 +142,7 @@ function MainChar()
 
 
 
-			this.Renderer.Animation.totalAnimationLength = .5;
+			this.Renderer.Animation.totalAnimationLength = .2;
 			this.Renderer.Animation.animated = true;
 
 			if (this.Physics.colliderIsSameSizeAsTransform) 
