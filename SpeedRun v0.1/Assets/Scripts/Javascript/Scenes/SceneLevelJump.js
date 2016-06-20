@@ -53,46 +53,53 @@ function SceneLevelJump()
 	{
 		if (!Application.GamePaused) 
 		{
-			// Background
-			ctx.fillStyle = "#2C2A2A";
-			ctx.fillRect(0,0, canvas.width, canvas.height);
+			if (!this.levelIsFinish()) {
 
-			// if last Index of tab is on screen, start next wave
-			if (this.lastObsOfPattern.Transform.Position.x + this.lastObsOfPattern.Transform.Size.x < canvas.width) {
+				// Background
+				ctx.fillStyle = "#2C2A2A";
+				ctx.fillRect(0,0, canvas.width, canvas.height);
 
-				var random = this.currentPattern;
-				while(random == this.currentPattern){
+				// if last Index of tab is on screen, start next wave
+				if (this.lastObsOfPattern.Transform.Position.x + this.lastObsOfPattern.Transform.Size.x < canvas.width) {
 
-					//									Warning if add partern change de RangeInt !!
-					random = Math.Random.RangeInt(0, 4, false);
-				}
-				this.currentPattern = random;
+					var random = this.currentPattern;
+					while(random == this.currentPattern){
 
-				this.partternToPlay = this.createPattern(this.currentPattern);
-				this.lastObsOfPattern = this.partternToPlay[this.partternToPlay.length - 1];
-				for (var i = 0; i < this.partternToPlay.length; i++) {
-					this.GameObjects.push(this.partternToPlay[i]);
-				}
-			}
+						//									Warning if add partern change de RangeInt !!
+						random = Math.Random.RangeInt(0, 4, false);
+					}
+					this.currentPattern = random;
 
-			// Remove useless GO
-			for (var i = 0; i < this.GameObjects.length; i++) 
-			{
-				this.GameObjects[i].Start();
-				if (this.GameObjects[i].name === "Obstacle") {
-					// 400(number) : marge pour ne pas supprimer l'objet trop tôt
-					// doit etre un peu plus grand que this.GameObjects[i].Transform.Size
-					if (this.GameObjects[i].Transform.Position.x < -400) {
-						this.GameObjects.splice(i,1);
-						// 													Not sure
-						i--;
+					this.partternToPlay = this.createPattern(this.currentPattern);
+					this.lastObsOfPattern = this.partternToPlay[this.partternToPlay.length - 1];
+					for (var i = 0; i < this.partternToPlay.length; i++) {
+						this.GameObjects.push(this.partternToPlay[i]);
 					}
 				}
+
+				// Remove useless GO
+				for (var i = 0; i < this.GameObjects.length; i++) 
+				{
+					this.GameObjects[i].Start();
+					if (this.GameObjects[i].name === "Obstacle") {
+						// 400(number) : marge pour ne pas supprimer l'objet trop tôt
+						// doit etre un peu plus grand que this.GameObjects[i].Transform.Size
+						if (this.GameObjects[i].Transform.Position.x < -400) {
+							this.GameObjects.splice(i,1);
+							// 													Not sure
+							i--;
+						}
+					}
+				}
+				// for (var i = 0; i < this.Groups.length; i++) 
+				// {
+				// 	this.Groups[i].Start();
+				// }
+			} else {
+				Application.LoadedScene = Scenes["Home"];
 			}
-			// for (var i = 0; i < this.Groups.length; i++) 
-			// {
-			// 	this.Groups[i].Start();
-			// }
+			
+
 		}
 		if (Application.debugMode) 
 		{
@@ -212,16 +219,12 @@ function SceneLevelJump()
 		}
 	}
 
-	this.canAutoGenerateObs = function(_x){
-		for (var i = 0; i < this.GameObjects.length; i++) {
-			// check if cursor is on obs
-			if (this.GameObjects[i].name === "Obstacle") {
-				if (_x < this.GameObjects[i].Transform.RelativePosition.x + this.GameObjects[i].Transform.Size.x) {
-					return false;
-				}
-			}
-		}
-		return true;
+	this.levelIsFinish = function(){
+		if (this.GameObjects[0].score > 3000) {
+			// validate level and give access to another
+			return true;
+		} 
+		return false;
 	}
 
 	this.Awake();

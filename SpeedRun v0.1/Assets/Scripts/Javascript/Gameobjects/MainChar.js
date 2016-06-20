@@ -480,8 +480,10 @@ function MainChar()
 		}
 		else {
 			// Game Over
-			if (this.score > Scenes["Home"].bestScore) {
-				Scenes["Home"].bestScore = this.score;
+			if (Application.LoadedScene == Scenes["Game"]) {
+					if (this.score > Scenes["Home"].bestScore) {
+					Scenes["Home"].bestScore = this.score;
+				}
 			}
 			Time.Timers = [];
 			Application.LoadedScene = Scenes["Home"];			
