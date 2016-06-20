@@ -51,17 +51,14 @@ function SceneGame(_difMode)
 		if (!this.started) 
 		{
 			Time.SetTimeWhenSceneBegin();
+			// operation start
 
 			// nb Spell
 			this.widthBySpell = this.maxWidth/this.nbSpell;
-
-			// operation start
 			this.generalSpeed = 10;
-
 			// nb obstacle utilisable (Energie)
 			this.obsAvailable = 3;
 			this.obsAvailableMax = 3;
-
 			// Timer regenerate obs
 			// 						ATTENTION : Ne pas oublier de reset (action) si Timer n'est pas "fini"
 			this.timerEnergie = new Timer(2, true, this.IncrementGUIEnergie, this.canIncrementEnergie, false);
@@ -100,10 +97,10 @@ function SceneGame(_difMode)
 
 			// generate auto : OBS
 			if (this.diffMode === "easy") {
-				this.obsToGenerate = 10;
+				this.obsToGenerate = 20;
 			}
 			if (this.diffMode === "normal") {
-				this.obsToGenerate = 5;
+				this.obsToGenerate = 7;
 
 			}
 			if (this.diffMode === "hard") {
@@ -111,8 +108,8 @@ function SceneGame(_difMode)
 
 			}
 			if (this.GameObjects.length < this.obsToGenerate) {
-				var pos = new Vector(canvas.width + 10,Math.Random.RangeInt(500, canvas.height - 150, false));
-				if (this.canGenerateObs(pos)) {
+				var pos = new Vector(canvas.width + 10,Math.Random.RangeInt(500, canvas.height - 250, false));
+				if (this.canAutoGenerateObs(pos.x)) {
 					var obs = new Obstacle(pos, this.generalSpeed);
 					this.GameObjects.push(obs);
 				}
@@ -277,6 +274,17 @@ function SceneGame(_difMode)
 	this.generateReward = function(){
 		//console.log("create Reward");
 		_self.GameObjects.push(new Reward(null, _self.generalSpeed));
+	}
+	this.canAutoGenerateObs = function(_x){
+		for (var i = 0; i < this.GameObjects.length; i++) {
+			// check if cursor is on obs
+			if (this.GameObjects[i].name === "Obstacle") {
+				if (_x < this.GameObjects[i].Transform.RelativePosition.x + this.GameObjects[i].Transform.Size.x) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	this.Awake();

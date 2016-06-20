@@ -42,6 +42,7 @@ function Loader()
 			//Scenes["SceneHub"] = new SceneHub();
 			Scenes["Home"] = new SceneHome();
 			Scenes["Game"] = new SceneGame();
+			Scenes["LevelJump"] = new SceneLevelJump();
 
 			LoadImages();
 			this.started = true;

@@ -127,6 +127,15 @@ function SceneHome() {
 				this.difficultyMode = "hard";
 			}
 
+			// Level Jump
+			this.boxHard = new Box(canvas.width*.3, canvas.height*.6, 50, 50);
+			ctx.fillStyle = "#62D8CE";
+			ctx.fillRect(this.boxHard.x, this.boxHard.y, this.boxHard.w, this.boxHard.h);
+			if (Input.mouseClick && Physics.CheckCollision(Input.MousePosition, this.boxHard)) {
+				Scenes["LevelJump"] = new SceneLevelJump();
+				Application.LoadedScene = Scenes["LevelJump"];
+			}
+
 		} else {
 			// Show pause menu
 		}
