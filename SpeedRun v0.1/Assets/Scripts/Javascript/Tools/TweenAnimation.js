@@ -31,16 +31,16 @@ function TweenAnim(_startValue, _changeValue, _duration, _type, _underType){
 			for (var i = 0; i < this.startValue.length; i++) {
 				tween = Tween[this.type]
 				value = tween[this.underType](this.timer.currentTime,
-										this.startValue[0],
-										this.changeValue[0],
+										this.startValue[i],
+										this.changeValue[i],
 										this.timer.duration);
 				this.tweenValue.push(value);
 			}
 		} else {
 			for (var i = 0; i < this.startValue.length; i++) {
 				value = Tween[this.type](this.timer.currentTime,
-										this.startValue[0],
-										this.changeValue[0],
+										this.startValue[i],
+										this.changeValue[i],
 										this.timer.duration);
 				this.tweenValue.push(value);
 			}

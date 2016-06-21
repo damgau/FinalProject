@@ -20,6 +20,7 @@ function Timer(_duration, _isRepeat, _Action, _Callback, _isStarted)
 	this.Action = _Action || null;
 	this.Callback = _Callback || null;
 	this.isStarted = _isStarted || false;
+	this.isCleared = false;
 
 	this.Awake = function () 
 	{
@@ -55,6 +56,7 @@ function Timer(_duration, _isRepeat, _Action, _Callback, _isStarted)
 				} 
 				else 
 				{
+					this.isCleared = true;
 					this.Clear();
 				}
 			}
@@ -63,7 +65,15 @@ function Timer(_duration, _isRepeat, _Action, _Callback, _isStarted)
 
 	this.Reset = function() 
 	{
+		if (this.isCleared) {
+			this.isCleared = false;
+			this.Awake();
+		}
+		if (this.repeat) this.isStarted = true;
+		else this.isStarted = false;
+
 		this.currentTime = 0;
+
 	}
 
 	this.Clear = function() 

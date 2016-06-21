@@ -217,8 +217,7 @@ ParticuleExample.prototype.createTween = function() {
 		// [ 10 = scale, can add rotate? ]
 		var startScale = Math.Random.RangeInt(0, 5, true);
 		var endScale = Math.Random.RangeInt(15, 25, true);
-		//var duration = Math.Random.RangeInt(200,300, true);
-		var duration = 300;
+		var duration = Math.Random.RangeInt(250,350, true);
 
 		var startRotate = Math.Random.RangeInt(-360, 150, true);
 		//console.log(startRotate);

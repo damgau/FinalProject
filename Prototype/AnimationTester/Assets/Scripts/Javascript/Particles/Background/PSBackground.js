@@ -70,15 +70,16 @@ function ParticlesSystemExample(_position)
 			this.AddElement(new EmitterExample2(
 					new Vector(window.innerWidth, window.innerHeight),
 					//new Vector(-.2, 0), 						GOOD VELOCITY
-					new Vector(-.2, 0),
+					new Vector(-.3, 0),
 					1,
 					1,
 					10
 				));
-			this.AddElement(new FieldExample(
-					new Vector(Application.LoadedScene.GameObjects[1].Transform.RelativePosition.x, Application.LoadedScene.GameObjects[1].Transform.RelativePosition.y),
-					.02
-				));
+			// this.AddElement(new FieldExample(
+			// 		new Vector(canvas.width*.3, canvas.height*.5 ),
+			// 		//.02
+			// 		-.05
+			// 	));
 			this.started = true;
 			Print('System: Particle System ' + this.name + " Started !");
 		}

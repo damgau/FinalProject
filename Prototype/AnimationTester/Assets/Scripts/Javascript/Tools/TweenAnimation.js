@@ -5,16 +5,19 @@
 */
 
 function TweenAnim(_startValue, _changeValue, _duration, _type, _underType){
-	_self = this;
+	var _self = this;
 	this.startValue = _startValue;
 	this.changeValue = _changeValue;
 	this.duration = _duration;
 	this.type = _type || "Linear";
 	this.underType = _underType || null;
 	this.isFinished = false;
-	this.timer = new Timer(this.duration, false, null, 
-							function(){ _self.isFinished = true;},
-							false);
+
+	this.callback = function(){
+		_self.isFinished = true;
+	}
+	this.timer = new Timer(this.duration, false, null, this.callback, false);
+
 
 	this.tweenValue = [];
 
@@ -49,11 +52,7 @@ function TweenAnim(_startValue, _changeValue, _duration, _type, _underType){
 		return this.tweenValue;
 	}
 	this.Reset = function(){
-		_self = this;
 		this.isFinished = false;
-		this.timer = new Timer(this.duration, false, null, 
-								function(){ _self.isFinished = true; },
-								false);
-		this.tweenValue = null;
+		this.timer.Reset();
 	}
 }

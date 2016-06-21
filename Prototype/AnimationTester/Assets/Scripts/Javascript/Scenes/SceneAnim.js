@@ -50,6 +50,9 @@ function SceneAnim() {
 
 	this.WorldSize = new Vector(4096,4096);
 
+	/* Private Variable */
+	this.Background;
+
 
 	this.Awake = function() {
 		//console.clear();
@@ -61,7 +64,7 @@ function SceneAnim() {
 			Time.SetTimeWhenSceneBegin();
 			// operation start
 			var bg = new Background();
-			this.GameObjects.push(bg);
+			this.Background = bg;
 			var mainChar = new MainChar();
 			this.GameObjects.push(mainChar);
 			var mainCharRun = new MainCharRun();
@@ -77,13 +80,16 @@ function SceneAnim() {
 		this.Update();
 	}
 	this.Update = function() {
+		this.Background.Start();
 		if (!Application.GamePaused) {
-			for (var i = 0; i < this.GameObjects.length; i++) {
-				this.GameObjects[i].Start();
-			}
 			for (var i = 0; i < this.Groups.length; i++) {
 				this.Groups[i].Start();
 			}
+			for (var i = 0; i < this.GameObjects.length; i++) {
+				this.GameObjects[i].Start();
+			}
+			
+
 		}
 		this.GUI();
 	}

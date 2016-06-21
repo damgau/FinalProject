@@ -202,23 +202,27 @@ function MainChar()
 												.5,
 												"Quadratic",
 												"Out");
+				this.gravityTween.Reset();	
+
 				this.canJump = false;
 			}
-			//  & Descendre
-			if (this.jumpAnim.isFinished) {
-				this.gravityValue = this.gravityTween.recoverValue();
-				this.Transform.RelativePosition.y += this.gravityValue[0];
+			
+
+			// UP
+			if (!this.jumpAnim.isFinished) {
+				this.tabValue = this.jumpAnim.recoverValue();
+				this.Transform.RelativePosition.y = this.tabValue[0];
+			}
+			// DOWN
+			else {
+				
+				this.tabValue = this.gravityTween.recoverValue();
+				this.Transform.RelativePosition.y += this.tabValue[0];
 				if (this.Transform.RelativePosition.y > canvas.height - 200) {
 					// stop fallAnim & this.canJump = true
 					//reset gravityTween
 					this.canJump = true;
-					this.gravityTween.Reset();					
 				}
-			}
-			else {
-				// Je monte !!
-				this.tabValue = this.jumpAnim.recoverValue();
-				this.Transform.RelativePosition.y = this.tabValue[0];
 			}
 
 			
