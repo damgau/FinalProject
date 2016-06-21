@@ -10,7 +10,7 @@
  * 
  * @return {Emitter}
  * */
-function EBackground(_ParticuleSystem, _position, _velocity, _spread, _rate, _max, _color) 
+function EBackground(_ParticuleSystem, _position, _velocity, _spread, _rate, _max) 
 {
 	this.Parent = null;
 	this.Particules = [];
@@ -19,7 +19,6 @@ function EBackground(_ParticuleSystem, _position, _velocity, _spread, _rate, _ma
 	this.Position = _position;
 	this.Velocity = _velocity || new Vector();
 	this.spread = _spread || Math.PI/32; //angles possibles de direction
-	this.color = _color || "white";
 	this.rate = _rate || 5;
 	this.angleNow = 0;
 	this.ps = _ParticuleSystem;
@@ -37,8 +36,12 @@ EBackground.prototype.EmitParticules = function()
 		if (this.Particules.length < this.particulesMax) 
 		{
 			// You can change this values for more fun.
-			var angle = this.Velocity.GetAngle() + this.spread * Math.random() ;
-			var position = new Vector(this.Position.x,Math.Random.RangeInt(canvas.height*.4, canvas.height*.6, false));
+			//var angle = this.Velocity.GetAngle() + this.spread;
+
+			// Math.Random.AngleRadian(-Math.PI/3, Math.PI/3) = cone de spread
+			var angle = this.Velocity.GetAngle() + Math.Random.AngleRadian(-Math.PI/3, Math.PI/3);
+			//var position = new Vector(this.Position.x,Math.Random.RangeInt(canvas.height*.4, canvas.height*.6, false));
+			var position = new Vector(this.Position.x,this.Position.y);
 			var velocity = this.Velocity.FromAngle(angle);
 
 			//console.log(position);

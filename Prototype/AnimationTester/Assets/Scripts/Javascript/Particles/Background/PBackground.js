@@ -24,6 +24,8 @@ function PBackground(_particleSystem, _position, _velocity)
 	this.tween = null;
 	this.tabValue = [];
 
+	this.offset = 500;
+
 	this.finalScale = 30;
 
 	this.Transform = {};
@@ -170,8 +172,9 @@ PBackground.prototype.Update = function()
 	this.Velocity.Add(this.Acceleration);
 	this.Transform.RelativePosition.Add(this.Velocity);
 
-	if (this.Transform.RelativePosition.x < 0 || this.Transform.RelativePosition.x > canvas.width || 
-		this.Transform.RelativePosition.y < 0 || this.Transform.RelativePosition.x > canvas.heigth) 
+	if (this.Transform.RelativePosition.x < -this.offset 
+		|| this.Transform.RelativePosition.y < -this.offset
+		|| this.Transform.RelativePosition.y > canvas.heigth + this.offset) 
 	{
 		this.outOfBounds = true;
 	}
@@ -219,6 +222,7 @@ PBackground.prototype.createTween = function() {
 		var startScale = Math.Random.RangeInt(0, 5, true);
 		var endScale = Math.Random.RangeInt(15, 25, true);
 		var duration = Math.Random.RangeInt(250,350, true);
+		//var duration = 10;
 
 		var startRotate = Math.Random.RangeInt(-360, 150, true);
 		//console.log(startRotate);

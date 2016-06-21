@@ -42,12 +42,13 @@ function PSBackground(_position)
 		if (!this.started) 
 		{
 			// operation start
+			//				EMitter : (_ParticuleSystem, _position, _velocity, _spread, _rate, _max)
 			this.Emitters.push(new EBackground(
 					this,
-					new Vector(window.innerWidth, window.innerHeight),
+					new Vector(canvas.width + 250, canvas.height*.5),
 					//new Vector(-.2, 0), 						GOOD VELOCITY
-					new Vector(-2, 0),
-					1,
+					new Vector(-.2, 0),
+					null,
 					1,
 					10
 				));
