@@ -10,7 +10,7 @@
  * 
  * @return {Emitter}
  * */
-function EmitterExample2(_position, _velocity, _spread, _rate, _max, _color) 
+function EBackground(_ParticuleSystem, _position, _velocity, _spread, _rate, _max, _color) 
 {
 	this.Parent = null;
 	this.Particules = [];
@@ -22,13 +22,14 @@ function EmitterExample2(_position, _velocity, _spread, _rate, _max, _color)
 	this.color = _color || "white";
 	this.rate = _rate || 5;
 	this.angleNow = 0;
+	this.ps = _ParticuleSystem;
 }
 /**
 *
 * Launch the Particles
 *
 * */
-EmitterExample2.prototype.EmitParticules = function() 
+EBackground.prototype.EmitParticules = function() 
 {
 	var count = this.rate;
 	while (count--) 
@@ -41,7 +42,7 @@ EmitterExample2.prototype.EmitParticules = function()
 			var velocity = this.Velocity.FromAngle(angle);
 
 			//console.log(position);
-			this.Particules.push(new ParticuleExample(position,velocity,this.color));
+			this.Particules.push(new PBackground(this.ps, position, velocity));
 		} 
 		else return;
 	}
@@ -51,7 +52,7 @@ EmitterExample2.prototype.EmitParticules = function()
 * Update the Particles movement
 *
 * */
-EmitterExample2.prototype.Update = function() 
+EBackground.prototype.Update = function() 
 {
 	if (this.Parent != null)
 	{

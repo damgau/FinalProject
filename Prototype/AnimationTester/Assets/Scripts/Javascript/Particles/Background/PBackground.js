@@ -10,8 +10,9 @@
 * @param {String} _color - set a color of particle
 *
 **/
-function ParticuleExample(_position, _velocity, _color) 
+function PBackground(_particleSystem, _position, _velocity) 
 {
+	this.ps = _particleSystem;
 	this.Position = _position;
 	this.Velocity = _velocity;
 	this.color = "#10FCDD";
@@ -120,7 +121,7 @@ function ParticuleExample(_position, _velocity, _color)
 	};
 
 }
-ParticuleExample.prototype.Start = function() 
+PBackground.prototype.Start = function() 
 {
 	if (!this.started){
 		this.Renderer.Material.Source = Images["Particle"];
@@ -136,7 +137,7 @@ ParticuleExample.prototype.Start = function()
 	this.PreUpdate();
 }
 
-ParticuleExample.prototype.PreUpdate = function() 
+PBackground.prototype.PreUpdate = function() 
 {
 	
 	this.Transform.Position.x = this.Transform.RelativePosition.x;
@@ -154,7 +155,7 @@ ParticuleExample.prototype.PreUpdate = function()
 *
 **/
 
-ParticuleExample.prototype.Update = function()
+PBackground.prototype.Update = function()
 {
 	// tween --> change scale, rotate , blabla
 	this.tabValue = this.tween.recoverValue();
@@ -184,7 +185,7 @@ ParticuleExample.prototype.Update = function()
 *
 **/
 
-ParticuleExample.prototype.Render = function()
+PBackground.prototype.Render = function()
 {
 	this.Renderer.Draw();
 	// ctx.fillStyle = this.color;
@@ -199,11 +200,11 @@ ParticuleExample.prototype.Render = function()
 *apply a strengh to the particles from Fields
 *
 **/
-ParticuleExample.prototype.SubmitToFields = function()
+PBackground.prototype.SubmitToFields = function()
 {
-	for (var i = 0; i < Application.LoadedScene.Groups[0].Fields.length; i++) {
+	for (var i = 0; i < this.ps.Fields.length; i++) {
 		
-		var field = Application.LoadedScene.Groups[0].Fields[i];
+		var field = this.ps.Fields[i];
 		var vector = new Vector();
 		vector.x = field.Position.x - this.Position.x;
 		vector.y = field.Position.y - this.Position.y;
@@ -213,7 +214,7 @@ ParticuleExample.prototype.SubmitToFields = function()
 		this.Acceleration = vector.Multiply(new Vector(strength, strength));
 	}
 };
-ParticuleExample.prototype.createTween = function() {
+PBackground.prototype.createTween = function() {
 		// [ 10 = scale, can add rotate? ]
 		var startScale = Math.Random.RangeInt(0, 5, true);
 		var endScale = Math.Random.RangeInt(15, 25, true);

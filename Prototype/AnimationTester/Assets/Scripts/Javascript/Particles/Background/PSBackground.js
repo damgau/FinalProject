@@ -5,9 +5,9 @@
  * @param {Vector} _position - The position of the ParticlesSystem
  * @return {ParticlesSystem}
  * */
-function ParticlesSystemExample(_position)
+function PSBackground(_position)
 {
-	this.name = "ParticlesSystemExample";
+	this.name = "PSBackground";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
@@ -23,29 +23,6 @@ function ParticlesSystemExample(_position)
 	this.Transform.RelativeScale = new Vector(1, 1);
 	this.Transform.Size = new Vector();
 	this.Transform.Scale = new Vector(1,1);
-
-	/** 
-	* Add a Field or an Emitter to the Particles System
-	* @param {Emitter|Field} _element - The vector to add
-	*
-	* */
-	this.AddElement = function(_element)
-	{
-		if (_element instanceof EmitterExample2) 
-		{
-			_element.Parent = this;
-			this.Emitters.push(_element);
-		}
-		else if (_element instanceof FieldExample) 
-		{
-			_element.Parent = this;
-			this.Fields.push(_element);
-		}
-		else 
-		{
-			PrintErr("Particule System " + this.name + " can only add Emitters or Fields");
-		}
-	}
 
 	/** 
 	* Create the Particles System, log a message in the console
@@ -65,17 +42,16 @@ function ParticlesSystemExample(_position)
 		if (!this.started) 
 		{
 			// operation start
-			// add EmitterExample(_position, _velocity, _spread, _rate, _max, _color) 
-			//add FieldExample(_position, _mass)
-			this.AddElement(new EmitterExample2(
+			this.Emitters.push(new EBackground(
+					this,
 					new Vector(window.innerWidth, window.innerHeight),
 					//new Vector(-.2, 0), 						GOOD VELOCITY
-					new Vector(-.3, 0),
+					new Vector(-2, 0),
 					1,
 					1,
 					10
 				));
-			// this.AddElement(new FieldExample(
+			// this.Fields.push(new FBackground(
 			// 		new Vector(canvas.width*.3, canvas.height*.5 ),
 			// 		//.02
 			// 		-.05

@@ -71,7 +71,7 @@ function SceneAnim() {
 			this.GameObjects.push(mainCharRun);
 
 			// Test Particules
-			this.Groups.push(new ParticlesSystemExample(new Vector(0, 0)));
+			this.Groups.push(new PSBackground(new Vector(0, 0)));
 
 			this.started = true;
 			console.log('%c System:Scene ' + this.name + " Started !", 'background:#222; color:#bada55');
