@@ -5,9 +5,9 @@
  * @param {Vector} _position - The position of the ParticlesSystem
  * @return {ParticlesSystem}
  * */
-function ParticlesSystem(_position)
+function PSBackground(_position)
 {
-	this.name = "ParticlesSystem";
+	this.name = "PSBackground";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
@@ -23,29 +23,6 @@ function ParticlesSystem(_position)
 	this.Transform.RelativeScale = new Vector(1, 1);
 	this.Transform.Size = new Vector();
 	this.Transform.Scale = new Vector(1,1);
-
-	/** 
-	* Add a Field or an Emitter to the Particles System
-	* @param {Emitter|Field} _element - The vector to add
-	*
-	* */
-	this.AddElement = function(_element)
-	{
-		if (_element instanceof Emitter) 
-		{
-			_element.Parent = this;
-			this.Emitters.push(_element);
-		}
-		else if (_element instanceof Field) 
-		{
-			_element.Parent = this;
-			this.Fields.push(_element);
-		}
-		else 
-		{
-			PrintErr("Particule System " + this.name + " can only add Emitters or Fields");
-		}
-	}
 
 	/** 
 	* Create the Particles System, log a message in the console
@@ -65,8 +42,20 @@ function ParticlesSystem(_position)
 		if (!this.started) 
 		{
 			// operation start
-			// add Emitter
-			//add Fiels
+			this.Emitters.push(new EBackground(
+					this,
+					new Vector(window.innerWidth, window.innerHeight),
+					//new Vector(-.2, 0), 						GOOD VELOCITY
+					new Vector(-2, 0),
+					1,
+					1,
+					10
+				));
+			// this.Fields.push(new FBackground(
+			// 		new Vector(canvas.width*.3, canvas.height*.5 ),
+			// 		//.02
+			// 		-.05
+			// 	));
 			this.started = true;
 			Print('System: Particle System ' + this.name + " Started !");
 		}

@@ -13,6 +13,7 @@ function SceneLevelJump()
 	/*
 				Personnal Variable
 	*/
+	this.mainChar;
 
 	this.generalSpeed = 0;
 	var _self = this;
@@ -35,8 +36,9 @@ function SceneLevelJump()
 		{
 			Time.SetTimeWhenSceneBegin();
 			// operation start
+			// create MainChar
+			this.mainChar = new MainChar();
 			this.generalSpeed = 10;
-			this.GameObjects.push(new MainChar());
 			// push the first wave
 			this.partternToPlay = this.createPattern(this.currentPattern);
 			this.lastObsOfPattern = this.partternToPlay[this.partternToPlay.length - 1];
@@ -95,6 +97,7 @@ function SceneLevelJump()
 				// {
 				// 	this.Groups[i].Start();
 				// }
+				this.mainChar.Start();
 			} else {
 				Application.LoadedScene = Scenes["Home"];
 			}
@@ -114,9 +117,11 @@ function SceneLevelJump()
 			//Show UI
 
 			// Score
-			// ctx.fillStyle = "#F4F3F3";
-			// ctx.fillText( this.GameObjects[0].score,canvas.width - canvas.width*.1, canvas.height*.1,
-			// 			 this.currentWidth, 50);
+			ctx.fillStyle = "#F2E6E6";
+			ctx.font = "30px arial";
+			ctx.textAlign = "normal";
+			ctx.fillText( this.mainChar.score,canvas.width - canvas.width*.1, canvas.height*.1,
+						 50, 50);
 		} 
 		else 
 		{
@@ -220,7 +225,7 @@ function SceneLevelJump()
 	}
 
 	this.levelIsFinish = function(){
-		if (this.GameObjects[0].score > 3000) {
+		if (this.mainChar.score > 3000) {
 			// validate level and give access to another
 			return true;
 		} 

@@ -13,6 +13,10 @@ function SceneGame(_difMode)
 	/*
 				Personnal Variable
 	*/
+	this.mainChar;
+
+	this.background;
+	this.psBackground;
 
 	this.diffMode = _difMode;
 	this.obsToGenerate = 0;
@@ -52,7 +56,11 @@ function SceneGame(_difMode)
 		{
 			Time.SetTimeWhenSceneBegin();
 			// operation start
-
+			// create background
+			this.background = new Background();
+			this.psBackground = new PSBackground(new Vector(0, 0));
+			// create MainChar
+			this.mainChar = new MainChar();
 			// nb Spell
 			this.widthBySpell = this.maxWidth/this.nbSpell;
 			this.generalSpeed = 10;
@@ -64,7 +72,6 @@ function SceneGame(_difMode)
 			this.timerEnergie = new Timer(2, true, this.IncrementGUIEnergie, this.canIncrementEnergie, false);
 			this.timerReward = new Timer(2, true, null, this.generateReward, true);
 
-			this.GameObjects.push(new MainChar());
 			var tempObstacle = new Obstacle(
 												new Vector( canvas.width*.7, canvas.height*.5 ),
 												this.generalSpeed
@@ -92,8 +99,8 @@ function SceneGame(_difMode)
 		if (!Application.GamePaused) 
 		{
 			// Background
-			ctx.fillStyle = "#2C2A2A";
-			ctx.fillRect(0,0, canvas.width, canvas.height);
+			this.background.Start();
+			this.psBackground.Start();
 
 			// generate auto : OBS
 			if (this.diffMode === "easy") {
@@ -129,21 +136,22 @@ function SceneGame(_difMode)
 			{
 				this.GameObjects[i].Start();
 
+				// Remove reward catched
+				if (this.GameObjects[i].name === "Reward") {
+					if (Physics.CheckCollision(this.mainChar.Physics.Collider, this.GameObjects[i].Physics.Collider)) {
+						this.incrementEnergie();
+						this.GameObjects.splice(i,1);
+						// 													Not sure
+						i--;
+						break;
+					}
+				}
+
 				// Remove useless GO or Call particuleSystem (effect)
 				if (this.GameObjects[i].name === "Obstacle" || this.GameObjects[i].name === "Reward") {
 					// 400(number) : marge pour ne pas supprimer l'objet trop tôt
 					// doit etre un peu plus grand que this.GameObjects[i].Transform.Size
 					if (this.GameObjects[i].Transform.Position.x < -400) {
-						this.GameObjects.splice(i,1);
-						// 													Not sure
-						i--;
-					}
-				}
-				// Remove reward catched
-				if (this.GameObjects[i].name === "Reward") {
-					// GameObjects[0] = Player
-					if (Physics.CheckCollision(this.GameObjects[0].Physics.Collider, this.GameObjects[i].Physics.Collider)) {
-						this.incrementEnergie();
 						this.GameObjects.splice(i,1);
 						// 													Not sure
 						i--;
@@ -155,6 +163,10 @@ function SceneGame(_difMode)
 			// 	this.Groups[i].Start();
 			// }
 			
+			// MAIN CHAR last start : position
+			this.mainChar.Start();
+			
+			// Calcul for GUI
 			this.widthByEnergie = this.maxWidth/this.obsAvailableMax;
 			this.currentWidth = this.widthByEnergie*this.obsAvailable;
 		}
@@ -172,8 +184,8 @@ function SceneGame(_difMode)
 
 			// Score
 			ctx.fillStyle = "#F4F3F3";
-			ctx.fillText( this.GameObjects[0].score,canvas.width - canvas.width*.1, canvas.height*.1,
-						 this.currentWidth, 50);
+			ctx.fillText( this.mainChar.score,canvas.width - canvas.width*.1, canvas.height*.1,
+						 50, 50);
 
 			// Jauge ENERGIE
 			// Permet de ne pas reload si on a le max de obs dispo  (reload < 99 --> "debug graphique")
@@ -188,7 +200,7 @@ function SceneGame(_difMode)
 			ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.1,
 						 this.currentWidth, 50);
 			// Spell
-			if (this.GameObjects[0].canUseDash) {
+			if (this.mainChar.canUseDash) {
 				ctx.fillStyle = "#FFFFFF";
 			} else {
 				ctx.fillStyle = "#807878";
@@ -196,10 +208,10 @@ function SceneGame(_difMode)
 			ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.16,
 						 this.widthBySpell, 50);
 
-			if (!this.GameObjects[0].canUseDash) {
+			if (!this.mainChar.canUseDash) {
 				ctx.fillStyle = "#F2E6E6";
 				ctx.font = "30px arial";
-				var cd = Math.ceil(this.GameObjects[0].timerDash.duration - this.GameObjects[0].timerDash.currentTime);
+				var cd = Math.ceil(this.mainChar.timerDash.duration - this.mainChar.timerDash.currentTime);
 				ctx.fillText("" + cd, canvas.width*.215, canvas.height - canvas.height*.12,
 						 this.widthBySpell, 50);
 				ctx.textAlign = "normal";

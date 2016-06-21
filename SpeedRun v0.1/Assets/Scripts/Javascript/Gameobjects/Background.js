@@ -141,6 +141,17 @@ function Background() {
 	this.FixedToCamera = true;
 
 	this.Parent = null;
+
+	/* 
+			Personal Prop
+	 */
+	 this.speed = .2;
+	this.tweenLandScape;
+	this.tabValue = [];
+
+	// ParticlesSystem
+	//this.Groups = [];
+	//this.particlesSystem;
 	
 	this.Transform = {};
 	this.Transform.RelativePosition = new Vector(0,0);
@@ -164,7 +175,7 @@ function Background() {
 
 	this.Renderer = {
 		isVisible: true,
-		isSpriteSheet: false,
+		isSpriteSheet: true,
 		That: this.Transform,
 		Material: {
 			Source: "",
@@ -173,7 +184,7 @@ function Background() {
 		},
 		AnimationCount:0,
 		Animation:{
-			animated: true,
+			animated: false,
 			Animations: [],
 			Current:[],
 			countdown:0
@@ -240,6 +251,20 @@ function Background() {
 																Images["ImagesPath -> Name"]
 			*/
 			this.Renderer.Material.Source = Images["Fond"];
+			this.SetSize(canvas.width, canvas.height);
+			this.Renderer.Material.SizeFrame = new Vector(canvas.width, this.Renderer.Material.Source.height);
+			this.Renderer.Material.CurrentFrame = new Vector(0, 0);
+
+			// Tweeen linear pour avancer sur l'image (changer x de CurrentFrame/SizeFrame)
+			//TweenAnim(_startValue, _changeValue, _duration, _type, _underType)
+			var changeValue = this.Renderer.Material.Source.width - canvas.width;
+			this.tweenLandScape = new TweenAnim([0],[changeValue], 700, "Linear");
+
+			// PS
+			//this.particlesSystem = new PSBackground(new Vector(canvas.width - 5, canvas.height*.5));
+			//this.particlesSystem = new PSBackground(new Vector(canvas.width*.5, canvas.height*.5));
+			//this.Groups.push(this.particlesSystem);
+
 			this.started = true;
 			console.log('%c System:GameObject ' + this.name + " Started !", 'background:#222; color:#bada55');
 		}
@@ -272,8 +297,18 @@ function Background() {
 			
 	};
 	this.Update = function() {
+
+		// TWEEN : linear pour avancer sur l'image (changer x de CurrentFrame/SizeFrame)
+		this.tabValue = this.tweenLandScape.recoverValue();
+		//this.Renderer.Material.SizeFrame.x += this.tabValue[0];
+		//this.Renderer.Material.CurrentFrame.x += this.tabValue[0];
+		this.Renderer.Material.CurrentFrame.x += this.speed;
 		
-		this.Renderer.Draw();
+		this.landscapeDraw();
+
+		// for (var i = 0; i < this.Groups.length; i++) {
+		// 	this.Groups[i].Start();
+		// }
 
 		this.PosUpdate();	
 	};
@@ -296,7 +331,39 @@ function Background() {
 	this.onUnHovered = function() {
 		this.Physics.countHovered = 0;
 	}
+	this.SetSize = function(_x, _y)
+	{
+	    if(typeof _x != 'number') PrintErr("Parameter x in SetSize Go");
+	    if(typeof _y != 'number') PrintErr("Parameter y in SetSize Go");
+		this.Transform.Size.x = _x;
+		this.Transform.Size.y = _y;
+	};
+	this.landscapeDraw = function() {
+		var sxNextFrame = this.Renderer.Material.CurrentFrame.x - this.Renderer.Material.Source.width;
+		if (this.Renderer.Material.CurrentFrame.x > this.Renderer.Material.Source.width) {
+			this.Renderer.Material.CurrentFrame.x = 0;
+		}
+		ctx.drawImage(	this.Renderer.Material.Source,
+						this.Renderer.Material.CurrentFrame.x,
+						this.Renderer.Material.CurrentFrame.y,
+						this.Renderer.Material.SizeFrame.x,
+						this.Renderer.Material.SizeFrame.y,
+						0,
+						0,
+						canvas.width,
+						canvas.height);
 
+		ctx.drawImage(	this.Renderer.Material.Source,
+						sxNextFrame,
+						this.Renderer.Material.CurrentFrame.y,
+						this.Renderer.Material.SizeFrame.x,
+						this.Renderer.Material.SizeFrame.y,
+						0,
+						0,
+						canvas.width,
+						canvas.height);
+	};
+	
 	this.Awake();
 
 }

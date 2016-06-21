@@ -1,5 +1,5 @@
 /**
- * Create a new Emiiter
+ * Create a new Emitter
  * 
  * @class
  * @param {Vector} _position - The position of the Emitter
@@ -10,7 +10,7 @@
  * 
  * @return {Emitter}
  * */
-function Emitter(_position, _velocity, _spread, _rate, _max) 
+function EBackground(_ParticuleSystem, _position, _velocity, _spread, _rate, _max, _color) 
 {
 	this.Parent = null;
 	this.Particules = [];
@@ -19,26 +19,30 @@ function Emitter(_position, _velocity, _spread, _rate, _max)
 	this.Position = _position;
 	this.Velocity = _velocity || new Vector();
 	this.spread = _spread || Math.PI/32; //angles possibles de direction
-	this.color = "white";
+	this.color = _color || "white";
 	this.rate = _rate || 5;
 	this.angleNow = 0;
+	this.ps = _ParticuleSystem;
 }
 /**
 *
 * Launch the Particles
 *
 * */
-Emitter.prototype.EmitParticules = function() 
+EBackground.prototype.EmitParticules = function() 
 {
 	var count = this.rate;
 	while (count--) 
 	{
 		if (this.Particules.length < this.particulesMax) 
 		{
-			var angle = this.velocity.GetAngle() + this.spread ;
-			var position = new Vector(this.Position.x,this.Position.y);
+			// You can change this values for more fun.
+			var angle = this.Velocity.GetAngle() + this.spread * Math.random() ;
+			var position = new Vector(this.Position.x,Math.Random.RangeInt(canvas.height*.4, canvas.height*.6, false));
 			var velocity = this.Velocity.FromAngle(angle);
-			this.Particules.push(new Particle(position,velocity,this.color));
+
+			//console.log(position);
+			this.Particules.push(new PBackground(this.ps, position, velocity));
 		} 
 		else return;
 	}
@@ -48,7 +52,7 @@ Emitter.prototype.EmitParticules = function()
 * Update the Particles movement
 *
 * */
-Emitter.prototype.Update = function() 
+EBackground.prototype.Update = function() 
 {
 	if (this.Parent != null)
 	{
@@ -65,8 +69,9 @@ Emitter.prototype.Update = function()
 		} 
 		else 
 		{
-			this.Particules[index].Update();
-			this.Particules[index].Render();
+			this.Particules[index].Start();
+			// Call in Particule.Update
+			//this.Particules[index].Render();
 		}
 	}
 };
