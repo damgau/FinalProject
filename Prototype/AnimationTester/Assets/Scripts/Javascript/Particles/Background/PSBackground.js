@@ -5,9 +5,9 @@
  * @param {Vector} _position - The position of the ParticlesSystem
  * @return {ParticlesSystem}
  * */
-function PSBackground(_position)
+function ParticlesSystemExample(_position)
 {
-	this.name = "PSBackground";
+	this.name = "ParticlesSystemExample";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
@@ -31,12 +31,12 @@ function PSBackground(_position)
 	* */
 	this.AddElement = function(_element)
 	{
-		if (_element instanceof Emitter) 
+		if (_element instanceof EmitterExample2) 
 		{
 			_element.Parent = this;
 			this.Emitters.push(_element);
 		}
-		else if (_element instanceof Field) 
+		else if (_element instanceof FieldExample) 
 		{
 			_element.Parent = this;
 			this.Fields.push(_element);
@@ -65,8 +65,20 @@ function PSBackground(_position)
 		if (!this.started) 
 		{
 			// operation start
-			// add Emitter
-			//add Fiels
+			// add EmitterExample(_position, _velocity, _spread, _rate, _max, _color) 
+			//add FieldExample(_position, _mass)
+			this.AddElement(new EmitterExample2(
+					new Vector(window.innerWidth, window.innerHeight),
+					//new Vector(-.2, 0), 						GOOD VELOCITY
+					new Vector(-.2, 0),
+					1,
+					1,
+					10
+				));
+			this.AddElement(new FieldExample(
+					new Vector(Application.LoadedScene.GameObjects[1].Transform.RelativePosition.x, Application.LoadedScene.GameObjects[1].Transform.RelativePosition.y),
+					.02
+				));
 			this.started = true;
 			Print('System: Particle System ' + this.name + " Started !");
 		}

@@ -67,6 +67,9 @@ function SceneAnim() {
 			var mainCharRun = new MainCharRun();
 			this.GameObjects.push(mainCharRun);
 
+			// Test Particules
+			this.Groups.push(new ParticlesSystemExample(new Vector(0, 0)));
+
 			this.started = true;
 			console.log('%c System:Scene ' + this.name + " Started !", 'background:#222; color:#bada55');
 			Time.SetTimeWhenSceneLoaded();
@@ -87,6 +90,10 @@ function SceneAnim() {
 	this.GUI = function() {
 		if (!Application.GamePaused) {
 			//Show UI
+			if(Application.debugMode)
+			{
+				Debug.DebugScene();
+			}
 		} else {
 			// Show pause menu
 		}

@@ -9,7 +9,7 @@
 *
 **/
 
-function FBackground(_position, _mass) 
+function FieldExample(_position, _mass) 
 {
 	this.Parent = null;
 	this.RelativePosition = _position;
@@ -18,10 +18,10 @@ function FBackground(_position, _mass)
 }
 
 /**
-*Apply a Mass to the field
+*Apply a Mass to the fieldExample
 **/
 
-Field.prototype.SetMass = function(_mass) 
+FieldExample.prototype.SetMass = function(_mass) 
 {
 	this.mass = _mass || 50;
 	this.drawColor = this.mass < 0 ? "#f00": "#0f0";
@@ -29,11 +29,11 @@ Field.prototype.SetMass = function(_mass)
 
 /**
 *
-* Updates he values of the field
+* Updates he values of the fieldExample
 *
 **/
 
-Field.prototype.Update = function() 
+FieldExample.prototype.Update = function() 
 {
 	if (this.Parent != null) 
 	{
@@ -45,11 +45,11 @@ Field.prototype.Update = function()
 
 /**
 *
-* display the field
+* display the fieldExample
 *
 **/
 
-Field.prototype.Render = function()
+FieldExample.prototype.Render = function()
 {
 	ctx.fillStyle = this.drawColor;
 	ctx.fillRect(this.Position.x, this.Position.y, 10, 10);  

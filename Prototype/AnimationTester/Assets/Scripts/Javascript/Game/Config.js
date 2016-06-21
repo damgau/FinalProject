@@ -24,7 +24,7 @@ var Application =
 {
 	LoadedScene: null,
 	gamePaused: false,
-	debugMode: false
+	debugMode: true
 };
 
 var imagesLoaded = 0;
@@ -34,6 +34,7 @@ var ImagesPath =
 [
 	// { name:"monImage",path: "background/image.png"},
 	{ name:"Fond",path: "/Fond.png"},
-	{ name:"Runner",path: "/Vendor/runner.png"}
+	{ name:"Runner",path: "/Vendor/runner.png"},
+	{ name:"Particle",path: "/particle.png"}
 ];
 var Images = {};
