@@ -132,11 +132,11 @@ function MainCharRun()
 		if (!this.started) {
 			// operation start
 			this.SetPosition(600, canvas.height - 200);
-			this.SetSize(50, 50);
+			this.SetSize(100, 100);
 			// nb is the height ! 
 			// TWEEN V0.1
 			// for tween "progress" 66 : 66secondes?milli?
-			this.SetSpriteSheet( Images["Runner"],new Vector(16,17) );
+			this.SetSpriteSheet( Images["Test"],new Vector(64,71) );
 
 
 			this.Renderer.Animation.totalAnimationLength = .2;

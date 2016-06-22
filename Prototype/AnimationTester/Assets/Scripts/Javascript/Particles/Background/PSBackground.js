@@ -47,7 +47,7 @@ function PSBackground(_position)
 					this,
 					new Vector(canvas.width + 250, canvas.height*.5),
 					//new Vector(-.2, 0), 						GOOD VELOCITY
-					new Vector(-.2, 0),
+					new Vector(-.5, 0),
 					null,
 					1,
 					10

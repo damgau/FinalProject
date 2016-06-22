@@ -1,4 +1,4 @@
-function Particle(_pos, _size, _rotate, _isRect) 
+function Particle(_isRect, _startPosX, _startPosY, _startSizeX, _startSizeY, _startAngle, _changePosX, _changePosY, _changeSizeX, _changeSizeY, _changeAngle) 
 {
 	this.name = "Particle";
 	this.enabled = true;
@@ -14,15 +14,32 @@ function Particle(_pos, _size, _rotate, _isRect)
 	this.isRect = _isRect || false;
 	this.color = "white";
 	this.lineWidth = 5;
+
+
+	// tween
+	this.startPosX = _startPosX;
+	this.startPosY = _startPosY;
+	this.startSizeX = _startSizeX;
+	this.startSizeY = _startSizeY;
+	this.startAngle = _startAngle;
+
+	this.changePosX = _changePosX;
+	this.changePosY = _changePosY;
+	this.changeSizeX = _changeSizeX;
+	this.changeSizeY = _changeSizeY;
+	this.changeAngle = _changeAngle;
+
+	this.tween;
+	this.tabValue = [];
 	
 	this.Transform = {};
-	this.Transform.RelativePosition = _pos || new Vector();
+	this.Transform.RelativePosition = new Vector();
 	this.Transform.Position = new Vector();
-	this.Transform.Size = _size || new Vector();
+	this.Transform.Size = new Vector();
 	this.Transform.RelativeScale = new Vector(1,1);
 	this.Transform.Scale = new Vector(1,1);
 	this.Transform.Pivot = new Vector(0,0);
-	this.Transform.angle = _rotate || 0;
+	this.Transform.angle = 0;
 
 	this.Renderer = 
 	{
@@ -145,6 +162,12 @@ function Particle(_pos, _size, _rotate, _isRect)
 	{
 		if (!this.started) {
 			// operation start
+
+			this.tween = new TweenAnim([this.startPosX, this.startPosY, this.startSizeX, this.startSizeY, this.startAngle],
+										[this.changePosX, this.changePosY,this.changeSizeX, this.changeSizeY, this.changeAngle],
+										10, "Quadratic", "Out");
+
+
 			this.started = true;
 			Print('System:GameObject ' + this.name + " Started !");
 		}
@@ -195,14 +218,13 @@ function Particle(_pos, _size, _rotate, _isRect)
 	 * */
 	this.Update = function() 
 	{
-		if (this.Transform.Position.x < 600) {
-			this.Transform.RelativePosition.x ++;
-		}
-		if (this.Transform.Size.x < 100) {
-			this.Transform.Size.x ++;
-		} else {
-			this.SetSize(250, 80);
-		}
+		//[PosionX, PosionY, SizeX, SizeY, angle]
+		this.tabValue = this.tween.recoverValue();
+		this.Transform.RelativePosition.x = this.tabValue[0];
+		this.Transform.RelativePosition.y = this.tabValue[1];
+		this.Transform.Size.x = canvas.width + this.tween.startValue[2] - this.tabValue[2];
+		this.Transform.Size.y = canvas.height + this.tween.startValue[3] - this.tabValue[3];
+		this.Transform.angle = this.tween.changeValue[4] - this.tabValue[4];
 		this.Renderer.Draw();
 		this.PostUpdate();	
 	};
