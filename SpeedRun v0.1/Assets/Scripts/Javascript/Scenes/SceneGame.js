@@ -18,6 +18,8 @@ function SceneGame(_difMode)
 	this.background;
 	this.psBackground;
 
+	this.rangeFirstPlan = canvas.height*.4;
+
 	this.diffMode = _difMode;
 	this.obsToGenerate = 0;
 
@@ -79,6 +81,16 @@ function SceneGame(_difMode)
 			this.GameObjects.push(tempObstacle);
 			this.GameObjects.push(new Obstacle(null, this.generalSpeed));
 
+			if (this.diffMode === "easy") {
+				this.obsToGenerate = 7;
+			}
+			if (this.diffMode === "normal") {
+				this.obsToGenerate = 5;
+			}
+			if (this.diffMode === "hard") {
+				this.obsToGenerate = 2;
+			}
+
 			// boucle for console.log
 			// for (var i = 0; i < this.GameObjects.length; i++) {
 			// 	console.log(this.GameObjects[i].Physics.Collider);
@@ -103,21 +115,14 @@ function SceneGame(_difMode)
 			this.psBackground.Start();
 
 			// generate auto : OBS
-			if (this.diffMode === "easy") {
-				this.obsToGenerate = 20;
-			}
-			if (this.diffMode === "normal") {
-				this.obsToGenerate = 7;
-
-			}
-			if (this.diffMode === "hard") {
-				this.obsToGenerate = 2;
-
-			}
 			if (this.GameObjects.length < this.obsToGenerate) {
-				var pos = new Vector(canvas.width + 10,Math.Random.RangeInt(500, canvas.height - 250, false));
+				var pos = new Vector(canvas.width + 10,Math.Random.RangeInt(250, canvas.height - 250, false));
 				if (this.canAutoGenerateObs(pos.x)) {
-					var obs = new Obstacle(pos, this.generalSpeed);
+					if (pos.y < this.rangeFirstPlan) {
+						var obs = new Obstacle(pos, this.generalSpeed, true);
+					} else {
+						var obs = new Obstacle(pos, this.generalSpeed, false);
+					}
 					this.GameObjects.push(obs);
 				}
 			}
@@ -132,9 +137,12 @@ function SceneGame(_difMode)
 			}
 			this.regenEnergie();
 
+			// "LastPlan"
 			for (var i = 0; i < this.GameObjects.length; i++) 
 			{
-				this.GameObjects[i].Start();
+				if (!this.GameObjects[i].isFirstPlan) {
+					this.GameObjects[i].Start();
+				}
 
 				// Remove reward catched
 				if (this.GameObjects[i].name === "Reward") {
@@ -166,6 +174,13 @@ function SceneGame(_difMode)
 			// MAIN CHAR last start : position
 			this.mainChar.Start();
 			
+			// First Plan
+			for (var i = 0; i < this.GameObjects.length; i++) 
+			{
+				if (this.GameObjects[i].isFirstPlan) {
+					this.GameObjects[i].Start();
+				}
+			}
 			// Calcul for GUI
 			this.widthByEnergie = this.maxWidth/this.obsAvailableMax;
 			this.currentWidth = this.widthByEnergie*this.obsAvailable;
@@ -233,7 +248,12 @@ function SceneGame(_difMode)
 		if (this.canGenerateObs(relativePos)) {
 
 			//create OBS
-			var obs = new Obstacle(relativePos, this.generalSpeed);
+			if (relativePos.y < this.rangeFirstPlan) {
+				var obs = new Obstacle(relativePos, this.generalSpeed, true);
+			} else {
+				var obs = new Obstacle(relativePos, this.generalSpeed);
+			}
+			
 			obs.tweenSpeed = new TweenAnim([0],[Scenes["Game"].generalSpeed],
 														 1, "Quadratic", "Out");
 			this.GameObjects.push(obs);

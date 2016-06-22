@@ -1,10 +1,11 @@
-function Obstacle(_pos, _generalSpeed) 
+function Obstacle(_pos, _generalSpeed, _isFirstPlan) 
 {
 	this.name = "Obstacle";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
 	this.fixedToCamera = true;
+	this.isFirstPlan = _isFirstPlan || false;
 
 
 	/*
@@ -138,7 +139,20 @@ function Obstacle(_pos, _generalSpeed)
 	{
 		if (!this.started) {
 			// operation start
-			this.SetSize(200, 50);
+			this.SetSize(250, 80);
+			if (this.Transform.RelativePosition.y < canvas.height*.2) {
+				this.Renderer.Material.Source = Images["ObsTopTop"];
+			} else if (this.Transform.RelativePosition.y < canvas.height*.4){
+				this.Renderer.Material.Source = Images["ObsMiddleTop"];
+			} else if (this.Transform.RelativePosition.y < canvas.height*.6){
+				this.Renderer.Material.Source = Images["ObsMiddle"];
+			} else if ( this.Transform.RelativePosition.y < canvas.height*.8) {
+				this.Renderer.Material.Source = Images["ObsMiddleBot"];
+			} else if ( this.Transform.RelativePosition.y < canvas.height*.9) {
+				this.Renderer.Material.Source = Images["ObsBotBot"];
+			} else {
+				this.Renderer.Material.Source = Images["ObsBotBot"];
+			}
 
 			// Set Collision
 			if (this.Physics.colliderIsSameSizeAsTransform) 
@@ -206,9 +220,11 @@ function Obstacle(_pos, _generalSpeed)
 		
 
 		// Position of Obstacle
-		ctx.fillStyle = "#42BF2E";
-		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
-					 this.Transform.Size.x, this.Transform.Size.y);
+		// ctx.fillStyle = "#42BF2E";
+		// ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
+		// 			 this.Transform.Size.x, this.Transform.Size.y);
+
+		this.Renderer.Draw();
 
 		this.PostUpdate();	
 	};

@@ -35,6 +35,11 @@ var ImagesPath =
 	// { name:"monImage",path: "background/image.png"},
 	{ name:"Fond",path: "/Fond.png"},
 	{ name:"Particle",path: "/particle.png"},
-	{ name:"Runner",path: "/Vendor/runner.png"}
+	{ name:"Runner",path: "/Vendor/runner.png"},
+	{ name:"ObsBotBot",path: "/Obstacles/obs_bot_bot.png"},
+	{ name:"ObsMiddle",path: "/Obstacles/obs_middle.png"},
+	{ name:"ObsMiddleBot",path: "/Obstacles/obs_middle_bot.png"},
+	{ name:"ObsMiddleTop",path: "/Obstacles/obs_middle_top.png"},
+	{ name:"ObsTopTop",path: "/Obstacles/obs_top_top.png"}
 ];
 var Images = {};
