@@ -238,6 +238,31 @@ function SceneGame(_difMode)
 			// Show pause menu
 		}
 	}
+	// this.onClick = function(){
+	// 	// Recup MousePos
+	// 	// offset
+	// 	var offsetX = Input.MousePosition.x - 100;
+	// 	var offsetY = Input.MousePosition.y + 25;
+	// 	var relativePos = new Vector(offsetX, offsetY);
+	// 	// Condition to drop GO
+	// 	if (this.canGenerateObs(relativePos)) {
+
+	// 		//create OBS
+	// 		if (relativePos.y < this.rangeFirstPlan) {
+	// 			var obs = new Obstacle(relativePos, this.generalSpeed, true);
+	// 		} else {
+	// 			var obs = new Obstacle(relativePos, this.generalSpeed);
+	// 		}
+			
+	// 		obs.tweenSpeed = new TweenAnim([0],[Scenes["Game"].generalSpeed],
+	// 													 1, "Quadratic", "Out");
+	// 		this.GameObjects.push(obs);
+	// 		this.obsAvailable--;
+	// 		//console.log(this.obsAvailable);
+	// 	}
+	// }
+
+	/* Test Anim : create GO on clic */
 	this.onClick = function(){
 		// Recup MousePos
 		// offset
@@ -246,6 +271,10 @@ function SceneGame(_difMode)
 		var relativePos = new Vector(offsetX, offsetY);
 		// Condition to drop GO
 		if (this.canGenerateObs(relativePos)) {
+
+			// 1. create 2 rect (STROKE)
+			// 2. Tween -> épesseur, x, y, width, height, rotate? 
+			// 3. fin du tween = create OBS
 
 			//create OBS
 			if (relativePos.y < this.rangeFirstPlan) {
@@ -261,6 +290,7 @@ function SceneGame(_difMode)
 			//console.log(this.obsAvailable);
 		}
 	}
+
 	this.canGenerateObs = function (_pos){
 		// check if the energie is available
 		if (this.obsAvailable < 1) {

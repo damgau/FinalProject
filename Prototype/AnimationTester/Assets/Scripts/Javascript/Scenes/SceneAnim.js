@@ -53,6 +53,8 @@ function SceneAnim() {
 	/* Private Variable */
 	this.Background;
 
+	this.Particles = [];
+
 
 	this.Awake = function() {
 		//console.clear();
@@ -69,6 +71,8 @@ function SceneAnim() {
 			this.GameObjects.push(mainChar);
 			var mainCharRun = new MainCharRun();
 			this.GameObjects.push(mainCharRun);
+			var rectTest = new Particle(new Vector(500, 500), new Vector(50, 50), 0, true);
+			this.Particles.push(rectTest);
 
 			// Test Particules
 			this.Groups.push(new PSBackground(new Vector(0, 0)));
@@ -87,6 +91,9 @@ function SceneAnim() {
 			}
 			for (var i = 0; i < this.GameObjects.length; i++) {
 				this.GameObjects[i].Start();
+			}
+			for (var i = 0; i < this.Particles.length; i++) {
+				this.Particles[i].Start();
 			}
 			
 
