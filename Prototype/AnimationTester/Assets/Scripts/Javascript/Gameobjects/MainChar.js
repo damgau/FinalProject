@@ -134,16 +134,17 @@ function MainChar()
 		if (!this.started) {
 			// operation start
 			this.SetPosition(200, canvas.height - 200);
-			this.SetSize(50, 50);
-			
-			this.SetSpriteSheet( Images["Runner"],new Vector(16,17) );
+			this.SetSize(100, 100);
+																// Taille de la "frame" new Vector(x, y)
+			this.SetSpriteSheet( Images["Jump"],new Vector(64,71) );
+																// "Rapidité" entre les sprite
+			this.Renderer.Animation.totalAnimationLength = .2;
+			this.Renderer.Animation.animated = true;
 
 			this.createTween();
 
 
 
-			this.Renderer.Animation.totalAnimationLength = .2;
-			this.Renderer.Animation.animated = true;
 
 			if (this.Physics.colliderIsSameSizeAsTransform) 
 			{

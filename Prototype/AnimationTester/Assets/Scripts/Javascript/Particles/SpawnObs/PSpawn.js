@@ -1,6 +1,7 @@
-function SpawnForm(_pos, _size, _rotate, _isRect) 
+function PSpawn(_isRect, _startPosX, _startPosY, _startSizeX, _startSizeY, _startAngle, _changePosX, _changePosY, _changeSizeX, _changeSizeY, _changeAngle) 
 {
-	this.name = "SpawnForm";
+	var _self = this;
+	this.name = "PSpawn";
 	this.enabled = true;
 	this.started = false;
 	this.rendered = true;
@@ -14,15 +15,32 @@ function SpawnForm(_pos, _size, _rotate, _isRect)
 	this.isRect = _isRect || false;
 	this.color = "white";
 	this.lineWidth = 5;
+
+
+	// tween
+	this.startPosX = _startPosX;
+	this.startPosY = _startPosY;
+	this.startSizeX = _startSizeX;
+	this.startSizeY = _startSizeY;
+	this.startAngle = _startAngle;
+
+	this.changePosX = _changePosX;
+	this.changePosY = _changePosY;
+	this.changeSizeX = _changeSizeX;
+	this.changeSizeY = _changeSizeY;
+	this.changeAngle = _changeAngle;
+
+	this.tween;
+	this.tabValue = [];
 	
 	this.Transform = {};
-	this.Transform.RelativePosition = _pos || new Vector();
+	this.Transform.RelativePosition = new Vector();
 	this.Transform.Position = new Vector();
-	this.Transform.Size = _size || new Vector();
+	this.Transform.Size = new Vector();
 	this.Transform.RelativeScale = new Vector(1,1);
 	this.Transform.Scale = new Vector(1,1);
-	this.Transform.Pivot = new Vector(.5,.5);
-	this.Transform.angle = _rotate || 0;
+	this.Transform.Pivot = new Vector(0,0);
+	this.Transform.angle = 0;
 
 	this.Renderer = 
 	{
@@ -57,67 +75,71 @@ function SpawnForm(_pos, _size, _rotate, _isRect)
 		 * */
 		Draw: function() 
 		{
-			var ScaledSizeX = this.That.Size.x*this.That.Scale.x;
-			var ScaledSizeY = this.That.Size.y*this.That.Scale.y;
+			if (this.isVisible) {
+				var ScaledSizeX = this.That.Size.x*this.That.Scale.x;
+				var ScaledSizeY = this.That.Size.y*this.That.Scale.y;
 
-			ctx.save();
-			ctx.translate((this.That.Position.x), (this.That.Position.y));
-			ctx.rotate(Math.DegreeToRadian(this.That.angle));
-			if (this.isSpriteSheet) 
-			{
-				if (this.Animation.animated)
-				{	
-					if (this.animationCount > this.Animation.totalAnimationLength / this.Animation.Current.length) 
-					{
-						this.Animation.currentIndex ++ ;
-						this.animationCount = 0 ;
-						if (this.Animation.currentIndex > this.Animation.Current.length-1) 
+				ctx.save();
+				ctx.translate((this.That.Position.x), (this.That.Position.y));
+				ctx.rotate(Math.DegreeToRadian(this.That.angle));
+				if (this.isSpriteSheet) 
+				{
+					if (this.Animation.animated)
+					{	
+						if (this.animationCount > this.Animation.totalAnimationLength / this.Animation.Current.length) 
 						{
-							this.Animation.currentIndex = 0;
-						}
-					} 
-					
-					this.animationCount += Time.deltaTime;
-					
+							this.Animation.currentIndex ++ ;
+							this.animationCount = 0 ;
+							if (this.Animation.currentIndex > this.Animation.Current.length-1) 
+							{
+								this.Animation.currentIndex = 0;
+							}
+						} 
+						
+						this.animationCount += Time.deltaTime;
+						
+					}
+					else 
+					{
+						this.animationCount = 0;
+						this.Animation.currentIndex = 0;
+					}
+					this.Material.CurrentFrame = this.Animation.Current[this.Animation.currentIndex];
+
+					ctx.drawImage(this.Material.Source,
+									this.Material.CurrentFrame.x,
+									this.Material.CurrentFrame.y,
+									this.Material.SizeFrame.x,
+									this.Material.SizeFrame.y,
+									-this.That.Pivot.x*ScaledSizeX,
+									-this.That.Pivot.y*ScaledSizeY,
+									ScaledSizeX,
+									ScaledSizeY);
 				}
 				else 
 				{
-					this.animationCount = 0;
-					this.Animation.currentIndex = 0;
+					if (this._self.isRect) {
+						ctx.beginPath();
+						ctx.strokeStyle = this._self.color;
+						ctx.lineWidth = this._self.lineWidth;
+						ctx.rect(-this.That.Pivot.x*ScaledSizeX,
+									-this.That.Pivot.y*ScaledSizeY,
+									ScaledSizeX,
+									ScaledSizeY);
+						ctx.stroke();
+						ctx.closePath();
+					}
+					else
+					{
+						ctx.drawImage(this.Material.Source,
+									-this.That.Pivot.x*ScaledSizeX,
+									-this.That.Pivot.y*ScaledSizeY,
+									ScaledSizeX,
+									ScaledSizeY);
+					}
 				}
-				this.Material.CurrentFrame = this.Animation.Current[this.Animation.currentIndex];
-
-				ctx.drawImage(this.Material.Source,
-								this.Material.CurrentFrame.x,
-								this.Material.CurrentFrame.y,
-								this.Material.SizeFrame.x,
-								this.Material.SizeFrame.y,
-								-this.That.Pivot.x*ScaledSizeX,
-								-this.That.Pivot.y*ScaledSizeY,
-								ScaledSizeX,
-								ScaledSizeY);
+				ctx.restore();
 			}
-			else 
-			{
-				if (this._self.isRect) {
-					ctx.strokeStyle = this._self.color;
-					ctx.lineWidth = this._self.lineWidth;
-					ctx.rect(-this.That.Pivot.x*ScaledSizeX,
-								-this.That.Pivot.y*ScaledSizeY,
-								ScaledSizeX,
-								ScaledSizeY);
-					ctx.stroke();
-				}
-				else
-				{
-					ctx.drawImage(this.Material.Source,
-								-this.That.Pivot.x*ScaledSizeX,
-								-this.That.Pivot.y*ScaledSizeY,
-								ScaledSizeX,
-								ScaledSizeY);
-				}
-			}
-			ctx.restore();
 		}
 	};
 
@@ -145,6 +167,16 @@ function SpawnForm(_pos, _size, _rotate, _isRect)
 	{
 		if (!this.started) {
 			// operation start
+
+			this.tween = new TweenAnim([this.startPosX, this.startPosY, this.startSizeX, this.startSizeY, this.startAngle],
+										[this.changePosX, this.changePosY,this.changeSizeX, this.changeSizeY, this.changeAngle],
+										.1, "Quadratic", "Out", 
+										function(){
+			 								Application.LoadedScene.GameObjects.push(new Obstacle(new Vector(_self.startPosX + _self.changePosX,
+			 																								 _self.startPosY + _self.changePosY)));
+			 							});
+
+
 			this.started = true;
 			Print('System:GameObject ' + this.name + " Started !");
 		}
@@ -166,6 +198,14 @@ function SpawnForm(_pos, _size, _rotate, _isRect)
 	{
 		if (this.enabled) 
 		{
+			//[PosionX, PosionY, SizeX, SizeY, angle]
+			this.tabValue = this.tween.recoverValue();
+			this.Transform.RelativePosition.x = this.tabValue[0];
+			this.Transform.RelativePosition.y = this.tabValue[1];
+			this.Transform.Size.x = this.tabValue[2];
+			this.Transform.Size.y = this.tabValue[3];
+			this.Transform.angle = this.tween.changeValue[4] - this.tabValue[4];
+
 			if (this.Parent != null) 
 			{
 				this.Transform.Position.x = this.Transform.RelativePosition.x + this.Parent.Transform.Position.x;
@@ -195,14 +235,6 @@ function SpawnForm(_pos, _size, _rotate, _isRect)
 	 * */
 	this.Update = function() 
 	{
-		if (this.Transform.Position.x < 600) {
-			this.Transform.RelativePosition.x ++;
-		}
-		if (this.Transform.Size.x < 100) {
-			this.Transform.Size.x ++;
-		} else {
-			this.SetSize(250, 80);
-		}
 		this.Renderer.Draw();
 		this.PostUpdate();	
 	};

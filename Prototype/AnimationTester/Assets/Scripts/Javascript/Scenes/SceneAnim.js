@@ -54,6 +54,7 @@ function SceneAnim() {
 	this.Background;
 
 	this.Particles = [];
+	this.ps;
 
 
 	this.Awake = function() {
@@ -71,13 +72,8 @@ function SceneAnim() {
 			this.GameObjects.push(mainChar);
 			var mainCharRun = new MainCharRun();
 			this.GameObjects.push(mainCharRun);
-			// function Particle(_isRect, _startPosX, _startPosY, _startSizeX, _startSizeY, _startAngle,
-			//					 _changePosX, _changePosY, _changeSizeX, _changeSizeY, _changeAngle) 
-			var rectTest = new Particle(true, 0, 0, 250, 80, 0,
-			 							500, 500, canvas.width - 250, canvas.height - 80, 0);
-			var rectTest2 = new Particle(true, 0, 0, 250, 80, 0,
-			 							500, 500, canvas.width - 250, canvas.height - 80, 90);
-			this.Particles.push(rectTest, rectTest2);
+
+			this.ps = new PSSpawn();
 
 			// Test Particules
 			this.Groups.push(new PSBackground(new Vector(0, 0)));
@@ -97,10 +93,7 @@ function SceneAnim() {
 			for (var i = 0; i < this.GameObjects.length; i++) {
 				this.GameObjects[i].Start();
 			}
-			for (var i = 0; i < this.Particles.length; i++) {
-				this.Particles[i].Start();
-			}
-			
+			this.ps.Start();
 
 		}
 		this.GUI();

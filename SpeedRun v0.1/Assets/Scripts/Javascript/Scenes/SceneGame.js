@@ -272,6 +272,8 @@ function SceneGame(_difMode)
 		// Condition to drop GO
 		if (this.canGenerateObs(relativePos)) {
 
+			// AddEmitter
+			
 			// 1. create 2 rect (STROKE)
 			// 2. Tween -> épesseur, x, y, width, height, rotate? 
 			// 3. fin du tween = create OBS
