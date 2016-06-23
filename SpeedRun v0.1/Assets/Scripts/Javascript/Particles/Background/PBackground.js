@@ -24,6 +24,8 @@ function PBackground(_particleSystem, _position, _velocity)
 	this.tween = null;
 	this.tabValue = [];
 
+	this.offset = 500;
+
 	this.finalScale = 30;
 
 	this.Transform = {};
@@ -160,18 +162,20 @@ PBackground.prototype.Update = function()
 	// tween --> change scale, rotate , blabla
 	this.tabValue = this.tween.recoverValue();
 	//console.log(this.tabValue[0]);
-	this.Transform.RelativeScale.x = this.finalScale - this.tabValue[0];
-	this.Transform.RelativeScale.y = this.finalScale - this.tabValue[0];
+	this.Transform.RelativeScale.x = this.tween.startValue[0] + this.tabValue[0];
+	this.Transform.RelativeScale.y = this.tween.startValue[0] + this.tabValue[0];
 
-	this.Transform.angle = this.tabValue[1];
+	this.Transform.angle = this.tween.startValue[1] + this.tabValue[1];
 
 
 	this.SubmitToFields();
+	this.Velocity.x = -this.Transform.RelativeScale.x*.2;
 	this.Velocity.Add(this.Acceleration);
 	this.Transform.RelativePosition.Add(this.Velocity);
 
-	if (this.Transform.RelativePosition.x < 0 || this.Transform.RelativePosition.x > canvas.width || 
-		this.Transform.RelativePosition.y < 0 || this.Transform.RelativePosition.x > canvas.heigth) 
+	if (this.Transform.RelativePosition.x < -this.offset 
+		|| this.Transform.RelativePosition.y < -this.offset
+		|| this.Transform.RelativePosition.y > canvas.heigth + this.offset) 
 	{
 		this.outOfBounds = true;
 	}
@@ -216,16 +220,16 @@ PBackground.prototype.SubmitToFields = function()
 };
 PBackground.prototype.createTween = function() {
 		// [ 10 = scale, can add rotate? ]
-		var startScale = Math.Random.RangeInt(0, 5, true);
-		var endScale = Math.Random.RangeInt(15, 25, true);
-		var duration = Math.Random.RangeInt(250,350, true);
+		var startScale = Math.Random.RangeInt(5, 10, true);
+		var changeScale = Math.Random.RangeInt(5, 7, true);
+		var duration = Math.Random.RangeInt(60,90, true);
 
-		var startRotate = Math.Random.RangeInt(-360, 150, true);
+		var startRotate = Math.Random.RangeInt(-360, 360, true);
 		//console.log(startRotate);
-		var endRotate = Math.Random.RangeInt(-100, 360, true);
-		//console.log(endRotate);
+		var changeRotate = Math.Random.RangeInt(-50, 50, true);
+		//console.log(changeRotate);
 		this.tween = new TweenAnim(	[startScale, startRotate],
-									[endScale, endRotate],
+									[changeScale, changeRotate],
 									duration,
 									"Quartic",
 									"Out");

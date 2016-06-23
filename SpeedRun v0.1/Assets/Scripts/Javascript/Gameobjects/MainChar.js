@@ -387,6 +387,19 @@ function MainChar()
 		}
 		return false;
 	};
+	this.checkCollideOtherObs = function() {
+		for (var i = 0; i <  Application.LoadedScene.GameObjects.length; i++) {
+			var obs =  Application.LoadedScene.GameObjects[i];
+			if (obs.name === "Obstacle" && !this.obsTouched) {
+			// Check Collision with Obs
+				if (Physics.CheckCollision(this.Physics.Collider, obs.Physics.Collider)) {
+					this.obsTouched = obs;
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	this.checkCollideObstacleTop = function() {
 
@@ -496,7 +509,9 @@ function MainChar()
 		}
 	};
 	this.hurt = function() {
+
 		if (Physics.CheckCollision(this.Physics.Collider, this.obsTouched.Physics.Collider)) {
+			// check if collision with another obj (not obsTouched)
 			if (this.tweenJump.isFinished) {
 				//this.obsTouched.speed = 0;
 				this.relativeValue = this.tweenGravity.recoverValue();
@@ -540,7 +555,8 @@ function MainChar()
 				this.tweenSpell = null;
 				this.stateChar.castingSpell = false;
 				this.timerDash.isStarted = true;
-				this.canUseDash = false;		
+				this.canUseDash = false;
+				this.tweenJump.isFinished = true;
 			}
 		}
 	}

@@ -10,7 +10,7 @@
  * 
  * @return {Emitter}
  * */
-function EBackground(_ParticuleSystem, _position, _velocity, _spread, _rate, _max, _color) 
+function EBackground(_ParticuleSystem, _position, _velocity, _spread, _rate, _max) 
 {
 	this.Parent = null;
 	this.Particules = [];
@@ -19,7 +19,6 @@ function EBackground(_ParticuleSystem, _position, _velocity, _spread, _rate, _ma
 	this.Position = _position;
 	this.Velocity = _velocity || new Vector();
 	this.spread = _spread || Math.PI/32; //angles possibles de direction
-	this.color = _color || "white";
 	this.rate = _rate || 5;
 	this.angleNow = 0;
 	this.ps = _ParticuleSystem;

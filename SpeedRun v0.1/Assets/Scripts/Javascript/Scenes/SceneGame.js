@@ -25,6 +25,7 @@ function SceneGame(_difMode)
 
 	this.generalSpeed = 0;
 	this.timerEnergie = null;
+	this.durationEnergie;
 	this.timerReward = null;
 	var _self = this;
 	/*
@@ -67,13 +68,6 @@ function SceneGame(_difMode)
 			this.widthBySpell = this.maxWidth/this.nbSpell;
 			this.generalSpeed = 10;
 			// nb obstacle utilisable (Energie)
-			this.obsAvailable = 3;
-			this.obsAvailableMax = 3;
-			// Timer regenerate obs
-			// 						ATTENTION : Ne pas oublier de reset (action) si Timer n'est pas "fini"
-			this.timerEnergie = new Timer(2, true, this.IncrementGUIEnergie, this.canIncrementEnergie, false);
-			this.timerReward = new Timer(2, true, null, this.generateReward, true);
-
 			var tempObstacle = new Obstacle(
 												new Vector( canvas.width*.7, canvas.height*.5 ),
 												this.generalSpeed
@@ -82,14 +76,27 @@ function SceneGame(_difMode)
 			this.GameObjects.push(new Obstacle(null, this.generalSpeed));
 
 			if (this.diffMode === "easy") {
-				this.obsToGenerate = 7;
+				this.obsToGenerate = 5;
+				this.obsAvailable = 3;
+				this.obsAvailableMax = 3;
+				this.durationEnergie = .5;
 			}
 			if (this.diffMode === "normal") {
-				this.obsToGenerate = 5;
+				this.obsToGenerate = 4;
+				this.obsAvailable = 3;
+				this.obsAvailableMax = 3;
+				this.durationEnergie = 1;
 			}
 			if (this.diffMode === "hard") {
 				this.obsToGenerate = 2;
+				this.obsAvailable = 3;
+				this.obsAvailableMax = 3;
+				this.durationEnergie = 2;
 			}
+			// Timer regenerate obs
+			// 						ATTENTION : Ne pas oublier de reset (action) si Timer n'est pas "fini"
+			this.timerEnergie = new Timer(this.durationEnergie, true, this.IncrementGUIEnergie, this.canIncrementEnergie, false);
+			this.timerReward = new Timer(2, true, null, this.generateReward, true);
 
 			// boucle for console.log
 			// for (var i = 0; i < this.GameObjects.length; i++) {

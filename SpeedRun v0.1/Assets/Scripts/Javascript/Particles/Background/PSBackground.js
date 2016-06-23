@@ -46,8 +46,8 @@ function PSBackground(_position)
 					this,
 					new Vector(window.innerWidth, window.innerHeight),
 					//new Vector(-.2, 0), 						GOOD VELOCITY
-					new Vector(-2, 0),
-					1,
+					new Vector(-.5, 0),
+					null,
 					1,
 					10
 				));
