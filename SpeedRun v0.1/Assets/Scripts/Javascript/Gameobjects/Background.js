@@ -145,9 +145,9 @@ function Background() {
 	/* 
 			Personal Prop
 	 */
-	 this.speed = .2;
-	this.tweenLandScape;
-	this.tabValue = [];
+	 this.speed = .5;
+	//this.tweenLandScape;
+	//this.tabValue = [];
 
 	// ParticlesSystem
 	//this.Groups = [];
@@ -257,8 +257,8 @@ function Background() {
 
 			// Tweeen linear pour avancer sur l'image (changer x de CurrentFrame/SizeFrame)
 			//TweenAnim(_startValue, _changeValue, _duration, _type, _underType)
-			var changeValue = this.Renderer.Material.Source.width - canvas.width;
-			this.tweenLandScape = new TweenAnim([0],[changeValue], 700, "Linear");
+			//var changeValue = this.Renderer.Material.Source.width - canvas.width;
+			//this.tweenLandScape = new TweenAnim([0],[changeValue], 4, "Linear");
 
 			// PS
 			//this.particlesSystem = new PSBackground(new Vector(canvas.width - 5, canvas.height*.5));
@@ -299,7 +299,7 @@ function Background() {
 	this.Update = function() {
 
 		// TWEEN : linear pour avancer sur l'image (changer x de CurrentFrame/SizeFrame)
-		this.tabValue = this.tweenLandScape.recoverValue();
+		//this.tabValue = this.tweenLandScape.recoverValue();
 		//this.Renderer.Material.SizeFrame.x += this.tabValue[0];
 		//this.Renderer.Material.CurrentFrame.x += this.tabValue[0];
 		this.Renderer.Material.CurrentFrame.x += this.speed;
