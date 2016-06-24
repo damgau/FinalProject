@@ -46,6 +46,8 @@ function SceneGame(_difMode)
 	this.nbSpell = 4;
 	this.widthBySpell = 0;
 
+	/* ANIM */
+	this.psSpawn;
 
 	this.Awake = function() 
 	{
@@ -97,6 +99,9 @@ function SceneGame(_difMode)
 			// 						ATTENTION : Ne pas oublier de reset (action) si Timer n'est pas "fini"
 			this.timerEnergie = new Timer(this.durationEnergie, true, this.IncrementGUIEnergie, this.canIncrementEnergie, false);
 			this.timerReward = new Timer(2, true, null, this.generateReward, true);
+
+			/*Spawn Anim*/
+			this.psSpawn = new PSSpawn();
 
 			// boucle for console.log
 			// for (var i = 0; i < this.GameObjects.length; i++) {
@@ -188,6 +193,12 @@ function SceneGame(_difMode)
 					this.GameObjects[i].Start();
 				}
 			}
+
+
+			// Spawn on click
+			this.psSpawn.Start();
+
+
 			// Calcul for GUI
 			this.widthByEnergie = this.maxWidth/this.obsAvailableMax;
 			this.currentWidth = this.widthByEnergie*this.obsAvailable;
@@ -271,6 +282,7 @@ function SceneGame(_difMode)
 
 	/* Test Anim : create GO on clic */
 	this.onClick = function(){
+
 		// Recup MousePos
 		// offset
 		var offsetX = Input.MousePosition.x - 100;
