@@ -122,7 +122,7 @@ function MainCharRun()
 	{
 		if (!this.started) {
 			// operation start
-			this.SetPosition(canvas.width*.5, canvas.height - 200);
+			this.SetPosition(canvas.width*.13, canvas.height - 200);
 			this.SetSize(50, 50);
 			this.Physics.Collider = new Box(this.Transform.RelativePosition.x,
 											this.Transform.RelativePosition.y,
