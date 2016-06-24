@@ -123,13 +123,13 @@ function MainCharRun()
 		if (!this.started) {
 			// operation start
 			this.SetPosition(canvas.width*.13, canvas.height - 200);
-			this.SetSize(50, 50);
+			this.SetSize(80, 120);
 			this.Physics.Collider = new Box(this.Transform.RelativePosition.x,
 											this.Transform.RelativePosition.y,
 											this.Transform.Size.x,
 											this.Transform.Size.y);
 			
-			this.SetSpriteSheet( Images["Runner"],new Vector(16,17) );
+			this.SetSpriteSheet( Images["marineRun1"],new Vector(128,226) );
 
 			this.Renderer.Animation.totalAnimationLength = .2;
 			this.Renderer.Animation.animated = true;

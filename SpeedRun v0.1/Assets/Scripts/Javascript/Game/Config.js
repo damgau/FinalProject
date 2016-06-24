@@ -33,7 +33,7 @@ var WalkableTiles = [];
 var ImagesPath = 
 [
 	// { name:"monImage",path: "background/image.png"},
-	{ name:"Fond",path: "/Fond.png"},
+	{ name:"Fond",path: "/Fond.jpg"},
 	{ name:"Particle",path: "/particle.png"},
 	{ name:"Runner",path: "/Vendor/runner.png"},
 	{ name:"ObsBotBot",path: "/Obstacles/obs_bot_bot.png"},
@@ -44,6 +44,8 @@ var ImagesPath =
 	{ name:"easyMode",path: "/HomePage/easyMode.png"},
 	{ name:"hardMode",path: "/HomePage/hardMode.png"},
 	{ name:"normalMode",path: "/HomePage/normalMode.png"},
-	{ name:"levelJump",path: "/HomePage/levelJump.png"}
+	{ name:"levelJump",path: "/HomePage/levelJump.png"},
+	{ name:"marineRun1",path: "/MarineAnim/Anim1.png"},
+	{ name:"marineRun2",path: "/MarineAnim/Anim2.png"}
 ];
 var Images = {};
