@@ -355,8 +355,15 @@ function SceneGame(_difMode)
 		_self.reloadWidth = 100/(this.duration/this.currentTime);
 	}
 	this.generateReward = function(){
-		//console.log("create Reward");
-		_self.GameObjects.push(new Reward(null, _self.generalSpeed));
+		// generate auto : reward
+		var isGenerate = false;
+		while(!isGenerate){
+			var pos = new Vector(canvas.width + 10,Math.Random.RangeInt(250, canvas.height - 250, false));
+			if (_self.canGenerateReward(pos)) {
+				_self.GameObjects.push(new Reward(pos, _self.generalSpeed));
+				isGenerate = true;
+			}
+		}
 	}
 	this.canAutoGenerateObs = function(_x){
 		for (var i = 0; i < this.GameObjects.length; i++) {
@@ -364,6 +371,20 @@ function SceneGame(_difMode)
 			if (this.GameObjects[i].name === "Obstacle") {
 				if (_x < this.GameObjects[i].Transform.RelativePosition.x + this.GameObjects[i].Transform.Size.x) {
 					return false;
+				}
+			}
+		}
+		return true;
+	}
+	this.canGenerateReward = function(_pos){
+		for (var i = 0; i < this.GameObjects.length; i++) {
+			// check if cursor is on obs
+			if (this.GameObjects[i].name === "Obstacle") {
+				// 200, 50 = size reward
+				var tmpCollider = new Box(_pos.x, _pos.y, 50, 50);
+				if (Physics.CheckCollision(tmpCollider, this.GameObjects[i].Physics.Collider)) {
+					console.log("cant pop reward");
+					return false
 				}
 			}
 		}
