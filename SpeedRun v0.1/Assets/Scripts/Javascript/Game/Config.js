@@ -40,6 +40,10 @@ var ImagesPath =
 	{ name:"ObsMiddle",path: "/Obstacles/obs_middle.png"},
 	{ name:"ObsMiddleBot",path: "/Obstacles/obs_middle_bot.png"},
 	{ name:"ObsMiddleTop",path: "/Obstacles/obs_middle_top.png"},
-	{ name:"ObsTopTop",path: "/Obstacles/obs_top_top.png"}
+	{ name:"ObsTopTop",path: "/Obstacles/obs_top_top.png"},
+	{ name:"easyMode",path: "/HomePage/easyMode.png"},
+	{ name:"hardMode",path: "/HomePage/hardMode.png"},
+	{ name:"normalMode",path: "/HomePage/normalMode.png"},
+	{ name:"levelJump",path: "/HomePage/levelJump.png"}
 ];
 var Images = {};

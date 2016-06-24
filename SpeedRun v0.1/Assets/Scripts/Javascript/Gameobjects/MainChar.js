@@ -495,14 +495,14 @@ function MainChar()
 			// Game Over
 			if (Application.LoadedScene == Scenes["Game"]) {
 				Scenes["Home"].lastScore = this.score;
-					if (Application.LoadedScene.diffMode === "easy" && this.score > Scenes["Home"].bestScroreEasy) {
-						Scenes["Home"].bestScroreEasy = this.score;
+					if (Application.LoadedScene.diffMode === "easy" && this.score > Scenes["Home"].bestScoreEasy) {
+						Scenes["Home"].bestScoreEasy = this.score;
 					}
-					if (Application.LoadedScene.diffMode === "normal" && this.score > Scenes["Home"].bestScroreNormal) {
-						Scenes["Home"].bestScroreNormal = this.score;
+					if (Application.LoadedScene.diffMode === "normal" && this.score > Scenes["Home"].bestScoreNormal) {
+						Scenes["Home"].bestScoreNormal = this.score;
 					}
-					if (Application.LoadedScene.diffMode === "hard" && this.score > Scenes["Home"].bestScroreHard) {
-						Scenes["Home"].bestScroreHard = this.score;
+					if (Application.LoadedScene.diffMode === "hard" && this.score > Scenes["Home"].bestScoreHard) {
+						Scenes["Home"].bestScoreHard = this.score;
 					}
 			}
 			Time.Timers = [];

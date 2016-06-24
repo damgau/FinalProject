@@ -51,9 +51,9 @@ function SceneHome() {
 	this.WorldSize = new Vector(4096,4096);
 
 	this.lastScore = 0;
-	this.bestScroreEasy = 0;
-	this.bestScroreNormal = 0;
-	this.bestScroreHard = 0;
+	this.bestScoreEasy = 0;
+	this.bestScoreNormal = 0;
+	this.bestScoreHard = 0;
 	this.difficultyMode = "easy";
 	this.boxEasy;
 	this.boxNormal;
@@ -70,10 +70,10 @@ function SceneHome() {
 			Time.SetTimeWhenSceneBegin();
 			// operation start
 
-			this.boxEasy = new Box(canvas.width*.38, canvas.height*.25, 250, 80);
+			this.boxEasy = new Box(canvas.width*.38, canvas.height*.29, 250, 80);
 			this.boxNormal = new Box(canvas.width*.38, canvas.height*.50, 250, 80);
 			this.boxHard = new Box(canvas.width*.38, canvas.height*.71, 250, 80);
-			this.boxLevelJump = new Box(canvas.width*.075, canvas.height*.25, 250, 80);
+			this.boxLevelJump = new Box(canvas.width*.075, canvas.height*.29, 250, 80);
 
 
 			var bg = new Background();
@@ -107,26 +107,32 @@ function SceneHome() {
 			ctx.font = "24px arial";
 			ctx.fillText("SCORES", canvas.width*.74, canvas.height*.15);
 
-			// Best Scrore EASY
+			// Last Score
 			ctx.fillStyle = "#DAD5D5";
 			ctx.font = "24px arial";
-			ctx.fillText("" + this.bestScroreEasy,canvas.width*.77, canvas.height*.30);
+			ctx.fillText("Last score : " + this.lastScore, canvas.width*.74, canvas.height*.2);
 
-			// Best Scrore NORMAL
+			// Best Score EASY
 			ctx.fillStyle = "#DAD5D5";
 			ctx.font = "24px arial";
-			ctx.fillText("" + this.bestScroreNormal,canvas.width*.77, canvas.height*.55);
+			ctx.fillText("" + this.bestScoreEasy,canvas.width*.77, canvas.height*.34);
 
-			// Best Scrore HARD
+			// Best Score NORMAL
 			ctx.fillStyle = "#DAD5D5";
 			ctx.font = "24px arial";
-			ctx.fillText("" + this.bestScroreHard,canvas.width*.77, canvas.height*.76);
+			ctx.fillText("" + this.bestScoreNormal,canvas.width*.77, canvas.height*.55);
+
+			// Best Score HARD
+			ctx.fillStyle = "#DAD5D5";
+			ctx.font = "24px arial";
+			ctx.fillText("" + this.bestScoreHard,canvas.width*.77, canvas.height*.76);
 
 
 			//Mode Libre
 			// easy
-			ctx.fillStyle = "#3AF600";
-			ctx.fillRect(this.boxEasy.x, this.boxEasy.y, this.boxEasy.w, this.boxEasy.h);
+			ctx.drawImage(Images["easyMode"], this.boxEasy.x, this.boxEasy.y, this.boxEasy.w, this.boxEasy.h);
+			//ctx.fillStyle = "#3AF600";
+			//ctx.fillRect(this.boxEasy.x, this.boxEasy.y, this.boxEasy.w, this.boxEasy.h);
 			if (Input.mouseClick && Physics.CheckCollision(Input.MousePosition, this.boxEasy)) {
 				
 				this.difficultyMode = "easy";
@@ -135,8 +141,9 @@ function SceneHome() {
 			}
 
 			// normal
-			ctx.fillStyle = "#EF7E22";
-			ctx.fillRect(this.boxNormal.x, this.boxNormal.y, this.boxNormal.w, this.boxNormal.h);
+			ctx.drawImage(Images["normalMode"], this.boxNormal.x, this.boxNormal.y, this.boxNormal.w, this.boxNormal.h);
+			//ctx.fillStyle = "#EF7E22";
+			//ctx.fillRect(this.boxNormal.x, this.boxNormal.y, this.boxNormal.w, this.boxNormal.h);
 			if (Input.mouseClick && Physics.CheckCollision(Input.MousePosition, this.boxNormal)) {
 				
 				this.difficultyMode = "normal";
@@ -144,8 +151,9 @@ function SceneHome() {
 				Application.LoadedScene = Scenes["Game"];
 			}
 			// hard
-			ctx.fillStyle = "#E01C1C";
-			ctx.fillRect(this.boxHard.x, this.boxHard.y, this.boxHard.w, this.boxHard.h);
+			ctx.drawImage(Images["hardMode"], this.boxHard.x, this.boxHard.y, this.boxHard.w, this.boxHard.h);
+			//ctx.fillStyle = "#E01C1C";
+			//ctx.fillRect(this.boxHard.x, this.boxHard.y, this.boxHard.w, this.boxHard.h);
 			if (Input.mouseClick && Physics.CheckCollision(Input.MousePosition, this.boxHard)) {
 				
 				this.difficultyMode = "hard";
@@ -154,8 +162,9 @@ function SceneHome() {
 			}
 
 			// Level Jump
-			ctx.fillStyle = "#62D8CE";
-			ctx.fillRect(this.boxLevelJump.x, this.boxLevelJump.y, this.boxLevelJump.w, this.boxLevelJump.h);
+			ctx.drawImage(Images["levelJump"], this.boxLevelJump.x, this.boxLevelJump.y, this.boxLevelJump.w, this.boxLevelJump.h);
+			//ctx.fillStyle = "#62D8CE";
+			//ctx.fillRect(this.boxLevelJump.x, this.boxLevelJump.y, this.boxLevelJump.w, this.boxLevelJump.h);
 			if (Input.mouseClick && Physics.CheckCollision(Input.MousePosition, this.boxLevelJump)) {
 				Scenes["LevelJump"] = new SceneLevelJump();
 				Application.LoadedScene = Scenes["LevelJump"];
