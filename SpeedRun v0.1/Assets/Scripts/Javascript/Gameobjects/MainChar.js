@@ -95,7 +95,8 @@ function MainChar()
 			Current:[],
 			countdown:0,
 			currentIndex: 0,
-			totalAnimationLength: 0.2
+			//totalAnimationLength: 0.2
+			totalAnimationLength: 0.3
 		},
 		Draw: function() 
 		{
@@ -159,8 +160,10 @@ function MainChar()
 		if (!this.started) {
 			// operation start
 			this.SetPosition( canvas.width*.4,canvas.height*.5 );
-			this.SetSize(80, 120);
-			this.SetSpriteSheet( Images["marineRun1"],new Vector(124,232) );
+			//this.SetSize(80, 120);
+			//this.SetSpriteSheet( Images["marineRun1"],new Vector(124,232) );
+			this.SetSize(100, 120);
+			this.SetSpriteSheet( Images["MadfuguRun"],new Vector(64,71) );
 			
 			this.gravity = 10;
 			// Hauteur à atteindre en plus de la position actuel
@@ -414,7 +417,8 @@ function MainChar()
 		return Physics.CheckCollision(this.Physics.topCollider, this.obsTouched.Physics.botCollider);
 	};
 	this.run = function() {
-		this.SetSpriteSheet( Images["marineRun1"],new Vector(124,232) );
+		//this.SetSpriteSheet( Images["marineRun1"],new Vector(124,232) );
+		this.SetSpriteSheet( Images["MadfuguRun"],new Vector(64,71) );
 		if( Input.KeysDown[32] ){
 			this.tweenGravity.Reset();
 			this.stateChar.onElement = false;
@@ -476,7 +480,8 @@ function MainChar()
 			}
 			// Down || UP
 			else {
-				this.SetSpriteSheet( Images["marineRun2"],new Vector(124,232) );
+				//this.SetSpriteSheet( Images["marineRun2"],new Vector(124,232) );
+				this.SetSpriteSheet( Images["MadfuguJump"],new Vector(64,71) );
 				// UP
 				if (!this.tweenJump.isFinished) {
 					this.relativeValue = this.tweenJump.recoverValue();
