@@ -118,6 +118,7 @@ function PReward(_isRect, _startPosX,  _changePosX, _startPosY)
 				{
 					if (this._self.isRect) {
 						ctx.beginPath();
+						ctx.globalAlpha = 0.5;
 						ctx.strokeStyle = this._self.color;
 						ctx.lineWidth = this._self.lineWidth;
 						ctx.rect(-this.That.Pivot.x*ScaledSizeX,
@@ -165,7 +166,8 @@ function PReward(_isRect, _startPosX,  _changePosX, _startPosY)
 	{
 		if (!this.started) {
 			// operation start
-			this.SetSize(500,500);
+			this.SetSize(200,200);
+			this.SetScale(1,1);
 			this.Transform.RelativePosition.y = this.startPosY;
 			this.Transform.angle = -120;
 
@@ -198,7 +200,7 @@ function PReward(_isRect, _startPosX,  _changePosX, _startPosY)
 			//[PosionX, PosionY, angle]
 			this.tabValue = this.tween.recoverValue();
 			this.Transform.RelativePosition.x = this.tabValue[0];
-			this.Transform.RelativeScale = new Vector(this.tabValue[1], this.tabValue[1]);
+			//this.Transform.RelativeScale = new Vector(this.tabValue[1], this.tabValue[1]);
 
 			if (this.Parent != null) 
 			{
