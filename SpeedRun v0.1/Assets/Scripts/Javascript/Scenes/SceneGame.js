@@ -33,6 +33,9 @@ function SceneGame(_difMode)
 	*/
 	this.obsAvailable = 0;
 	this.obsAvailableMax = 0;
+	/* GUI */
+	this.posUI = canvas.width*.8;
+
 	/*
 				GUI : Jauge Energie
 	*/
@@ -164,7 +167,6 @@ function SceneGame(_difMode)
 					if (Physics.CheckCollision(this.mainChar.Physics.Collider, this.GameObjects[i].Physics.Collider)) {
 						this.incrementEnergie();
 						this.GameObjects.splice(i,1);
-						// 													Not sure
 						i--;
 						break;
 					}
@@ -176,7 +178,6 @@ function SceneGame(_difMode)
 					// doit etre un peu plus grand que this.GameObjects[i].Transform.Size
 					if (this.GameObjects[i].Transform.Position.x < -400) {
 						this.GameObjects.splice(i,1);
-						// 													Not sure
 						i--;
 					}
 				}
@@ -383,7 +384,7 @@ function SceneGame(_difMode)
 				ctx.strokeStyle = "black";
 				ctx.lineWidth = 2;
 			}
-			ctx.strokeRect(canvas.width*.2, canvas.height - canvas.height*.1,
+			ctx.strokeRect(this.posUI, canvas.height - canvas.height*.1,
 						 this.widthByEnergie*i, 50);
 			ctx.closePath();	
 		}
@@ -398,14 +399,14 @@ function SceneGame(_difMode)
 				ctx.fillStyle = "rgba(78, 79, 82, .3)";
 			}
 		}
-		ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.16,
+		ctx.fillRect(canvas.width*.89, canvas.height - canvas.height*.16,
 					 this.widthBySpell, 50);
 
 		if (!this.mainChar.canUseDash) {
 			ctx.fillStyle = "#3b7bdd";
 			ctx.font = "30px arial";
 			var cd = Math.ceil(this.mainChar.timerDash.duration - this.mainChar.timerDash.currentTime);
-			ctx.fillText("" + cd, canvas.width*.214, canvas.height - canvas.height*.12, this.widthBySpell, 50);
+			ctx.fillText("" + cd, canvas.width*.9, canvas.height - canvas.height*.125, this.widthBySpell, 50);
 		}
 	}
 	this.jaugeEnergieUI = function() {
@@ -421,12 +422,12 @@ function SceneGame(_difMode)
 				ctx.fillStyle = "#60d612";
 			}
 			//ctx.fillStyle = "#F2C53C";
-			ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.1,
+			ctx.fillRect(this.posUI, canvas.height - canvas.height*.1,
 						 this.currentWidth + this.widthByEnergie*this.reloadWidth/100, 50);
 		}
 		// modifier la largeur en fonction du nombre disponible
 		ctx.fillStyle = "#9add1e";
-		ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.1,
+		ctx.fillRect(this.posUI, canvas.height - canvas.height*.1,
 					 this.currentWidth, 50);
 	}
 	this.maxWithEnergieUI = function() {
@@ -440,7 +441,7 @@ function SceneGame(_difMode)
 			ctx.lineWidth = 2;
 		}
 		ctx.fillStyle = "#010000";
-		ctx.rect(canvas.width*.2, canvas.height - canvas.height*.1,
+		ctx.rect(this.posUI, canvas.height - canvas.height*.1,
 					 this.maxWidth, 50);
 		ctx.closePath();
 		ctx.stroke();
