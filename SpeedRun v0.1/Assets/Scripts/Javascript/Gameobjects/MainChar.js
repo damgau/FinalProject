@@ -243,7 +243,14 @@ function MainChar()
 			this.timerDash.Reset();
 			this.stateChar.castingSpell = true;
 			}
+		} else {
+			if(Input.KeysDown[65]) {
+				Application.LoadedScene.feedbackSpell = true;
+			} else {
+				Application.LoadedScene.feedbackSpell = false;
+			}
 		}
+
 		this.actionToDo();
 		// draw en fonction de this.StateChar.currentState (sprite)
 		// Position of MainChar & design
@@ -393,9 +400,10 @@ function MainChar()
 	this.checkCollideOtherObs = function() {
 		for (var i = 0; i <  Application.LoadedScene.GameObjects.length; i++) {
 			var obs =  Application.LoadedScene.GameObjects[i];
-			if (obs.name === "Obstacle" && !this.obsTouched) {
+			if (obs.name === "Obstacle" && obs != this.obsTouched) {
 			// Check Collision with Obs
 				if (Physics.CheckCollision(this.Physics.Collider, obs.Physics.Collider)) {
+					//console.log("hurt into run");
 					this.obsTouched = obs;
 					return true;
 				}
@@ -525,13 +533,19 @@ function MainChar()
 
 		if (Physics.CheckCollision(this.Physics.Collider, this.obsTouched.Physics.Collider)) {
 			// check if collision with another obj (not obsTouched)
-			if (this.tweenJump.isFinished) {
-				//this.obsTouched.speed = 0;
-				this.relativeValue = this.tweenGravity.recoverValue();
-				this.Transform.RelativePosition.y += this.relativeValue[0];
+			// run if is true
+			if(this.checkCollideOtherObs()) {
+				this.stateChar.onElement = true;
+				this.stateChar.hurtElement = false;
 			} else {
-				this.relativeValue = this.tweenJump.recoverValue();
-				this.Transform.RelativePosition.y = this.relativeValue[0];
+				if (this.tweenJump.isFinished) {
+					//this.obsTouched.speed = 0;
+					this.relativeValue = this.tweenGravity.recoverValue();
+					this.Transform.RelativePosition.y += this.relativeValue[0];
+				} else {
+					this.relativeValue = this.tweenJump.recoverValue();
+					this.Transform.RelativePosition.y = this.relativeValue[0];
+				}
 			}
 		}
 		else {

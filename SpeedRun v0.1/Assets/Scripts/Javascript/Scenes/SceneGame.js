@@ -40,11 +40,14 @@ function SceneGame(_difMode)
 	this.widthByEnergie = 0;
 	this.currentWidth = 0;
 	this.reloadWidth = 0; 
+	this.feedbackEnergie;
 
 	/* GUI SPELL */
 
 	this.nbSpell = 4;
 	this.widthBySpell = 0;
+	this.feedbackSpell;
+
 
 	/* ANIM */
 	this.psSpawn;
@@ -202,6 +205,7 @@ function SceneGame(_difMode)
 			// Calcul for GUI
 			this.widthByEnergie = this.maxWidth/this.obsAvailableMax;
 			this.currentWidth = this.widthByEnergie*this.obsAvailable;
+			this.maxWidth = this.widthByEnergie*this.obsAvailableMax;
 		}
 		if (Application.debugMode) 
 		{
@@ -215,41 +219,17 @@ function SceneGame(_difMode)
 		{
 			//Show UI
 
+			this.maxWithEnergieUI();
 			// Score
 			ctx.fillStyle = "#F4F3F3";
 			ctx.fillText( this.mainChar.score,canvas.width - canvas.width*.1, canvas.height*.1,
 						 50, 50);
-
 			// Jauge ENERGIE
-			// Permet de ne pas reload si on a le max de obs dispo  (reload < 99 --> "debug graphique")
-			if (this.obsAvailable < this.obsAvailableMax && this.reloadWidth < 99) {
-				// modifier la largeur en fonction du temps (reload)
-				ctx.fillStyle = "#F2C53C";
-				ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.1,
-							 this.currentWidth + this.widthByEnergie*this.reloadWidth/100, 50);
-			}
-			// modifier la largeur en fonction du nombre disponible
-			ctx.fillStyle = "#FFF000";
-			ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.1,
-						 this.currentWidth, 50);
+			this.jaugeEnergieUI();
 			// Spell
-			if (this.mainChar.canUseDash) {
-				ctx.fillStyle = "#FFFFFF";
-			} else {
-				ctx.fillStyle = "#807878";
-			}
-			ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.16,
-						 this.widthBySpell, 50);
-
-			if (!this.mainChar.canUseDash) {
-				ctx.fillStyle = "#F2E6E6";
-				ctx.font = "30px arial";
-				var cd = Math.ceil(this.mainChar.timerDash.duration - this.mainChar.timerDash.currentTime);
-				ctx.fillText("" + cd, canvas.width*.215, canvas.height - canvas.height*.12,
-						 this.widthBySpell, 50);
-				ctx.textAlign = "normal";
-			}	
-
+			this.spellUI();
+			this.withEnergieUI();
+			
 		} 
 		else 
 		{
@@ -315,7 +295,8 @@ function SceneGame(_difMode)
 	this.canGenerateObs = function (_pos){
 		// check if the energie is available
 		if (this.obsAvailable < 1) {
-			console.log("YOU NEED ENERGIE");
+			//console.log("YOU NEED ENERGIE");
+			this.feedbackEnergie = true;
 			return false;
 		}
 		for (var i = 0; i < this.GameObjects.length; i++) {
@@ -324,7 +305,7 @@ function SceneGame(_difMode)
 				// 200, 50 = size box
 				var tmpCollider = new Box(_pos.x, _pos.y, 200, 50);
 				if (Physics.CheckCollision(tmpCollider, this.GameObjects[i].Physics.Collider)) {
-					console.log("cant pop");
+					//console.log("cant pop");
 					return false
 				}
 			}
@@ -337,6 +318,8 @@ function SceneGame(_difMode)
 		// if 2s regen
 		if (!Input.mouseLongClick) {
 			this.timerEnergie.isStarted = true;
+			this.feedbackEnergie = false;
+
 		}
 	}
 	this.incrementEnergie = function(){
@@ -383,13 +366,92 @@ function SceneGame(_difMode)
 				// 200, 50 = size reward
 				var tmpCollider = new Box(_pos.x, _pos.y, 50, 50);
 				if (Physics.CheckCollision(tmpCollider, this.GameObjects[i].Physics.Collider)) {
-					console.log("cant pop reward");
+					//console.log("cant pop reward");
 					return false
 				}
 			}
 		}
 		return true;
 	}
+	this.withEnergieUI = function(){
+		for (var i = 0; i < this.obsAvailableMax + 1; i++) {
+			ctx.beginPath();
+			if (this.feedbackEnergie) {
+				ctx.strokeStyle = "#d58176";
+				ctx.lineWidth = 7;
+			} else {
+				ctx.strokeStyle = "black";
+				ctx.lineWidth = 2;
+			}
+			ctx.strokeRect(canvas.width*.2, canvas.height - canvas.height*.1,
+						 this.widthByEnergie*i, 50);
+			ctx.closePath();	
+		}
+	}
+	this.spellUI = function() {
+		if (this.mainChar.canUseDash) {
+			ctx.fillStyle = "#3b7bdd";
+		} else {
+			if (this.feedbackSpell) {
+				ctx.fillStyle = "#d58176";
+			} else {
+				ctx.fillStyle = "rgba(78, 79, 82, .3)";
+			}
+		}
+		ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.16,
+					 this.widthBySpell, 50);
 
+		if (!this.mainChar.canUseDash) {
+			ctx.fillStyle = "#3b7bdd";
+			ctx.font = "30px arial";
+			var cd = Math.ceil(this.mainChar.timerDash.duration - this.mainChar.timerDash.currentTime);
+			ctx.fillText("" + cd, canvas.width*.214, canvas.height - canvas.height*.12, this.widthBySpell, 50);
+		}
+	}
+	this.jaugeEnergieUI = function() {
+		// Permet de ne pas reload si on a le max de obs dispo  (reload < 99 --> "debug graphique")
+		if (this.obsAvailable < this.obsAvailableMax && this.reloadWidth < 99) {
+			// modifier la largeur en fonction du temps (reload)
+			if (this.reloadWidth < 33) {
+				ctx.fillStyle = "#7c3229";
+			}
+			else if (this.reloadWidth < 70){
+				ctx.fillStyle = "#db9718";
+			} else {
+				ctx.fillStyle = "#60d612";
+			}
+			//ctx.fillStyle = "#F2C53C";
+			ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.1,
+						 this.currentWidth + this.widthByEnergie*this.reloadWidth/100, 50);
+		}
+		// modifier la largeur en fonction du nombre disponible
+		ctx.fillStyle = "#9add1e";
+		ctx.fillRect(canvas.width*.2, canvas.height - canvas.height*.1,
+					 this.currentWidth, 50);
+	}
+	this.maxWithEnergieUI = function() {
+		ctx.save();
+		ctx.beginPath();
+		if (this.feedbackEnergie) {
+			ctx.strokeStyle = "#d58176";
+			ctx.lineWidth = 7;
+		} else {
+			ctx.strokeStyle = "black";
+			ctx.lineWidth = 2;
+		}
+		ctx.fillStyle = "#010000";
+		ctx.rect(canvas.width*.2, canvas.height - canvas.height*.1,
+					 this.maxWidth, 50);
+		ctx.closePath();
+		ctx.stroke();
+
+		/* Test : Shadow */
+		ctx.shadowColor = 'rgba(0,0,0,.5)';
+		ctx.shadowBlur = 20;
+		ctx.shadowOffsetX = 5;
+		ctx.shadowOffsetY = 5;
+		ctx.fill();
+		ctx.restore();
+	}
 	this.Awake();
 }
