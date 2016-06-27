@@ -48,6 +48,9 @@ var ImagesPath =
 	{ name:"marineRun1",path: "/MarineAnim/Anim1.png"},
 	{ name:"marineRun2",path: "/MarineAnim/Anim2.png"},
 	{ name:"MadfuguJump",path: "/MadfuguAnim/jump.png"},
-	{ name:"MadfuguRun",path: "/MadfuguAnim/run.png"}
+	{ name:"MadfuguRun",path: "/MadfuguAnim/run.png"},
+	{ name:"p01",path: "/Particles/p01.jpg"},
+	{ name:"p02",path: "/Particles/p02.png"},
+	{ name:"p03",path: "/Particles/p03.png"}
 ];
 var Images = {};

@@ -33,7 +33,9 @@ function SceneGame(_difMode)
 	*/
 	this.obsAvailable = 0;
 	this.obsAvailableMax = 0;
-	/* GUI */
+	/* 
+				GUI
+	*/
 	this.posUI = canvas.width*.8;
 
 	/*
@@ -45,15 +47,20 @@ function SceneGame(_difMode)
 	this.reloadWidth = 0; 
 	this.feedbackEnergie;
 
-	/* GUI SPELL */
+	/* 
+				GUI SPELL
+	*/
 
 	this.nbSpell = 4;
 	this.widthBySpell = 0;
 	this.feedbackSpell;
 
 
-	/* ANIM */
+	/* 
+				ANIM
+	*/
 	this.psSpawn;
+	this.psReward;
 
 	this.Awake = function() 
 	{
@@ -108,6 +115,7 @@ function SceneGame(_difMode)
 
 			/*Spawn Anim*/
 			this.psSpawn = new PSSpawn();
+			this.psReward = new PSReward();
 
 			// boucle for console.log
 			// for (var i = 0; i < this.GameObjects.length; i++) {
@@ -166,6 +174,8 @@ function SceneGame(_difMode)
 				if (this.GameObjects[i].name === "Reward") {
 					if (Physics.CheckCollision(this.mainChar.Physics.Collider, this.GameObjects[i].Physics.Collider)) {
 						this.incrementEnergie();
+						var pos = this.GameObjects[i].Transform.Position;
+						this.psReward.addEmitter(pos);
 						this.GameObjects.splice(i,1);
 						i--;
 						break;
@@ -201,6 +211,7 @@ function SceneGame(_difMode)
 
 			// Spawn on click
 			this.psSpawn.Start();
+			this.psReward.Start();
 
 
 			// Calcul for GUI
