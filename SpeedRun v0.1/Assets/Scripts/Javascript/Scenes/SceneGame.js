@@ -60,7 +60,7 @@ function SceneGame(_difMode)
 				ANIM
 	*/
 	this.psSpawn;
-	this.psReward;
+	this.PSFirstPlan;
 
 	this.Awake = function() 
 	{
@@ -111,11 +111,11 @@ function SceneGame(_difMode)
 			// Timer regenerate obs
 			// 						ATTENTION : Ne pas oublier de reset (action) si Timer n'est pas "fini"
 			this.timerEnergie = new Timer(this.durationEnergie, true, this.IncrementGUIEnergie, this.canIncrementEnergie, false);
-			this.timerReward = new Timer(2, true, null, this.generateReward, true);
+			this.timerReward = new Timer(2, true, null, this.GenerateReward, true);
 
 			/*Spawn Anim*/
 			this.psSpawn = new PSSpawn();
-			this.psReward = new PSReward();
+			this.PSFirstPlan = new PSFirstPlan();
 
 			// boucle for console.log
 			// for (var i = 0; i < this.GameObjects.length; i++) {
@@ -175,7 +175,7 @@ function SceneGame(_difMode)
 					if (Physics.CheckCollision(this.mainChar.Physics.Collider, this.GameObjects[i].Physics.Collider)) {
 						this.incrementEnergie();
 						var pos = this.GameObjects[i].Transform.Position;
-						this.psReward.addEmitter(pos);
+						this.PSFirstPlan.addEmitter(1);
 						this.GameObjects.splice(i,1);
 						i--;
 						break;
@@ -211,7 +211,7 @@ function SceneGame(_difMode)
 
 			// Spawn on click
 			this.psSpawn.Start();
-			this.psReward.Start();
+			this.PSFirstPlan.Start();
 
 
 			// Calcul for GUI
@@ -349,7 +349,7 @@ function SceneGame(_difMode)
 		//_self.reloadWidth (in %)
 		_self.reloadWidth = 100/(this.duration/this.currentTime);
 	}
-	this.generateReward = function(){
+	this.GenerateReward = function(){
 		// generate auto : reward
 		var isGenerate = false;
 		while(!isGenerate){
@@ -359,6 +359,8 @@ function SceneGame(_difMode)
 				isGenerate = true;
 			}
 		}
+		_self.PSFirstPlan.addEmitter();
+
 	}
 	this.canAutoGenerateObs = function(_x){
 		for (var i = 0; i < this.GameObjects.length; i++) {
