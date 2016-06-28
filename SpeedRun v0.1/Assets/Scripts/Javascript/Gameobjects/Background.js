@@ -145,7 +145,7 @@ function Background() {
 	/* 
 			Personal Prop
 	 */
-	 this.speed = 2;
+	 this.speed = 1;
 	//this.tweenLandScape;
 	//this.tabValue = [];
 

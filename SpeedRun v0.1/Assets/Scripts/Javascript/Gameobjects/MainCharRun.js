@@ -122,7 +122,7 @@ function MainCharRun()
 	{
 		if (!this.started) {
 			// operation start
-			this.SetPosition(canvas.width*.05, canvas.height - 250);
+			this.SetPosition(canvas.width*.1, canvas.height - 250);
 			this.Physics.Collider = new Box(this.Transform.RelativePosition.x,
 											this.Transform.RelativePosition.y,
 											this.Transform.Size.x,
@@ -131,7 +131,7 @@ function MainCharRun()
 			//this.SetSize(80, 120);
 			//this.SetSpriteSheet( Images["marineRun1"],new Vector(128,226) );
 
-			this.SetSize(200, 240);
+			this.SetSize(100, 120);
 			this.SetSpriteSheet( Images["MadfuguJump"],new Vector(64,71) );
 
 			this.Renderer.Animation.totalAnimationLength = .2;

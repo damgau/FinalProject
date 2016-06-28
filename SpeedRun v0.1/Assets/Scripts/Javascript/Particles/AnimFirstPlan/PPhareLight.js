@@ -168,6 +168,9 @@ function PPhareLight(_isRect, _startPosY)
 			var size  = Math.Random.RangeInt(10, 150, true);
 			var duration = 800 / size;
 			this.speed = size*.05 ;
+			if (this.speed < 2) {
+				this.speed = 2;
+			}
 			this.SetSize(size,size);
 			//this.SetScale(1,1);
 			this.Transform.RelativePosition.x = canvas.width + 150;
