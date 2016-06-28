@@ -50,7 +50,7 @@ function Reward(_pos, _generalSpeed)
 		That: this.Transform,
 		Material: 
 		{
-			Source: "",
+			Source: Images["MunnyOrb"],
 			SizeFrame: new Vector(),
 			CurrentFrame: new Vector(),
 		},
@@ -134,7 +134,7 @@ function Reward(_pos, _generalSpeed)
 	{
 		if (!this.started) {
 			// operation start
-			this.SetSize(50, 50);
+			this.SetSize(70, 70);
 
 			// Set Collision
 			if (this.Physics.colliderIsSameSizeAsTransform) 
@@ -191,9 +191,10 @@ function Reward(_pos, _generalSpeed)
 		this.Transform.RelativePosition.x -= this.speed;
 
 		// Position of Obstacle
-		ctx.fillStyle = "#FBE102";
-		ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
-					 this.Transform.Size.x, this.Transform.Size.y);
+		//ctx.fillStyle = "#FBE102";
+		//ctx.fillRect(this.Transform.Position.x, this.Transform.Position.y,
+		//			 this.Transform.Size.x, this.Transform.Size.y);
+		this.Renderer.Draw();
 
 		this.PostUpdate();	
 	};

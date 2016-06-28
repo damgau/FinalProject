@@ -60,7 +60,8 @@ function SceneGame(_difMode)
 				ANIM
 	*/
 	this.psSpawn;
-	this.PSFirstPlan;
+	this.psFirstPlan;
+	this.psReward;
 
 	this.Awake = function() 
 	{
@@ -115,7 +116,8 @@ function SceneGame(_difMode)
 
 			/*Spawn Anim*/
 			this.psSpawn = new PSSpawn();
-			this.PSFirstPlan = new PSFirstPlan();
+			this.psFirstPlan = new PSFirstPlan();
+			this.psReward = new PSReward();
 
 			// boucle for console.log
 			// for (var i = 0; i < this.GameObjects.length; i++) {
@@ -175,7 +177,8 @@ function SceneGame(_difMode)
 					if (Physics.CheckCollision(this.mainChar.Physics.Collider, this.GameObjects[i].Physics.Collider)) {
 						this.incrementEnergie();
 						var pos = this.GameObjects[i].Transform.Position;
-						this.PSFirstPlan.addEmitter(1);
+						this.psFirstPlan.addEmitter(1);
+						this.psReward.addEmitter(pos);
 						this.GameObjects.splice(i,1);
 						i--;
 						break;
@@ -211,7 +214,8 @@ function SceneGame(_difMode)
 
 			// Spawn on click
 			this.psSpawn.Start();
-			this.PSFirstPlan.Start();
+			this.psFirstPlan.Start();
+			this.psReward.Start();
 
 
 			// Calcul for GUI
@@ -359,7 +363,7 @@ function SceneGame(_difMode)
 				isGenerate = true;
 			}
 		}
-		_self.PSFirstPlan.addEmitter();
+		_self.psFirstPlan.addEmitter();
 
 	}
 	this.canAutoGenerateObs = function(_x){

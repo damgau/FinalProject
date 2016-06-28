@@ -51,6 +51,11 @@ var ImagesPath =
 	{ name:"MadfuguRun",path: "/MadfuguAnim/run.png"},
 	{ name:"p01",path: "/Particles/p01.jpg"},
 	{ name:"p02",path: "/Particles/p02.png"},
-	{ name:"p03",path: "/Particles/p03.png"}
+	{ name:"p03",path: "/Particles/p03.png"},
+	{ name:"OrbGreenClassic",path: "/Particles/reward/OrbGreenClassic.png"},
+	{ name:"OrbWhiteClassic",path: "/Particles/reward/OrbWhiteClassic.png"},
+	{ name:"OrbYellow",path: "/Particles/reward/OrbYellow.png"},
+	{ name:"OrbGreen",path: "/Particles/reward/OrbGreen.png"},
+	{ name:"MunnyOrb",path: "/Particles/reward/MunnyOrb.png"}
 ];
 var Images = {};

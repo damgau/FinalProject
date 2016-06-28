@@ -112,6 +112,7 @@ function PBackground(_particleSystem, _position, _velocity)
 			} 
 			else 
 			{
+				ctx.globalAlpha = .9;
 				ctx.drawImage(this.Material.Source,
 								-this.That.Pivot.x*ScaledSizeX,
 								-this.That.Pivot.y*ScaledSizeY,
