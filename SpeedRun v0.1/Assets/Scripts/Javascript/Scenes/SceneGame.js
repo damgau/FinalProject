@@ -92,7 +92,7 @@ function SceneGame(_difMode)
 			this.GameObjects.push(new Obstacle(null, this.generalSpeed));
 
 			if (this.diffMode === "easy") {
-				this.obsToGenerate = 5;
+				this.obsToGenerate = 4;
 				this.obsAvailable = 3;
 				this.obsAvailableMax = 3;
 				this.durationEnergie = .5;

@@ -185,7 +185,7 @@ function SceneHome() {
 			// title Easy
 			ctx.fillStyle = "#fbfcfe";
 			ctx.font = "bold 12px arial";
-			ctx.fillText("EASY",this.boxEasy.x + canvas.width*.055, this.boxEasy.y + canvas.height*.04);
+			ctx.fillText("SEYVUS",this.boxEasy.x + canvas.width*.055, this.boxEasy.y + canvas.height*.04);
 
 			// Best Score EASY
 			ctx.font = "12px arial";
@@ -197,7 +197,7 @@ function SceneHome() {
 			// title NORMAL
 			ctx.fillStyle = "#fbfcfe";
 			ctx.font = "bold 12px arial";
-			ctx.fillText("NORMAL",this.boxNormal.x + canvas.width*.055, this.boxNormal.y + canvas.height*.04);
+			ctx.fillText("ATLANA",this.boxNormal.x + canvas.width*.055, this.boxNormal.y + canvas.height*.04);
 			// Best Score NORMAL
 			ctx.font = "12px arial";
 			ctx.fillText("Best score : " + this.bestScoreNormal,this.boxNormal.x + canvas.width*.055, this.boxNormal.y + canvas.height*.057);
@@ -207,7 +207,7 @@ function SceneHome() {
 			// title HARD
 			ctx.fillStyle = "#fbfcfe";
 			ctx.font = "bold 12px arial";
-			ctx.fillText("HARD",this.boxHard.x + canvas.width*.055, this.boxHard.y + canvas.height*.04);
+			ctx.fillText("KORTRYK",this.boxHard.x + canvas.width*.055, this.boxHard.y + canvas.height*.04);
 			// Best Score HARD
 			ctx.fillStyle = "#fbfcfe";
 			ctx.font = "12px arial";
@@ -218,27 +218,32 @@ function SceneHome() {
 			// title Jump
 			ctx.fillStyle = "#fbfcfe";
 			ctx.font = "bold 12px arial";
-			ctx.fillText("JUMP",this.boxJump.x + canvas.width*.055, this.boxJump.y + canvas.height*.048);
+			ctx.fillText("DIVES",this.boxJump.x + canvas.width*.055, this.boxJump.y + canvas.height*.048);
 
 			// last game
 			ctx.fillStyle = "#fbfcfe";
 			ctx.font = "14px Consolas";
-			ctx.fillText("Last Game", canvas.width*.342, canvas.height*.48);
+			ctx.fillText("Last Game", canvas.width*.342, canvas.height*.51);
 
 			// Last Score
 			ctx.fillStyle = "#fbfcfe";
 			ctx.font = "14px Consolas";
-			ctx.fillText("Score : " + this.lastScore, canvas.width*.342, canvas.height*.51);
+			ctx.fillText("Score : " + this.lastScore, canvas.width*.342, canvas.height*.54);
 
-			// Last Timer
-			ctx.fillStyle = "#fbfcfe";
-			ctx.font = "14px Consolas";
-			ctx.fillText("Time : " + this.lastTime, canvas.width*.342, canvas.height*.54);
+			// // Last Timer
+			// ctx.fillStyle = "#fbfcfe";
+			// ctx.font = "14px Consolas";
+			// if (this.lastTime) {
+			// 	ctx.fillText("Time : " + this.lastTime.toString().toHHMMSS(), canvas.width*.342, canvas.height*.54);
+			// } else ctx.fillText("Time : " , canvas.width*.342, canvas.height*.54);
 
-			// Last Destination
-			ctx.fillStyle = "#fbfcfe";
-			ctx.font = "14px Consolas";
-			ctx.fillText("Destination : " + this.lastDest, canvas.width*.342, canvas.height*.57);	
+			// // Last Destination
+			// ctx.fillStyle = "#fbfcfe";
+			// ctx.font = "14px Consolas";
+			// if (this.lastDest) {
+			// 	ctx.fillText("Destination : " + this.lastDest, canvas.width*.342, canvas.height*.57);		
+			// } else ctx.fillText("Destination : ", canvas.width*.342, canvas.height*.57);	
+			
 
 		} else {
 			// Show pause menu

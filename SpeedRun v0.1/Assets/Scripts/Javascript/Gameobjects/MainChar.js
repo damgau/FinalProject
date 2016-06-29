@@ -509,6 +509,7 @@ function MainChar()
 			// Game Over
 			if (Application.LoadedScene == Scenes["Game"]) {
 				Scenes["Home"].lastScore = this.score;
+				Scenes["Home"].lastTime = Time.GetTimeWhenSceneBegin();
 					if (Application.LoadedScene.diffMode === "easy" && this.score > Scenes["Home"].bestScoreEasy) {
 						Scenes["Home"].bestScoreEasy = this.score;
 					}
