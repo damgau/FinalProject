@@ -37,7 +37,7 @@ EBackground.prototype.EmitParticules = function()
 		{
 			// You can change this values for more fun.
 			var angle = this.Velocity.GetAngle() + this.spread * Math.random() ;
-			var position = new Vector(this.Position.x,Math.Random.RangeInt(canvas.height*.4, canvas.height*.6, false));
+			var position = new Vector(this.Position.x + 400,Math.Random.RangeInt(canvas.height*.4, canvas.height*.6, false));
 			var velocity = this.Velocity.FromAngle(angle);
 
 			//console.log(position);

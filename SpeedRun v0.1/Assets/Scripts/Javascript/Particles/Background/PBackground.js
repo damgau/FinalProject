@@ -224,8 +224,8 @@ PBackground.prototype.SubmitToFields = function()
 };
 PBackground.prototype.createTween = function() {
 		// [ 10 = scale, can add rotate? ]
-		var startScale = Math.Random.RangeInt(5, 10, true);
-		var changeScale = Math.Random.RangeInt(5, 10, true);
+		var startScale = Math.Random.RangeInt(7, 18, true);
+		var changeScale = Math.Random.RangeInt(-5, -10, true);
 		var duration = Math.Random.RangeInt(60,90, true);
 
 		var startRotate = Math.Random.RangeInt(-360, 360, true);

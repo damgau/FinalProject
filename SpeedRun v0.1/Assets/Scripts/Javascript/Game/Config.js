@@ -64,6 +64,17 @@ var ImagesPath =
 	{ name:"MadfuguObsTopTop",path: "/Obstacles/madfugu/obs_top_top.png"},
 	{ name:"Particle01",path: "/particle01.png"},
 	{ name:"Particle02",path: "/particle02.png"},
-	{ name:"Particle03",path: "/particle03.png"}
+	{ name:"Particle03",path: "/particle03.png"},
+	{ name:"buttonEasy",path: "/Interface/easy.png"},
+	{ name:"buttonEasyHover",path: "/Interface/easyHover.png"},
+	{ name:"buttonHard",path: "/Interface/hard.png"},
+	{ name:"buttonHardHover",path: "/Interface/hardHover.png"},
+	{ name:"buttonJump",path: "/Interface/jump.png"},
+	{ name:"buttonJumpDisabled",path: "/Interface/jumpDisabled.png"},
+	{ name:"buttonJumpHover",path: "/Interface/jumpHover.png"},
+	{ name:"buttonNormal",path: "/Interface/normal.png"},
+	{ name:"buttonNormalHover",path: "/Interface/normalHover.png"},
+	{ name:"title",path: "/Interface/title.png"},
+	{ name:"panel",path: "/Interface/UI.png"}
 ];
 var Images = {};

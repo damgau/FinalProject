@@ -100,7 +100,7 @@ function ImageLoaded(_imageLoaded)
  * set window innerHeight to canvas height
  * 
  * */
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = window.innerWidth - 20;
+canvas.height = window.innerHeight- 20;
 
 Run();

@@ -50,15 +50,29 @@ function SceneHome() {
 
 	this.WorldSize = new Vector(4096,4096);
 
-	this.lastScore = 0;
 	this.bestScoreEasy = 0;
 	this.bestScoreNormal = 0;
 	this.bestScoreHard = 0;
 	this.difficultyMode = "easy";
-	this.boxEasy;
-	this.boxNormal;
-	this.boxHard;
 
+	this.boxEasy;
+	this.imgEasy;
+
+	this.boxNormal;
+	this.imgNormal;
+
+	this.boxHard;
+	this.imgHard;
+
+	this.boxJump;
+	this.imgJump;
+
+	/*
+			GUI
+	*/
+	this.lastScore = 0;
+	this.lastDest;
+	this.lastTime;
 
 	this.Awake = function() {
 		//console.clear();
@@ -69,17 +83,21 @@ function SceneHome() {
 		if (!this.started) {
 			Time.SetTimeWhenSceneBegin();
 			// operation start
+			this.imgEasy = Images["buttonEasy"];
+			this.boxEasy = new Box(canvas.width*.585, canvas.height*.37, 200, 78);
 
-			this.boxEasy = new Box(canvas.width*.38, canvas.height*.29, 250, 80);
-			this.boxNormal = new Box(canvas.width*.38, canvas.height*.50, 250, 80);
-			this.boxHard = new Box(canvas.width*.38, canvas.height*.71, 250, 80);
-			this.boxLevelJump = new Box(canvas.width*.075, canvas.height*.29, 250, 80);
+			this.imgNormal = Images["buttonNormal"];
+			this.boxNormal = new Box(canvas.width*.585, canvas.height*.46, 200, 78);
+
+			this.imgHard = Images["buttonHard"];
+			this.boxHard = new Box(canvas.width*.585, canvas.height*.55, 200, 78);
+
+			this.imgJump = Images["buttonJumpDisabled"];
+			this.boxJump = new Box(canvas.width*.585, canvas.height*.64, 200, 78);
 
 
 			var bg = new Background();
 			this.GameObjects.push(bg);
-			var mainCharRun = new MainCharRun();
-			this.GameObjects.push(mainCharRun);
 
 			this.started = true;
 			console.log('%c System:Scene ' + this.name + " Started !", 'background:#222; color:#bada55');
@@ -89,6 +107,54 @@ function SceneHome() {
 	}
 	this.Update = function() {
 		if (!Application.GamePaused) {
+
+			//EASY
+			if (Physics.CheckCollision(Input.MousePosition, this.boxEasy)){
+				this.imgEasy = Images["buttonEasyHover"];
+				if (Input.mouseClick) {
+					this.difficultyMode = "easy";
+					Scenes["Game"] = new SceneGame(Scenes["Home"].difficultyMode);
+					Application.LoadedScene = Scenes["Game"];	
+				}
+			} else {
+				this.imgEasy = Images["buttonEasy"];
+			}
+
+			//NORMAL
+			if (Physics.CheckCollision(Input.MousePosition, this.boxNormal)){
+				this.imgNormal = Images["buttonNormalHover"];
+				if (Input.mouseClick) {
+					this.difficultyMode = "normal";
+					Scenes["Game"] = new SceneGame(Scenes["Home"].difficultyMode);
+					Application.LoadedScene = Scenes["Game"];	
+				}
+			} else {
+				this.imgNormal = Images["buttonNormal"];
+			}
+
+			//Hard
+			if (Physics.CheckCollision(Input.MousePosition, this.boxHard)){
+				this.imgHard = Images["buttonHardHover"];
+				if (Input.mouseClick) {
+					this.difficultyMode = "hard";
+					Scenes["Game"] = new SceneGame(Scenes["Home"].difficultyMode);
+					Application.LoadedScene = Scenes["Game"];
+				}
+			} else {
+				this.imgHard = Images["buttonHard"];
+			}
+
+			//JUMPS
+			if (Physics.CheckCollision(Input.MousePosition, this.boxJump)){
+				this.imgJump = Images["buttonJumpHover"];
+				if (Input.mouseClick) {
+					Scenes["LevelJump"] = new SceneLevelJump();
+					Application.LoadedScene = Scenes["LevelJump"];
+				}
+			} else {
+				this.imgJump = Images["buttonJumpDisabled"];
+			}
+
 			for (var i = 0; i < this.GameObjects.length; i++) {
 				this.GameObjects[i].Start();
 			}
@@ -102,73 +168,77 @@ function SceneHome() {
 		if (!Application.GamePaused) {
 			//Show UI
 
-			// Score
-			ctx.fillStyle = "#DAD5D5";
-			ctx.font = "24px arial";
-			ctx.fillText("SCORES", canvas.width*.74, canvas.height*.15);
+			// Panel
+			ctx.drawImage(Images["panel"], canvas.width*.554, canvas.height*.29, 301, 452);
 
-			// Last Score
-			ctx.fillStyle = "#DAD5D5";
-			ctx.font = "24px arial";
-			ctx.fillText("Last score : " + this.lastScore, canvas.width*.74, canvas.height*.2);
+			ctx.fillStyle = "#fbfcfe";
+			ctx.font = "bold 16px Consolas";
+			ctx.fillText("Destination",canvas.width*.615, canvas.height*.345);
 
-			// Best Score EASY
-			ctx.fillStyle = "#DAD5D5";
-			ctx.font = "24px arial";
-			ctx.fillText("" + this.bestScoreEasy,canvas.width*.77, canvas.height*.34);
-
-			// Best Score NORMAL
-			ctx.fillStyle = "#DAD5D5";
-			ctx.font = "24px arial";
-			ctx.fillText("" + this.bestScoreNormal,canvas.width*.77, canvas.height*.55);
-
-			// Best Score HARD
-			ctx.fillStyle = "#DAD5D5";
-			ctx.font = "24px arial";
-			ctx.fillText("" + this.bestScoreHard,canvas.width*.77, canvas.height*.76);
+			// Title
+			ctx.drawImage(Images["title"], canvas.width*.2966, canvas.height*.27, 364, 205);
 
 
 			//Mode Libre
 			// easy
-			ctx.drawImage(Images["easyMode"], this.boxEasy.x, this.boxEasy.y, this.boxEasy.w, this.boxEasy.h);
-			//ctx.fillStyle = "#3AF600";
-			//ctx.fillRect(this.boxEasy.x, this.boxEasy.y, this.boxEasy.w, this.boxEasy.h);
-			if (Input.mouseClick && Physics.CheckCollision(Input.MousePosition, this.boxEasy)) {
-				
-				this.difficultyMode = "easy";
-				Scenes["Game"] = new SceneGame(Scenes["Home"].difficultyMode);
-				Application.LoadedScene = Scenes["Game"];
-			}
+			ctx.drawImage(this.imgEasy, this.boxEasy.x, this.boxEasy.y, this.boxEasy.w, this.boxEasy.h);
+			// title Easy
+			ctx.fillStyle = "#fbfcfe";
+			ctx.font = "bold 12px arial";
+			ctx.fillText("EASY",this.boxEasy.x + canvas.width*.055, this.boxEasy.y + canvas.height*.04);
+
+			// Best Score EASY
+			ctx.font = "12px arial";
+			ctx.fillText("Best score : " + this.bestScoreEasy,this.boxEasy.x + canvas.width*.055, this.boxEasy.y + canvas.height*.057);
+
 
 			// normal
-			ctx.drawImage(Images["normalMode"], this.boxNormal.x, this.boxNormal.y, this.boxNormal.w, this.boxNormal.h);
-			//ctx.fillStyle = "#EF7E22";
-			//ctx.fillRect(this.boxNormal.x, this.boxNormal.y, this.boxNormal.w, this.boxNormal.h);
-			if (Input.mouseClick && Physics.CheckCollision(Input.MousePosition, this.boxNormal)) {
-				
-				this.difficultyMode = "normal";
-				Scenes["Game"] = new SceneGame(Scenes["Home"].difficultyMode);
-				Application.LoadedScene = Scenes["Game"];
-			}
+			ctx.drawImage(this.imgNormal, this.boxNormal.x, this.boxNormal.y, this.boxNormal.w, this.boxNormal.h);
+			// title NORMAL
+			ctx.fillStyle = "#fbfcfe";
+			ctx.font = "bold 12px arial";
+			ctx.fillText("NORMAL",this.boxNormal.x + canvas.width*.055, this.boxNormal.y + canvas.height*.04);
+			// Best Score NORMAL
+			ctx.font = "12px arial";
+			ctx.fillText("Best score : " + this.bestScoreNormal,this.boxNormal.x + canvas.width*.055, this.boxNormal.y + canvas.height*.057);
+
 			// hard
-			ctx.drawImage(Images["hardMode"], this.boxHard.x, this.boxHard.y, this.boxHard.w, this.boxHard.h);
-			//ctx.fillStyle = "#E01C1C";
-			//ctx.fillRect(this.boxHard.x, this.boxHard.y, this.boxHard.w, this.boxHard.h);
-			if (Input.mouseClick && Physics.CheckCollision(Input.MousePosition, this.boxHard)) {
-				
-				this.difficultyMode = "hard";
-				Scenes["Game"] = new SceneGame(Scenes["Home"].difficultyMode);
-				Application.LoadedScene = Scenes["Game"];
-			}
+			ctx.drawImage(this.imgHard, this.boxHard.x, this.boxHard.y, this.boxHard.w, this.boxHard.h);
+			// title HARD
+			ctx.fillStyle = "#fbfcfe";
+			ctx.font = "bold 12px arial";
+			ctx.fillText("HARD",this.boxHard.x + canvas.width*.055, this.boxHard.y + canvas.height*.04);
+			// Best Score HARD
+			ctx.fillStyle = "#fbfcfe";
+			ctx.font = "12px arial";
+			ctx.fillText("Best score : " + this.bestScoreHard,this.boxHard.x + canvas.width*.055, this.boxHard.y + canvas.height*.057);
 
 			// Level Jump
-			ctx.drawImage(Images["levelJump"], this.boxLevelJump.x, this.boxLevelJump.y, this.boxLevelJump.w, this.boxLevelJump.h);
-			//ctx.fillStyle = "#62D8CE";
-			//ctx.fillRect(this.boxLevelJump.x, this.boxLevelJump.y, this.boxLevelJump.w, this.boxLevelJump.h);
-			if (Input.mouseClick && Physics.CheckCollision(Input.MousePosition, this.boxLevelJump)) {
-				Scenes["LevelJump"] = new SceneLevelJump();
-				Application.LoadedScene = Scenes["LevelJump"];
-			}
+			ctx.drawImage(this.imgJump, this.boxJump.x, this.boxJump.y, this.boxJump.w, this.boxJump.h);
+			// title Jump
+			ctx.fillStyle = "#fbfcfe";
+			ctx.font = "bold 12px arial";
+			ctx.fillText("JUMP",this.boxJump.x + canvas.width*.055, this.boxJump.y + canvas.height*.048);
+
+			// last game
+			ctx.fillStyle = "#fbfcfe";
+			ctx.font = "14px Consolas";
+			ctx.fillText("Last Game", canvas.width*.342, canvas.height*.48);
+
+			// Last Score
+			ctx.fillStyle = "#fbfcfe";
+			ctx.font = "14px Consolas";
+			ctx.fillText("Score : " + this.lastScore, canvas.width*.342, canvas.height*.51);
+
+			// Last Timer
+			ctx.fillStyle = "#fbfcfe";
+			ctx.font = "14px Consolas";
+			ctx.fillText("Time : " + this.lastTime, canvas.width*.342, canvas.height*.54);
+
+			// Last Destination
+			ctx.fillStyle = "#fbfcfe";
+			ctx.font = "14px Consolas";
+			ctx.fillText("Destination : " + this.lastDest, canvas.width*.342, canvas.height*.57);	
 
 		} else {
 			// Show pause menu
