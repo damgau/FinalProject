@@ -141,17 +141,17 @@ function Obstacle(_pos, _generalSpeed, _isFirstPlan)
 			// operation start
 			this.SetSize(250, 80);
 			if (this.Transform.RelativePosition.y < canvas.height*.2) {
-				this.Renderer.Material.Source = Images["ObsTopTop"];
+				this.Renderer.Material.Source = Images["MadfuguObsTopTop"];
 			} else if (this.Transform.RelativePosition.y < canvas.height*.4){
-				this.Renderer.Material.Source = Images["ObsMiddleTop"];
+				this.Renderer.Material.Source = Images["MadfuguObsMiddleTop"];
 			} else if (this.Transform.RelativePosition.y < canvas.height*.6){
-				this.Renderer.Material.Source = Images["ObsMiddle"];
+				this.Renderer.Material.Source = Images["MadfuguObsMiddle"];
 			} else if ( this.Transform.RelativePosition.y < canvas.height*.8) {
-				this.Renderer.Material.Source = Images["ObsMiddleBot"];
+				this.Renderer.Material.Source = Images["MadfuguObsMiddleBot"];
 			} else if ( this.Transform.RelativePosition.y < canvas.height*.9) {
-				this.Renderer.Material.Source = Images["ObsBotBot"];
+				this.Renderer.Material.Source = Images["MadfuguObsBotBot"];
 			} else {
-				this.Renderer.Material.Source = Images["ObsBotBot"];
+				this.Renderer.Material.Source = Images["MadfuguObsBotBot"];
 			}
 
 			// Set Collision

@@ -56,6 +56,14 @@ var ImagesPath =
 	{ name:"OrbWhiteClassic",path: "/Particles/reward/OrbWhiteClassic.png"},
 	{ name:"OrbYellow",path: "/Particles/reward/OrbYellow.png"},
 	{ name:"OrbGreen",path: "/Particles/reward/OrbGreen.png"},
-	{ name:"MunnyOrb",path: "/Particles/reward/MunnyOrb.png"}
+	{ name:"MunnyOrb",path: "/Particles/reward/MunnyOrb.png"},
+	{ name:"MadfuguObsBotBot",path: "/Obstacles/madfugu/obs_bot_bot.png"},
+	{ name:"MadfuguObsMiddle",path: "/Obstacles/madfugu/obs_middle.png"},
+	{ name:"MadfuguObsMiddleBot",path: "/Obstacles/madfugu/obs_middle_bot.png"},
+	{ name:"MadfuguObsMiddleTop",path: "/Obstacles/madfugu/obs_middle_top.png"},
+	{ name:"MadfuguObsTopTop",path: "/Obstacles/madfugu/obs_top_top.png"},
+	{ name:"Particle01",path: "/particle01.png"},
+	{ name:"Particle02",path: "/particle02.png"},
+	{ name:"Particle03",path: "/particle03.png"}
 ];
 var Images = {};

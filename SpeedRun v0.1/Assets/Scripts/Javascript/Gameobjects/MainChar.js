@@ -520,7 +520,7 @@ function MainChar()
 					}
 			}
 			Time.Timers = [];
-			Application.LoadedScene = Scenes["Home"];			
+			Application.LoadedScene = Scenes["Home"];
 			// Cheat Mode
 			// this.stateChar.onElement = true;
 			// this.stateChar.isJumping = false;

@@ -127,7 +127,10 @@ function PBackground(_particleSystem, _position, _velocity)
 PBackground.prototype.Start = function() 
 {
 	if (!this.started){
-		this.Renderer.Material.Source = Images["Particle"];
+		var rand = Math.Random.RangeInt(0,4, false);
+		if (rand == 1) this.Renderer.Material.Source = Images["Particle01"];
+		else if (rand == 2) this.Renderer.Material.Source = Images["Particle02"];
+		else this.Renderer.Material.Source = Images["Particle03"];
 
 		this.Transform.RelativeScale = new Vector(10, 10);
 		this.Transform.Size = new Vector(10, 10);
@@ -222,7 +225,7 @@ PBackground.prototype.SubmitToFields = function()
 PBackground.prototype.createTween = function() {
 		// [ 10 = scale, can add rotate? ]
 		var startScale = Math.Random.RangeInt(5, 10, true);
-		var changeScale = Math.Random.RangeInt(5, 7, true);
+		var changeScale = Math.Random.RangeInt(5, 10, true);
 		var duration = Math.Random.RangeInt(60,90, true);
 
 		var startRotate = Math.Random.RangeInt(-360, 360, true);
